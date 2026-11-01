@@ -116,3 +116,6 @@ you will get banned. Redistribute at your own risk; all third-party tools remain
 双击仓库根目录的 `push-to-github.bat`：它会自动暂存、提交并推送到
 <https://github.com/NemecSoft/legacy-game-compat>。本地 `Games/*/backup/` 里的游戏原始备份
 已被 `.gitignore` 排除，不会上传。
+
+仓库内所有文本文件统一 CRLF（`\r\n`），由根目录 `.gitattributes` 强制；图片、exe、dll 等二进制
+不做换行转换。脚本 `scripts/normalize-crlf.ps1` 可在提交前批量校正。
