@@ -47,7 +47,7 @@ if errorlevel 1 (
 git diff --cached --quiet
 if errorlevel 1 (
   echo   提交改动...
-  git commit -m "Update: %DATE% %TIME%"
+  git commit -m "Update: %DATE:~0,10% %TIME%"
   if errorlevel 1 (
     echo   提交失败，请查看上面的错误信息。
     pause
