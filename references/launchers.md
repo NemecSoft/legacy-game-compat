@@ -49,7 +49,7 @@ bat 用 `echo` 自己生成菜单，菜单项、顺序、默认值与 exe 完全
 7. **退出即结束**：游戏退出后启动器窗口自动关（bat）或状态回到"已退出"（exe）。
 8. **中国红，不要黑底**：bat `@echo off&color 4f`；exe 背景 `#C0121E`、标题/边框金色、正文白/米色。
 9. **源文件隔离**：`Launcher.cs`、bat 源码放仓库 `Games\<游戏>\src`；游戏目录只放编译/转码后的成品，
-   **不放 `.cs` / `.ps1`**。bat 源码 UTF-8，落地转 **GBK + CRLF**。
+   **不放 `.cs` / `.ps1`**。bat 源码 UTF-8 + **CRLF**，落地转 **GBK + CRLF**。
 10. **反作弊网游不做。**
 
 ## BAT 启动器
@@ -100,7 +100,7 @@ exit /b %rc%
   `>nul 2>&1` 顺便压掉 DXVK 控制台日志。**cmd 只认 `>nul`**。
 - 正常流程不用 `pause`（菜单里也没有“按任意键启动”的闸门）；只有缺文件报错时，
   非 `/go` 才 `pause` 一下让人看清提示。
-- **GBK + CRLF**（简体中文系统）。仓库里的模板是 UTF-8，落地时转码。
+- **GBK + CRLF**（简体中文系统）。仓库里的模板是 UTF-8 + CRLF，落地时转 GBK + CRLF。
 - `color 4f` 是中国红底 + 亮白字；不要 `1f` 蓝底/黑底。
 - **控制台窗口居中靠 nircmd**：`if exist "%~dp0_tools\nircmd\nircmdc.exe" "...\nircmdc.exe" win center ititle "%tl%"`
   放在 `title` / `mode con` **之后**；工具缺失时不影响启动。nircmd 只用来居中，不用来藏窗口。

@@ -1,0 +1,51 @@
+# Windows-first repository: all text files use CRLF in the working tree.
+* text=auto eol=crlf
+
+*.md text eol=crlf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.cs text eol=crlf
+*.ini text eol=crlf
+*.txt text eol=crlf
+*.json text eol=crlf
+*.xml text eol=crlf
+*.conf text eol=crlf
+*.py text eol=crlf
+*.java text eol=crlf
+*.cpp text eol=crlf
+*.h text eol=crlf
+*.hpp text eol=crlf
+*.sln text eol=crlf
+*.vcxproj text eol=crlf
+*.yml text eol=crlf
+*.yaml text eol=crlf
+*.csv text eol=crlf
+*.sample text eol=crlf
+*.prp text eol=crlf
+LICENSE text eol=crlf
+.gitignore text eol=crlf
+.gitattributes text eol=crlf
+
+# Binary payloads: never convert line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.exe binary
+*.dll binary
+*.asi binary
+*.bik binary
+*.zip binary
+*.7z binary
+*.pyc binary
+*.chm binary
+*.dat binary
+*.bak binary
+*.gbf binary
+*.gpr binary
+
+# Registry exports: War3 evidence is UTF-16LE, keep it byte-identical.
+*.reg binary
+Games/RoadRash/src/*.reg text eol=crlf

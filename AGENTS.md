@@ -59,7 +59,7 @@
    「打开运行日志」按钮（技术细节全进 `运行日志.txt`，界面只说人话），
    不要「打开游戏目录」；左栏只讲游戏本身，状态默认「已就绪」。
 9. **每个游戏的修改隔离在 `Games\<游戏>\`**：源码、工具、证据、分析都在这里；游戏目录只放成品，
-   **不放 `.cs` / `.ps1`**。bat 源码 UTF-8，构建时转 GBK+CRLF；exe 编译后复制过去。
+   **不放 `.cs` / `.ps1`**。bat 源码 UTF-8 + CRLF，构建时转 GBK+CRLF；exe 编译后复制过去。
 10. **启动器中国红**：bat `color 4f`；exe 背景 `#C0121E` + 金色 `#FFD85E`，不要黑底。
     exe 的具体视觉令牌（配色/字阶/三栏布局/键帽画法）见技能 `.qoder\skills\legacy-launcher-gui`。
 11. **测试时显示渲染水印，交付时关掉**：cnc-ddraw 的 GDI 软件警告 / DXVK HUD / dgVoodoo 水印，
@@ -73,6 +73,11 @@
 15. **整机 D3D9 全挂先清全局开关**：所有 D3D9 游戏同时挂、D3D11/12/Vulkan 正常时，先跑
     `scripts\修复本机D3D9.bat` 再复测；**禁止先重装/换驱动/装更新/上 DXVK**。
     完整复盘与死胡同清单见 `references/d3d9-global-failure.md`。
+16. **所有文本文件统一 CRLF（`\r\n`）**：`.md` / `.ps1` / `.cs` / `.bat` / `.cmd` / `.ini` / `.txt` /
+    `.json` / `.xml` / `.conf` / `.py` / `.java` / `.cpp` / `.h` / `.reg`（非 UTF-16 导出）等
+    一律用 Windows 换行；图片 / exe / dll / ico / zip / bik / dat 等二进制不动。
+    仓库根 `.gitattributes` 已设 `eol=crlf`，新文件也必须 CRLF，禁止提交 LF-only 文本。
+    例外：Windows 导出的 UTF-16LE `.reg` 保留原编码和 `0D 00 0A 00` 换行，不做字节转换。
 
 ## 本机（当前开发机）事实
 
