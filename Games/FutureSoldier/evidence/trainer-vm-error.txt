@@ -1,0 +1,35 @@
+Future Soldier 修改器诊断记录（2026-11-02）
+
+测试文件：
+- 附件/《幽灵行动：未来战士》v1.8十八项修改器[LinGon]/TCGhostRfs+18Tr-LNG_v1.8-DX11.exe
+- 附件/《幽灵行动：未来战士》v1.8十八项修改器[LinGon]/TCGhostRfs+18Tr-LNG_v1.8-DX9.exe
+
+实测：DX11 游戏已在运行（进程 Future Soldier DX11.exe），启动修改器后弹出：
+  Sorry, this application cannot run under a Virtual Machine.
+点确定后修改器退出，无法进入修改界面。
+
+保护壳特征：
+- PE 节区 .VCrypt0 / .VCrypt1，入口在 .VCrypt1
+- 导入 MSVBVM60.DLL、kernel32、winmm、user32（MessageBoxA）
+- 明文里搜不到 “Virtual Machine”，字符串/检测逻辑在壳内解密
+- 文件版本 1.02.0003，描述 “A LinGon Trainer”
+
+系统侧证据：
+- Win32_ComputerSystem.HypervisorPresent = True
+- Win32_DeviceGuard.VirtualizationBasedSecurityStatus = 2（运行中）
+- Hyper-V/VirtualMachinePlatform 相关功能状态见系统查询；训练器把 VBS/Hyper-V 误判为虚拟机
+
+结论：
+根因是 LinGon 修改器的 Themida/WinLicense 反虚拟机保护，在 Windows 11 开启
+VBS/内存完整性/Hyper-V 的物理机上误报；不是游戏版本、DX9/DX11 选错，
+也不是启动器参数问题。两个修改器（DX9/DX11）表现相同。
+
+额外因素：
+原 go.bat 给 DX9/DX11 写入 WINXPSP3 + RUNASADMIN，游戏会以管理员权限运行，
+普通权限修改器即使绕过反虚拟机检测也无法注入。本机已移除该兼容性项，
+启动器不写；但修改器仍会被 Themida 反虚拟机检测拦住。
+
+未做的处理：
+- 未关闭 VBS/内存完整性/Hyper-V（系统级更改，需要重启，且本仓库不改系统）
+- 未修改/脱壳第三方修改器（Themida/WinLicense 保护，不建议改）
+可选替代：换无壳修改器 / Cheat Engine 表；或由用户自行关闭 VBS 后重启再试。

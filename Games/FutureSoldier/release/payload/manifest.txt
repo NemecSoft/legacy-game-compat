@@ -1,0 +1,6 @@
+game_starter.exe
+game_starter.bat
+launcher.ini
+¼æÈÝÐÞ¸´.bat
+ÐÞ¸ÄÆ÷ËµÃ÷.txt
+_tools\nircmd\ircmdc.exe

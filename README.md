@@ -80,6 +80,7 @@ layered D3D9 games use DXVK (Vulkan); re-probe before applying that conclusion t
 | The Saboteur (2009) | `D3DERR_NOTAVAILABLE` on `CreateDevice` | DXVK 2.5.3 (2.3.1 white-screens) |
 | Prototype 2 (2012) | dgVoodoo2: magenta UI / vertex-buffer assert | DXVK 2.3.1 |
 | Prototype (2009) | 旧引擎多核启动崩溃 | DXVK + 0x3ff 亲和性 |
+| Ghost Recon Future Soldier (2012) | go.bat XP/RUNASADMIN; trainer Themida anti-VM | Native DX11 after removing XP flags; trainer blocked by VBS |
 | Counter-Strike 1.6 | No hardware OpenGL (GDI 1.1 only) | Mesa Gallium → D3D12 |
 
 Details, including the exact error logs and probe output, are in `references/cases.md`.

@@ -1,0 +1,5 @@
+﻿备份时间：2026-11-02 03:13:23
+注册表项：HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers
+
+D:\YunGame\V\Future Soldier\Future Soldier DX11.exe = ~ DWM8And16BitMitigation WINXPSP3 RUNASADMIN
+D:\YunGame\V\Future Soldier\Future Soldier DX9.exe = ~ DWM8And16BitMitigation WINXPSP3 RUNASADMIN

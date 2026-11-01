@@ -296,3 +296,27 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   `Games\Prototype2\evidence\prototype2-launcher.png`。
 - 启动器实测：P1 `/go` → init.exe → prototypef 的父进程是启动器、亲和性 0x3FF；
   关闭游戏后启动器退出码 0、桌面恢复 1920×1080。P2 使用同一套 CreateProcess/亲和性/退出码逻辑。
+
+## 11. 幽灵行动：未来战士（v1.8 全 DLC）—— XP 兼容性与修改器
+
+- 路径：`D:\YunGame\V\Future Soldier`；DX11 主程序 `Future Soldier DX11.exe`，
+  包装器 `Future Soldier.exe`；`init.exe` 退出码 10 是正常初始化。
+- `go.bat` 会写 `HKCU\...\AppCompatFlags\Layers` 的两个值：
+  `~ DWM8And16BitMitigation WINXPSP3 RUNASADMIN`（DX9/DX11 都有）。这会强制管理员权限，
+  普通修改器无法注入；已备份并只删除这两项（`Games\FutureSoldier\backup\`）。
+  启动器不调用 go.bat，也不写兼容性；`兼容修复.bat` 可重复清理。
+- 移除 XP 兼容性后，**DX11 原生可玩**（RX 580 / Win11，1920×1080），不需要 DXVK/DX9。
+- 启动链：`init.exe` → `Future Soldier.exe "Future Soldier DX11.exe"`；
+  实际游戏进程是 `Future Soldier DX11.exe`。启动器等待实际进程并取它的退出码，
+  不是只拿包装器的 0；游戏是孙进程（游戏自身分层）。
+- 修改器：LinGon v1.8 DX9/DX11 都是 Themida/WinLicense 加壳，带反虚拟机检测；本机
+  `HypervisorPresent=True` / VBS 运行中，启动即报
+  `Sorry, this application cannot run under a Virtual Machine.`，点确定退出。
+  两个修改器表现相同，不是版本/DX 选错。已记入 `Games\FutureSoldier\evidence\trainer-vm-error.txt`；
+  未关闭 VBS/Hyper-V、未脱壳第三方修改器。替代：无壳修改器 / Cheat Engine 表，或用户自行
+  关闭内存完整性/VBS 后重启再试。
+- 交付：`Games\FutureSoldier\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest），
+  应用会调用 `兼容修复.bat /quiet` 清 XP 兼容性并写记录；撤回保留被玩家改过的文件并记录跳过。
+- 证据：`Games\FutureSoldier\evidence\future-soldier-dx11.png`、
+  `future-soldier-launcher-game.png`、`future-soldier-bat-game.png`、
+  `future-soldier-launcher.png`、`launcher-log.txt`。
