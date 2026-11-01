@@ -1,0 +1,26 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Electronic Arts]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Electronic Arts\RoadRash]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Electronic Arts\RoadRash\1.0]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Electronic Arts\RoadRash 95]
+@=""
+"Path"="."
+"CheckDialup"=hex:00
+"ChatState"=hex:02
+"MiniDash"=hex:01
+"OpponentList"=hex:01
+"Mixer"=hex:00,00,00,00,00,00,00,00,32,00,00,00,00,00,00,00,46,00,00,00,00,00,\
+  00,00,46,00,00,00,00,00,00,00,46,00,00,00,00,00,00,00,32,00,00,00,00,00,00,\
+  00,46,00,00,00,00,00,00,00,46,00,00,00,00,00,00,00
+"Controls"=hex:00,94,00,92,00,93,00,84,00,78,00,61,00,73,00,7a,00,64,00,95,00,81
+"VideoMode"=hex:01,00,00,00
+"Group"=hex:05,00,00,00
+"Track"=hex:0d,00,00,00
+"HiRes"=hex:01
+"Inset"=hex:00
+"HiResBikers"=hex:01
+
