@@ -37,6 +37,10 @@ if errorlevel 1 (
 )
 
 echo   收集改动...
+where pwsh >nul
+if not errorlevel 1 (
+  if exist "scripts\normalize-crlf.ps1" pwsh -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\normalize-crlf.ps1" >nul
+)
 git add -A
 if errorlevel 1 (
   echo   git add 失败，请检查文件是否被占用。
