@@ -1,0 +1,7 @@
+[Launcher]
+Title=三角洲特种部队6 黑鹰坠落-军刀部队
+GameExe=dfbhd.exe
+LoaderExe=
+GameProcess=dfbhd
+PreLaunch=
+Notes=单机战役：主菜单选 SINGLE PLAYER，中文界面\n画面：DXVK 2.5.3（D3D8 转 Vulkan）\n黑屏或白屏：先跑一次 兼容修复.bat\n退出游戏后本窗口自动关闭

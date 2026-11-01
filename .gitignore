@@ -1,0 +1,25 @@
+# build outputs
+scripts/*.exe
+scripts/*.pdb
+scripts/*.obj
+Games/*/out/go.exe
+__pycache__/
+*.pyc
+*.lock
+*.lock~
+
+# OS / editor
+Thumbs.db
+desktop.ini
+.vs/
+.idea/
+*.user
+*.suo
+*.log
+
+# game folders sometimes get copied in by mistake
+_dxvk/
+_兼容备份/
+
+# local game backups (original game assets, not redistributable)
+Games/*/backup/
