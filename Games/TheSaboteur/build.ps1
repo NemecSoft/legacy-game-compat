@@ -70,6 +70,12 @@ if (-not (Test-Path $bakIni) -and (Test-Path $curIni)) {
   Copy-Item $curIni $bakIni -Force
   Write-Host '备份 dxvk.conf -> _dxvk（HUD 已关闭）'
 }
+$srcIni = Join-Path $Src 'dxvk.conf'
+if (Test-Path $srcIni) {
+  Copy-Item $srcIni $curIni -Force
+  Copy-Item $srcIni $bakIni -Force
+  Write-Host '已写入 dxvk.conf（HUD 关闭）'
+}
 
 $n = Join-Path $GameDir '_tools\nircmd'
 New-Item -ItemType Directory -Force -Path $n | Out-Null

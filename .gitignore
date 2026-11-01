@@ -23,3 +23,6 @@ _兼容备份/
 
 # local game backups (original game assets, not redistributable)
 Games/*/backup/
+
+# local delivery test targets
+Games/*/test-target*/

@@ -78,6 +78,11 @@
     一律用 Windows 换行；图片 / exe / dll / ico / zip / bik / dat 等二进制不动。
     仓库根 `.gitattributes` 已设 `eol=crlf`，新文件也必须 CRLF，禁止提交 LF-only 文本。
     例外：Windows 导出的 UTF-16LE `.reg` 保留原编码和 `0D 00 0A 00` 换行，不做字节转换。
+17. **每个游戏的交付包统一包含 `一键应用.bat` + `一键撤回.bat` + `payload\` + `manifest.txt`**
+    （参考 `Games\TheSaboteur\release\`）。应用时先校验游戏主程序，把目标同名文件备份到
+    `_legacy_compat_backup\<游戏>\`，写 `交付记录.txt`，再复制 payload；撤回按记录恢复被替换文件、
+    删除未被修改的交付文件，被玩家改过的文件跳过并写记录。存档、游戏资源、ReShade.ini 等
+    非交付文件不碰；外部配置（如我的文档 config.ini）和运行产物无法完全恢复时，必须在记录里写明。
 
 ## 本机（当前开发机）事实
 

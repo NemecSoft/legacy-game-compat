@@ -80,6 +80,10 @@
   exe 已嵌入 `Saboteur.exe` 图标（32.5 KB）；交付 `dxvk.conf` 关闭 HUD。
   证据：`Games\TheSaboteur\evidence\saboteur-first.png`（`DXVK v2.5.3 / D3D9 / 59.4 FPS`）、
   `saboteur-menu.png`（中文游戏内）、`saboteur-launcher.png`。
+- **跨机器交付包**：`Games\TheSaboteur\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest）。
+  应用到目标目录前先备份同名文件到 `_legacy_compat_backup\TheSaboteur\` 并写 `交付记录.txt`；
+  撤回恢复备份、删除未被修改的交付文件，玩家改过的文件跳过并记录。假目标 + 修改文件撤回测试全 PASS，
+  记录见 `Games\TheSaboteur\evidence\delivery-*.txt`。
 
 ## 4. Delta Force: Black Hawk Down（1.5 + 汉化外挂）
 

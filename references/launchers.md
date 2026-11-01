@@ -250,12 +250,27 @@ FixTips=...\n...                    ; 自绘版右栏故障说明
   launcher.ini
   game_starter-soft.bat / game_starter-640.bat 可选多模式
   切键-*.bat + road*.reg    可选多套按键/设置方案（配 _tools\keymap.exe 落地 + keymap.txt 记忆）
+  _legacy_compat_backup\    可选：一键应用生成的备份与交付记录（撤回用，别手改）
 
 Games\<游戏>\
   src\  tools\  evidence\  backup\
-  build.ps1
+  build.ps1  build-release.ps1
+  release\                  交付包：一键应用.bat / 一键撤回.bat / payload\ / manifest.txt
   适配过程分析.md
 ```
+
+## 一键应用 / 一键撤回（跨机器交付）
+
+- **应用**：拖入或输入目标游戏目录，校验主程序；目标同名文件先复制到
+  `_legacy_compat_backup\<游戏>\`，记录到 `交付记录.txt`，再覆盖/复制 payload。可重复执行；
+  已有历史备份不重复覆盖。
+- **撤回**：按备份恢复被替换的原文件；没有原备份的交付文件，只有和 payload 完全一致时才删除。
+  玩家改过的文件保留并写“跳过恢复/删除”，不能悄悄覆盖。
+- **不碰**：存档、游戏资源、`ReShade.ini` 等非交付文件。外部配置（如我的文档 `config.ini`）
+  和运行日志/cache 无法完全恢复的，写进记录；运行产物可删除并记录。
+- 备份目录和 `交付记录.txt` 撤回后保留，作为审计与手工恢复依据；不要在应用前删除它。
+- 参考实现：`Games\TheSaboteur\release\`；源脚本在 `src\一键应用.bat` / `src\一键撤回.bat`，
+  `build-release.ps1` 负责转 GBK + CRLF 并组装 payload。
 
 ## 选择建议
 

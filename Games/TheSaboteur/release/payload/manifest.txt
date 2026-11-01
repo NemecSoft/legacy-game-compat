@@ -1,0 +1,10 @@
+game_starter.exe
+game_starter.bat
+launcher.ini
+ºÊ»›–ﬁ∏¥.bat
+ª÷∏¥‘≠∞Ê.bat
+d3d9.dll
+dxvk.conf
+_dxvk\d3d9.dll
+_dxvk\dxvk.conf
+_tools\nircmd\ircmdc.exe
