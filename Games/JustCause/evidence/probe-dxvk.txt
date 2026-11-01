@@ -1,0 +1,4 @@
+adapters: 2
+adapter 0: fullscreen(0x54)=0x00000000 fullscreen(0x44)=0x00000000 windowed=0x00000000
+adapter 1: fullscreen(0x54)=0x8876086C fullscreen(0x44)=0x8876086C windowed=0x8876086C
+0x00000000 = OK   0x8876086A = D3DERR_NOTAVAILABLE   0x8876086C = D3DERR_INVALIDCALL
