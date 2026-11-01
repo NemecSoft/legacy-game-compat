@@ -110,3 +110,9 @@ you will get banned. Redistribute at your own risk; all third-party tools remain
 5. 分辨率：DXVK 不能强制，dgVoodoo2 的 Force resolution 才能；老引擎只有 4:3 档时按最高档全屏 + 显卡缩放。
 
 实战踩坑都写在 `SKILL.md` 和 `references/` 里了。
+
+## 推送更新
+
+双击仓库根目录的 `push-to-github.bat`：它会自动暂存、提交并推送到
+<https://github.com/NemecSoft/legacy-game-compat>。本地 `Games/*/backup/` 里的游戏原始备份
+已被 `.gitignore` 排除，不会上传。
