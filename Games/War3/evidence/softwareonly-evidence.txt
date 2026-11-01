@@ -1,0 +1,27 @@
+整机 D3D9 失效 —— 关键证据（2026-11-01）
+
+一、Procmon（9 秒抓取，进程 d3ddev.exe，真实窗口 x64 D3D9 探针）
+13:24:22.9773267  d3ddev.exe  RegQueryValue
+  HKLM\SOFTWARE\Microsoft\Direct3D\Drivers\SoftwareOnly
+  SUCCESS  Type: REG_DWORD, Length: 4, Data: 1
+
+随后 GetDeviceCaps(HAL) 与 CreateDevice 均返回 0x8876086A（D3DERR_NOTAVAILABLE）。
+
+二、修复前两个视图的开关值
+HKLM\SOFTWARE\Microsoft\Direct3D\Drivers\SoftwareOnly              = 1
+HKLM\SOFTWARE\WOW6432Node\Microsoft\Direct3D\Drivers\SoftwareOnly = 1
+HKLM\SOFTWARE\Microsoft\DirectDraw\EmulationOnly                  = 1
+HKLM\SOFTWARE\WOW6432Node\Microsoft\DirectDraw\EmulationOnly      = 0（本来正常）
+
+War3 是 32 位，读的是 WOW6432Node，所以直接原因是
+WOW6432Node\Microsoft\Direct3D\Drivers\SoftwareOnly = 1。
+
+三、修复后复测
+D3D9Probe32.exe  窗口/全屏 1920x1080@60 = 0x00000000
+D3D9Probe64.exe  窗口/全屏 1920x1080@60 = 0x00000000
+D3D9On12 CreateDevice                   = 0x00000000
+War3 原生 1920x1080 主菜单（war3-main-fixed.png / war3-native-fixed.png）
+
+四、结论
+不是驱动、不是显卡、不是远程软件/虚拟显示器/WSL/AMD 软件/刷新率/D3D9On12/DirectX 运行库。
+是“DirectX 修复/优化”工具写入的全局强制软件渲染开关；删除即恢复，无需重启/重装/更新。

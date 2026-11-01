@@ -1,0 +1,16 @@
+=== D3D9 ===
+Direct3DCreate9 = ok
+adapter count = 1
+[0] GetAdapterIdentifier hr=0x00000000
+     "AMD Radeon RX 580 2048SP"
+     driver: aticfx64.dll
+     vendor=0x1002 device=0x6FDF rev=239
+     monitor: 0,0 - 1920,1080 primary=1
+  CheckDeviceType(HAL, X8R8G8B8, windowed=TRUE)  = 0x8876086A
+  CheckDeviceType(HAL, X8R8G8B8, windowed=FALSE) = 0x8876086A
+  CheckDeviceType(HAL, R5G6B5, fullscreen)       = 0x8876086A
+  CreateDevice(640x480 windowed, HW T&L)         = 0x8876086A
+  CreateDevice(640x480 windowed, SW T&L)         = 0x8876086A
+=== D3D11 ===
+  D3D11CreateDevice(HARDWARE) = 0x00000000  OK
+  feature level = 0xB000
