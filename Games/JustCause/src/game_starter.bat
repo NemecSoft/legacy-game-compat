@@ -10,7 +10,7 @@ cd /d "%~dp0"
 if not exist "d3d9.dll" if exist "_dxvk\d3d9.dll" copy /y "_dxvk\d3d9.dll" "d3d9.dll" >nul
 if not exist "d3d9.dll" (
   echo.
-  echo   缺少兼容层 d3d9.dll，请先双击 兼容修复.bat
+  echo   缺少运行文件，请先双击 兼容修复.bat
   if /i not "%~1"=="/go" pause
   exit /b 1
 )
@@ -35,8 +35,8 @@ if /i not "%~1"=="/go" (
   echo     操作：W A S D 移动 / 鼠标 视角·射击 / E 互动·开伞 / Esc 菜单
   echo   ------------------------------------------------------------
   echo     显示
-  echo       1  启动游戏（显示帧数 HUD，默认）
-  echo       2  启动游戏（正常游玩，不显示 HUD）
+  echo       1  启动游戏（显示帧数，默认）
+  echo       2  启动游戏（正常游玩，不显示帧数）
   echo.
   echo       3  打开运行日志
   echo       4  退出

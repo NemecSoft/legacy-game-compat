@@ -47,9 +47,16 @@ freely, subject to the following restrictions:
 - Used only for one thing: centering the console window of the `.bat` launcher
   (`nircmdc win center ititle "<title>"`).
 
+## cnc-ddraw 7.1 — `Games/Heroes3/src/` and `Games/Heroes3/release/payload/`
+
+- Author: FunkyFr3sh and contributors
+- Homepage: https://github.com/FunkyFr3sh/cnc-ddraw
+- License: MIT.
+- The `ddraw.dll` files are unmodified copies of the 7.1 release; `ddraw*.ini` are configurations
+  generated from the tool's defaults for Heroes III (GDI renderer, 60 FPS cap).
+
 ## Not bundled (optional)
 
-- **cnc-ddraw** — MIT — https://github.com/FunkyFr3sh/cnc-ddraw — recommended for DirectDraw (≤DX7) games.
 - **Mesa for Windows** — MIT — https://github.com/pal1000/mesa-dist-win — provides a software/hardware
   OpenGL implementation, useful when no OpenGL ICD is registered.
 

@@ -61,8 +61,7 @@ if /i not "%~1"=="/go" (
   echo     反恐精英 Counter-Strike 1.6
   echo     Valve · GoldSrc 2003 · 简体中文硬盘版
   echo   ------------------------------------------------------------
-  echo     经典战术射击：警匪对抗、买枪、打点位。单机带机器人，
-  echo     画面用 Mesa OpenGL 层走 D3D12。
+  echo     经典战术射击：警匪对抗、买枪、打点位。单机带机器人。
   echo.
   echo     操作：W A S D 移动 / 鼠标 视角·射击 / R 换弹 / B 买枪
   echo.

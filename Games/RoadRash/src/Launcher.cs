@@ -57,12 +57,12 @@ class Launcher : Form
     {
         "1  兼容模式 1080p 4:3 黑边",
         "2  1080p 拉伸铺满 16:9",
-        "3  1080p 纯软件（无 Vulkan）",
+        "3  1080p 最兼容（老机器）",
         "4  原版 640×480 全屏"
     };
     static readonly string[] ModeSubNames =
     {
-        "兼容模式 1080p 4:3 黑边", "1080p 拉伸铺满 16:9", "1080p 纯软件", "原版 640×480 全屏"
+        "兼容模式 1080p 4:3 黑边", "1080p 拉伸铺满 16:9", "1080p 最兼容", "原版 640×480 全屏"
     };
     static readonly string[] KeyNames =
     {
@@ -1323,7 +1323,7 @@ class Launcher : Form
                 message = "已从 " + layerBackupDir + " 恢复兼容层";
                 return true;
             }
-            catch (Exception ex) { message = "恢复兼容层失败：" + ex.Message; return false; }
+            catch (Exception ex) { message = "恢复运行文件失败：" + ex.Message; return false; }
         }
         if (!File.Exists(dll))
         {

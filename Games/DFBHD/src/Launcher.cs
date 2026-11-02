@@ -77,7 +77,6 @@ class Launcher : Form
         "这份还带「军刀部队」资料片，\n" +
         "简体中文界面，\n" +
         "单机战役和局域网都在，\n" +
-        "画面已适配新系统，\n" +
         "直接进游戏即可。\n" +
         "\n" +
         "# 玩不了或报错\n" +
@@ -966,7 +965,7 @@ class Launcher : Form
             if (!File.Exists(p) && File.Exists(Path.Combine(bak, f)))
             {
                 try { File.Copy(Path.Combine(bak, f), p, true); }
-                catch (Exception ex) { message = "恢复兼容层失败：" + ex.Message; return false; }
+                catch (Exception ex) { message = "恢复运行文件失败：" + ex.Message; return false; }
             }
             if (!File.Exists(p))
             {

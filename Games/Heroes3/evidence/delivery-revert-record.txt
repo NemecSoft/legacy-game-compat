@@ -1,0 +1,71 @@
+============================================================
+[2026/11/02 周一  9:52:54.34] 一键应用：英雄无敌3：死亡阴影
+目标目录："D:\AI\legacy-game-compat\Games\Heroes3\test-target"
+包目录："D:\AI\legacy-game-compat\Games\Heroes3\release\"
+记录说明：应用脚本会备份目标同名文件并调用兼容修复设置 AppPath/CDDrive；撤回不自动恢复该注册表项。
+记录说明：运行日志.txt 为启动器运行产物，撤回会删除；显示预设与存档不改。
+------------------------------------------------------------
+[ 9:52:54.34] 新增文件：game_starter.exe
+[ 9:52:54.35] 复制交付文件：game_starter.exe
+[ 9:52:54.36] 备份原文件：game_starter.bat -> _legacy_compat_backup\Heroes3\game_starter.bat
+[ 9:52:54.37] 复制交付文件：game_starter.bat
+[ 9:52:54.39] 备份原文件：launcher.ini -> _legacy_compat_backup\Heroes3\launcher.ini
+[ 9:52:54.44] 复制交付文件：launcher.ini
+[ 9:52:54.44] 新增文件：兼容修复.bat
+[ 9:52:54.45] 复制交付文件：兼容修复.bat
+[ 9:52:54.46] 备份原文件：ddraw.dll -> _legacy_compat_backup\Heroes3\ddraw.dll
+[ 9:52:54.49] 复制交付文件：ddraw.dll
+[ 9:52:54.51] 备份原文件：ddraw.ini -> _legacy_compat_backup\Heroes3\ddraw.ini
+[ 9:52:54.61] 复制交付文件：ddraw.ini
+[ 9:52:54.62] 新增文件：ddraw-43.ini
+[ 9:52:54.62] 复制交付文件：ddraw-43.ini
+[ 9:52:54.62] 新增文件：ddraw-window.ini
+[ 9:52:54.62] 复制交付文件：ddraw-window.ini
+[ 9:52:54.62] 新增文件：ddraw-640.ini
+[ 9:52:54.63] 复制交付文件：ddraw-640.ini
+[ 9:52:54.63] 新增文件：_presets\ddraw.ini
+[ 9:52:54.63] 复制交付文件：_presets\ddraw.ini
+[ 9:52:54.63] 新增文件：_presets\ddraw-43.ini
+[ 9:52:54.64] 复制交付文件：_presets\ddraw-43.ini
+[ 9:52:54.64] 新增文件：_presets\ddraw-window.ini
+[ 9:52:54.64] 复制交付文件：_presets\ddraw-window.ini
+[ 9:52:54.64] 新增文件：_presets\ddraw-640.ini
+[ 9:52:54.64] 复制交付文件：_presets\ddraw-640.ini
+[ 9:52:54.64] 新增文件：_cnc-ddraw\ddraw.dll
+[ 9:52:54.65] 复制交付文件：_cnc-ddraw\ddraw.dll
+[ 9:52:54.65] 新增文件：_cnc-ddraw\ddraw.ini
+[ 9:52:54.65] 复制交付文件：_cnc-ddraw\ddraw.ini
+[ 9:52:54.65] 新增文件：_tools\nircmd\ircmdc.exe
+[ 9:52:54.66] 复制交付文件：_tools\nircmd\ircmdc.exe
+[ 9:52:54.66] 调用兼容修复：设置 AppPath/CDDrive、检查 cnc-ddraw
+------------------------------------------------------------
+[ 9:52:54.73] 完成：复制 16 个，备份 4 个，错误=0
+记录与备份保留在："D:\AI\legacy-game-compat\Games\Heroes3\test-target\_legacy_compat_backup\Heroes3"
+============================================================
+============================================================
+[2026/11/02 周一  9:52:55.14] 一键撤回：英雄无敌3：死亡阴影
+目标目录："D:\AI\legacy-game-compat\Games\Heroes3\test-target"
+------------------------------------------------------------
+[ 9:52:55.22] 删除交付文件：game_starter.exe
+[ 9:52:55.24] 恢复原文件：game_starter.bat
+[ 9:52:55.26] 恢复原文件：launcher.ini
+[ 9:52:55.27] 删除交付文件：兼容修复.bat
+[ 9:52:55.29] 恢复原文件：ddraw.dll
+[ 9:52:55.30] 恢复原文件：ddraw.ini
+[ 9:52:55.32] 删除交付文件：ddraw-43.ini
+[ 9:52:55.33] 删除交付文件：ddraw-window.ini
+[ 9:52:55.35] 删除交付文件：ddraw-640.ini
+[ 9:52:55.36] 删除交付文件：_presets\ddraw.ini
+[ 9:52:55.38] 删除交付文件：_presets\ddraw-43.ini
+[ 9:52:55.39] 删除交付文件：_presets\ddraw-window.ini
+[ 9:52:55.41] 删除交付文件：_presets\ddraw-640.ini
+[ 9:52:55.42] 删除交付文件：_cnc-ddraw\ddraw.dll
+[ 9:52:55.44] 删除交付文件：_cnc-ddraw\ddraw.ini
+[ 9:52:55.48] 删除交付文件：_tools\nircmd\ircmdc.exe
+[ 9:52:55.49] 删除运行产物：运行日志.txt
+------------------------------------------------------------
+[ 9:52:55.49] 记录：注册表 AppPath/CDDrive 未自动恢复；如需恢复请重新运行兼容修复。
+[ 9:52:55.49] 记录：目标文件若被修改过，已保留现文件并跳过覆盖。
+[ 9:52:55.49] 完成：恢复 4 个，删除 13 个，跳过 0 个，错误=0
+记录与备份保留在："D:\AI\legacy-game-compat\Games\Heroes3\test-target\_legacy_compat_backup\Heroes3"
+============================================================

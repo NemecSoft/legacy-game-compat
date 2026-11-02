@@ -185,19 +185,18 @@ function Install-Layer($info, [string]$layer) {
 
 function New-FixBats($info, [string]$layer, $files) {
     $main = $files[0]
-    $layerName = if ($layer -eq "dxvk") { "DXVK 2.5.3" } else { "dgVoodoo2 2.87.6" }
     $keepDir = if ($layer -eq "dgv") { "_dgv" } else { "_dxvk" }
 
     $fix = @"
 @echo off&color 1f
 title 兼容修复
 cd /d "%~dp0"
-if not exist "$keepDir\$main" echo   缺少 $keepDir\$main&pause&exit /b
+if not exist "$keepDir\$main" echo   缺少运行文件，兼容包不完整&pause&exit /b
 if exist "$main" if not exist "$main.bak" ren "$main" "$main.bak"
 copy /y "$keepDir\$main" "$main" >nul
 if not exist "dxvk.conf" >"dxvk.conf" echo d3d9.presentInterval = 1
 echo.
-echo   已启用 $layerName
+echo   已启用画面适配
 echo   双击 game_starter.exe 进游戏
 echo.
 pause
@@ -209,7 +208,7 @@ cd /d "%~dp0"
 del /q "$main" "dxvk.conf" >nul 2>&1
 if exist "$main.bak" ren "$main.bak" "$main"
 echo.
-echo   已移除 $layerName，恢复原生
+echo   已移除适配文件，恢复原生
 echo.
 pause
 "@
@@ -224,7 +223,7 @@ function New-GoBat($info, [string]$gameTitleCn, [string]$gameTitleEn) {
     $tpl = Join-Path $Templates "game_starter.bat"
     $text = [System.IO.File]::ReadAllText($tpl, [System.Text.Encoding]::UTF8)
     $text = $text.Replace("{{GAME_NAME}}", $gameTitleCn).Replace("{{GAME_NAME_EN}}", $gameTitleEn)
-    $text = $text.Replace("{{GAME_EXE}}", $info.Name).Replace("{{LAYER_DESC}}", "DXVK 2.5.3（D3D8/D3D9 转 Vulkan）")
+    $text = $text.Replace("{{GAME_EXE}}", $info.Name).Replace("{{LAYER_DESC}}", "已适配新系统")
     $text = $text.Replace("{{EXTRA_HINT}}", "分辨率/画质在游戏内 OPTIONS 里改")
     Log "生成 game_starter.bat"
     if (-not $DryRun) { Save-Gbk (Join-Path $GameDir "game_starter.bat") $text }
@@ -242,7 +241,7 @@ GameExe=$($info.Name)
 LoaderExe=
 GameProcess=$proc
 PreLaunch=
-Notes=画面：DXVK 2.5.3（D3D8/D3D9 转 Vulkan）\n黑屏或白屏：先跑一次 兼容修复.bat\n退出游戏后本窗口自动关闭
+Notes=画面已适配新系统，直接进游戏即可\n黑屏或白屏：先跑一次 兼容修复.bat\n退出游戏后本窗口自动关闭
 "@
     Log "生成 game_starter.exe + launcher.ini"
     if (-not $DryRun) {

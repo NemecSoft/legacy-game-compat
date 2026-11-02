@@ -325,7 +325,32 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 - 交付：`Games\FutureSoldier\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest），
   payload 含 DX9 的 DXVK 2.5.3；应用会调用 `兼容修复.bat /quiet` 清 XP 兼容性、恢复 DX9 层并写记录；
   撤回保留被玩家改过的文件并记录跳过。
+- 玩家界面按 AGENTS 19 只写 `DX11（画质最好，默认）` / `DX9（最兼容，老机器）`；
+  DXVK、Vulkan、XP 兼容层、Themida 等词只进运行日志和仓库文档。
 - 证据：`Games\FutureSoldier\evidence\future-soldier-dx11.png`、
   `future-soldier-launcher-game.png`、`future-soldier-bat-game.png`、
   `future-soldier-dx9-dxvk-2.png`、`future-soldier-dx9-launcher.png`、
   `future-soldier-launcher.png`、`launcher-log.txt`。
+
+## 12. 英雄无敌3：死亡阴影 —— DirectDraw 的兼容层选择
+
+- 路径：`D:\YunGame\E\Heroes3`；v3.1 简体中文完整版，`Heroes3.exe` 导入 `DDRAW.dll`。
+- 目录已有 **cnc-ddraw 7.1**（`ddraw.dll`），`ddraw.ini` 的 `[Heroes3]` 段为
+  `renderer=gdi`、`fullscreen=true`、`maxfps=60`；go.bat 只设置 AppPath/CDDrive，不写 XP 兼容性。
+- **显示方式（启动器四选一）**：稳定全屏 GDI（默认）/ 保持 4:3（左右黑边）/
+  窗口 1280×720 / 原版 640×480（窗口）；全部用 GDI 软件渲染。
+- **不提供 auto / direct3d9 / DXVK**：现有《必读-崩溃修复说明》记录该链路会
+  `dxvk::DxvkError`/黑屏；本游戏是 DirectDraw，DXVK 的 d3d9 通道不适合，别放 d3d9/dxgi。
+- 启动器 GUI 中栏下拉切 `_presets\ddraw*.ini`，启动后恢复默认；bat 同菜单，`/go` 默认稳定全屏。
+  启动器/兼容修复会设置 `AppPath/CDDrive`（32 位注册表视图），游戏直接子进程并回传退出码。
+- 交付包 `Games\Heroes3\release\`：应用备份目标 ddraw/ddraw.ini 并复制启动器/预设/兼容层；
+  撤回恢复原文件、删除未修改的交付文件；注册表 AppPath/CDDrive 不自动恢复，记录写明。
+  假目标应用/撤回测试全部 PASS，记录在 `Games\Heroes3\evidence\delivery-*.txt`。
+- 证据：`Games\Heroes3\evidence\h3-current.png`、`h3-43.png`、`h3-window.png`、
+  `h3-640-window.png`、`h3-launcher-game.png`、`h3-launcher.png`、`bat-test.txt`、
+  `hotkey-toggle.txt`。
+- 分辨率如实记录：640 模式是 640×480 窗口，桌面仍 1920×1080，不写成原生 1080p。
+- cnc-ddraw 的 `[Heroes3]` 默认给了 `keytogglefullscreen2=0x73`（F4 单键切换），但本机
+  Win11 合成按键实测窗口矩形/样式不变（`hotkey-toggle.txt`）；界面不写未验证的快捷键，
+  换窗口统一用启动器的「窗口模式」预设。玩家界面只保留 `GDI（最兼容）`，不出现层名。
+- 未验证：高 DPI、多显示器、IPX 房间互连（IPXWrapper 已在目录里）。

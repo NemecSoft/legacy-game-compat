@@ -1,0 +1,5 @@
+﻿handle=1182602 foreground=1182602
+before  1920x1080 at 0,0 style=0x94000000
+after F4 1920x1080 at 0,0 style=0x94000000
+fg after F4=1182602
+after Alt+Enter 1920x1080 at 0,0 style=0x94000000

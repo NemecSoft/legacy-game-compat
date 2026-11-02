@@ -56,8 +56,8 @@ class Launcher : Form
         "主角在曼哈顿追查病毒，\n" +
         "能跑墙、滑翔、变形、吸收路人。\n" +
         "\n" +
-        "这份是简体中文硬盘版，画面已用\n" +
-        "兼容层适配，直接进游戏即可。\n" +
+        "这份是简体中文硬盘版，\n" +
+        "直接进游戏即可。\n" +
         "\n" +
         "# 玩不了或报错\n" +
         "点「打开运行日志」\n" +
@@ -896,7 +896,7 @@ class Launcher : Form
         if (!File.Exists(dll) && layerBackupDir.Length > 0 && File.Exists(Path.Combine(dir, layerBackupDir, layerDll)))
         {
             try { File.Copy(Path.Combine(dir, layerBackupDir, layerDll), dll, true); }
-            catch (Exception ex) { message = "恢复兼容层失败：" + ex.Message; return false; }
+            catch (Exception ex) { message = "恢复运行文件失败：" + ex.Message; return false; }
         }
         if (!File.Exists(dll))
         {

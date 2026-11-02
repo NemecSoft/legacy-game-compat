@@ -111,7 +111,7 @@ class Launcher : Form
         "买枪、配合、打点位。\n" +
         "\n" +
         "这份是中文硬盘版，带机器人，\n" +
-        "单机就能开局；画面已适配新系统，\n" +
+        "单机就能开局；\n" +
         "直接进游戏即可。\n" +
         "\n" +
         "# 玩不了或报错\n" +
@@ -1049,7 +1049,7 @@ class Launcher : Form
             if (!File.Exists(p) && File.Exists(Path.Combine(bak, f)))
             {
                 try { File.Copy(Path.Combine(bak, f), p, true); }
-                catch (Exception ex) { message = "恢复 Mesa 组件失败：" + ex.Message; return false; }
+                catch (Exception ex) { message = "恢复运行文件失败：" + ex.Message; return false; }
             }
             if (!File.Exists(p))
             {

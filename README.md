@@ -82,8 +82,9 @@ confirm the layer is active; native games do not run DXVK and do not show this H
 | The Saboteur (2009) | `D3DERR_NOTAVAILABLE` on `CreateDevice` | DXVK 2.5.3 (2.3.1 white-screens) |
 | Prototype 2 (2012) | dgVoodoo2: magenta UI / vertex-buffer assert | DXVK 2.3.1 |
 | Prototype (2009) | 旧引擎多核启动崩溃 | DXVK + 0x3ff 亲和性 |
-| Ghost Recon Future Soldier (2012) | go.bat XP/RUNASADMIN; DX11 native only on dev PC | DX11 native default + DX9/DXVK compatibility; trainer blocked by VBS |
+| Ghost Recon Future Soldier (2012) | go.bat XP/RUNASADMIN; DX11 native only on dev PC | DX11 native default + DX9/DXVK fallback; launcher + revert package; trainer blocked by VBS |
 | Counter-Strike 1.6 | No hardware OpenGL (GDI 1.1 only) | Mesa Gallium → D3D12 |
+| Heroes of Might and Magic III (1999) | DirectDraw display/compat issues | cnc-ddraw 7.1 GDI presets (full/4:3/window/640) + launcher/revert package |
 
 Details, including the exact error logs and probe output, are in `references/cases.md`.
 
@@ -91,7 +92,7 @@ Details, including the exact error logs and probe output, are in `references/cas
 
 - DXVK — zlib license, https://github.com/doitsujin/dxvk
 - dgVoodoo2 — freeware by Dege, https://dege.freeweb.hu/dgVoodoo2/
-- cnc-ddraw — MIT, https://github.com/FunkyFr3sh/cnc-ddraw (not bundled; download separately)
+- cnc-ddraw — MIT, https://github.com/FunkyFr3sh/cnc-ddraw (bundled with the Heroes III package)
 - NirCmd — freeware by Nir Sofer, https://www.nirsoft.net/utils/nircmd.html
 - Mesa — MIT, https://mesa3d.org/
 
@@ -110,7 +111,9 @@ you will get banned. Redistribute at your own risk; all third-party tools remain
 2. 按决策表选翻译层（DXVK / dgVoodoo2 / cnc-ddraw / Mesa）；
 3. 全部落在游戏目录：`d3d8.dll`/`d3d9.dll` + `_dxvk\` 留底 + `兼容修复.bat`/`恢复原版.bat`；
 4. 用游戏自带的分辨率测试、截图、DXVK HUD 做**客观验证**；
-5. 分辨率：DXVK 不能强制，dgVoodoo2 的 Force resolution 才能；老引擎只有 4:3 档时按最高档全屏 + 显卡缩放。
+5. 分辨率：DXVK 不能强制，dgVoodoo2 的 Force resolution 才能；老引擎只有 4:3 档时按最高档全屏 + 显卡缩放；
+6. 玩家界面说人话：只保留 `DX11（画质最好）`、`DX9（老机器）`、`GDI（最兼容，推荐）`
+   这类结果标注，层名、注册表、亲和性、DLL 文件名等技术细节只写进运行日志和仓库文档。
 
 实战踩坑都写在 `SKILL.md` 和 `references/` 里了。
 

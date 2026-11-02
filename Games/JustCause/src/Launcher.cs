@@ -50,10 +50,10 @@ class Launcher : Form
     // ---------- 选项数据（顺序与默认值即界面所见） ----------
     static readonly string[] HudNames =
     {
-        "1  显示帧数 HUD（默认）",
-        "2  正常游玩（不显示 HUD）"
+        "1  显示帧数（默认）",
+        "2  正常游玩（不显示帧数）"
     };
-    static readonly string[] HudSubNames = { "显示帧数 HUD", "正常游玩" };
+    static readonly string[] HudSubNames = { "显示帧数", "正常游玩" };
 
     // ---------- launcher.ini 可覆盖 ----------
     string gameTitle = "正当防卫 Just Cause";
@@ -68,8 +68,8 @@ class Launcher : Form
         "《正当防卫》是 Avalanche Studios 2006 年的开放世界动作游戏：主角 Rico 空降到热带岛国，\n" +
         "帮反抗军推翻独裁者，跳伞、抢车、炸基地，想去哪就去哪。\n" +
         "\n" +
-        "这份是简体中文汉化版：菜单、任务提示、对话字幕都是中文，画面按桌面分辨率全屏，\n" +
-        "Win10/11 上直接跑，不用改系统。\n" +
+        "这份是简体中文汉化版：菜单、任务提示、对话字幕都是中文，\n" +
+        "直接进游戏即可。\n" +
         "\n" +
         "# 玩不了或报错\n" +
         "点「打开运行日志」\n" +
@@ -823,7 +823,7 @@ class Launcher : Form
         }
         catch (Exception ex)
         {
-            message = "写兼容层配置失败：" + ex.Message;
+            message = "写运行配置失败：" + ex.Message;
             return false;
         }
     }
@@ -846,7 +846,7 @@ class Launcher : Form
         if (!File.Exists(dll) && File.Exists(Path.Combine(bak, layerDll)))
         {
             try { File.Copy(Path.Combine(bak, layerDll), dll, true); }
-            catch (Exception ex) { message = "恢复兼容层失败：" + ex.Message; return false; }
+            catch (Exception ex) { message = "恢复运行文件失败：" + ex.Message; return false; }
         }
         if (!File.Exists(dll))
         {

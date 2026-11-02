@@ -1,53 +1,53 @@
 ============================================================
-[2026/11/02 周一  9:06:39.03] 一键应用：幽灵行动：未来战士
+[2026/11/02 周一  9:47:23.63] 一键应用：幽灵行动：未来战士
 目标目录："D:\AI\legacy-game-compat\Games\FutureSoldier\test-target"
 包目录："D:\AI\legacy-game-compat\Games\FutureSoldier\release\"
 记录说明：应用脚本只修改目标游戏目录；游戏初始化会写我的文档 default.cfg，撤回不自动还原。
 记录说明：运行日志.txt 为启动器运行产物，撤回会删除；兼容修复.bat 清理的 XP 兼容性/RUNASADMIN 不自动恢复。
 ------------------------------------------------------------
-[ 9:06:39.04] 新增文件：game_starter.exe
-[ 9:06:39.04] 复制交付文件：game_starter.exe
-[ 9:06:39.06] 备份原文件：game_starter.bat -> _legacy_compat_backup\FutureSoldier\game_starter.bat
-[ 9:06:39.07] 复制交付文件：game_starter.bat
-[ 9:06:39.10] 备份原文件：launcher.ini -> _legacy_compat_backup\FutureSoldier\launcher.ini
-[ 9:06:39.29] 复制交付文件：launcher.ini
-[ 9:06:39.29] 新增文件：兼容修复.bat
-[ 9:06:39.30] 复制交付文件：兼容修复.bat
-[ 9:06:39.31] 备份原文件：修改器说明.txt -> _legacy_compat_backup\FutureSoldier\修改器说明.txt
-[ 9:06:39.35] 复制交付文件：修改器说明.txt
-[ 9:06:39.35] 新增文件：d3d9.dll
-[ 9:06:39.36] 复制交付文件：d3d9.dll
-[ 9:06:39.36] 新增文件：dxvk.conf
-[ 9:06:39.36] 复制交付文件：dxvk.conf
-[ 9:06:39.36] 新增文件：_dx9_compat\d3d9.dll
-[ 9:06:39.37] 复制交付文件：_dx9_compat\d3d9.dll
-[ 9:06:39.37] 新增文件：_dx9_compat\dxvk.conf
-[ 9:06:39.38] 复制交付文件：_dx9_compat\dxvk.conf
-[ 9:06:39.38] 新增文件：_tools\nircmd\ircmdc.exe
-[ 9:06:39.38] 复制交付文件：_tools\nircmd\ircmdc.exe
-[ 9:06:39.38] 调用兼容修复：清理 XP 兼容性/RUNASADMIN
+[ 9:47:23.63] 新增文件：game_starter.exe
+[ 9:47:23.64] 复制交付文件：game_starter.exe
+[ 9:47:23.65] 备份原文件：game_starter.bat -> _legacy_compat_backup\FutureSoldier\game_starter.bat
+[ 9:47:23.66] 复制交付文件：game_starter.bat
+[ 9:47:23.67] 备份原文件：launcher.ini -> _legacy_compat_backup\FutureSoldier\launcher.ini
+[ 9:47:23.73] 复制交付文件：launcher.ini
+[ 9:47:23.73] 新增文件：兼容修复.bat
+[ 9:47:23.73] 复制交付文件：兼容修复.bat
+[ 9:47:23.75] 备份原文件：修改器说明.txt -> _legacy_compat_backup\FutureSoldier\修改器说明.txt
+[ 9:47:23.79] 复制交付文件：修改器说明.txt
+[ 9:47:23.79] 新增文件：d3d9.dll
+[ 9:47:23.79] 复制交付文件：d3d9.dll
+[ 9:47:23.79] 新增文件：dxvk.conf
+[ 9:47:23.80] 复制交付文件：dxvk.conf
+[ 9:47:23.80] 新增文件：_dx9_compat\d3d9.dll
+[ 9:47:23.81] 复制交付文件：_dx9_compat\d3d9.dll
+[ 9:47:23.81] 新增文件：_dx9_compat\dxvk.conf
+[ 9:47:23.81] 复制交付文件：_dx9_compat\dxvk.conf
+[ 9:47:23.81] 新增文件：_tools\nircmd\ircmdc.exe
+[ 9:47:23.81] 复制交付文件：_tools\nircmd\ircmdc.exe
+[ 9:47:23.82] 调用兼容修复：清理 XP 兼容性/RUNASADMIN
 ------------------------------------------------------------
-[ 9:06:39.50] 完成：复制 10 个，备份 3 个，错误=0
+[ 9:47:23.93] 完成：复制 10 个，备份 3 个，错误=0
 记录与备份保留在："D:\AI\legacy-game-compat\Games\FutureSoldier\test-target\_legacy_compat_backup\FutureSoldier"
 ============================================================
 ============================================================
-[2026/11/02 周一  9:06:39.67] 一键撤回：幽灵行动：未来战士
+[2026/11/02 周一  9:47:24.11] 一键撤回：幽灵行动：未来战士
 目标目录："D:\AI\legacy-game-compat\Games\FutureSoldier\test-target"
 ------------------------------------------------------------
-[ 9:06:39.71] 删除交付文件：game_starter.exe
-[ 9:06:39.73] 恢复原文件：game_starter.bat
-[ 9:06:39.74] 恢复原文件：launcher.ini
-[ 9:06:39.75] 删除交付文件：兼容修复.bat
-[ 9:06:39.77] 恢复原文件：修改器说明.txt
-[ 9:06:39.91] 删除交付文件：d3d9.dll
-[ 9:06:39.93] 删除交付文件：dxvk.conf
-[ 9:06:40.07] 删除交付文件：_dx9_compat\d3d9.dll
-[ 9:06:40.09] 删除交付文件：_dx9_compat\dxvk.conf
-[ 9:06:40.12] 删除交付文件：_tools\nircmd\ircmdc.exe
-[ 9:06:40.16] 删除运行产物：运行日志.txt
+[ 9:47:24.19] 删除交付文件：game_starter.exe
+[ 9:47:24.20] 恢复原文件：game_starter.bat
+[ 9:47:24.22] 恢复原文件：launcher.ini
+[ 9:47:24.23] 删除交付文件：兼容修复.bat
+[ 9:47:24.24] 恢复原文件：修改器说明.txt
+[ 9:47:24.35] 删除交付文件：d3d9.dll
+[ 9:47:24.36] 删除交付文件：dxvk.conf
+[ 9:47:24.48] 删除交付文件：_dx9_compat\d3d9.dll
+[ 9:47:24.50] 删除交付文件：_dx9_compat\dxvk.conf
+[ 9:47:24.57] 删除交付文件：_tools\nircmd\ircmdc.exe
+[ 9:47:24.61] 删除运行产物：运行日志.txt
 ------------------------------------------------------------
-[ 9:06:40.17] 记录：外部 default.cfg 未自动还原；启动器和游戏可能改过画质/分辨率，请按需手动处理。
-[ 9:06:40.17] 记录：目标文件若被修改过，已保留现文件并跳过覆盖。
-[ 9:06:40.17] 完成：恢复 3 个，删除 8 个，跳过 0 个，错误=0
+[ 9:47:24.61] 记录：外部 default.cfg 未自动还原；启动器和游戏可能改过画质/分辨率，请按需手动处理。
+[ 9:47:24.61] 记录：目标文件若被修改过，已保留现文件并跳过覆盖。
+[ 9:47:24.61] 完成：恢复 3 个，删除 8 个，跳过 0 个，错误=0
 记录与备份保留在："D:\AI\legacy-game-compat\Games\FutureSoldier\test-target\_legacy_compat_backup\FutureSoldier"
 ============================================================

@@ -10,7 +10,7 @@ cd /d "%~dp0"
 if not exist "{{LAYER_DLL}}" if exist "_dxvk\{{LAYER_DLL}}" copy /y "_dxvk\{{LAYER_DLL}}" "{{LAYER_DLL}}" >nul
 if not exist "{{LAYER_DLL}}" (
   echo.
-  echo   缺少兼容层 {{LAYER_DLL}}，请先双击 兼容修复.bat
+  echo   缺少运行文件，请先双击 兼容修复.bat
   if /i not "%~1"=="/go" pause
   exit /b 1
 )

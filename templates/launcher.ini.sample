@@ -4,4 +4,4 @@ GameExe=dfbhd.exe
 LoaderExe=
 GameProcess=dfbhd
 PreLaunch=
-Notes=单机战役：主菜单选 SINGLE PLAYER，中文界面\n画面：DXVK 2.5.3（D3D8 转 Vulkan）\n黑屏或白屏：先跑一次 兼容修复.bat\n退出游戏后本窗口自动关闭
+Notes=单机战役：主菜单选 SINGLE PLAYER，中文界面\n画面已适配新系统，直接进游戏即可\n黑屏或白屏：先跑一次 兼容修复.bat\n退出游戏后本窗口自动关闭

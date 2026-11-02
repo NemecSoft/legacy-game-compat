@@ -71,7 +71,6 @@ class Launcher : Form
         "破坏纳粹设施，爬楼、潜行、炸坦克。\n" +
         "\n" +
         "这份是简体中文硬盘版，\n" +
-        "画面已用兼容层适配，\n" +
         "直接进游戏即可。\n" +
         "\n" +
         "# 玩不了或报错\n" +
@@ -994,7 +993,7 @@ bool EnsureLayer(out string message)
         if (!File.Exists(dll) && File.Exists(Path.Combine(bak, layerDll)))
         {
             try { File.Copy(Path.Combine(bak, layerDll), dll, true); }
-            catch (Exception ex) { message = "恢复兼容层失败：" + ex.Message; return false; }
+            catch (Exception ex) { message = "恢复运行文件失败：" + ex.Message; return false; }
         }
         if (!File.Exists(dll))
         {

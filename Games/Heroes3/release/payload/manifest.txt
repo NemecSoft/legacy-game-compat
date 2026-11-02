@@ -1,0 +1,16 @@
+game_starter.exe
+game_starter.bat
+launcher.ini
+¼æÈİĞŞ¸´.bat
+ddraw.dll
+ddraw.ini
+ddraw-43.ini
+ddraw-window.ini
+ddraw-640.ini
+_presets\ddraw.ini
+_presets\ddraw-43.ini
+_presets\ddraw-window.ini
+_presets\ddraw-640.ini
+_cnc-ddraw\ddraw.dll
+_cnc-ddraw\ddraw.ini
+_tools\nircmd\ircmdc.exe

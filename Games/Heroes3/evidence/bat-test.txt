@@ -1,0 +1,3 @@
+bat=24544
+game=22100
+bat_exit=-1

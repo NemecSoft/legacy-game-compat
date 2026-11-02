@@ -58,7 +58,7 @@ class Launcher : Form
         "和火力打击任务。\n" +
         "\n" +
         "这份是 v1.8 全 DLC 简体中文版，\n" +
-        "DX11 原生渲染，直接进游戏即可。\n" +
+        "直接进游戏即可。\n" +
         "\n" +
         "# 玩不了或报错\n" +
         "点「打开运行日志」\n" +
@@ -66,19 +66,22 @@ class Launcher : Form
     string entryGuide =
         "启动后先等加载（第一次较慢）\n" +
         "过场动画按 Esc / Enter 跳过\n" +
+        "默认 DX11；进不去选 DX9（最兼容）\n" +
         "画面、按键在游戏「选项」里改\n" +
-        "不要再用 go.bat（它会写 XP 兼容性）";
+        "不要再用 go.bat";
     string tips =
         "# 提示\n" +
-        "启动器按 DX11 方式启动，不加参数\n" +
+        "默认 DX11，画质最好\n" +
+        "老机器 / 进不去选 DX9（最兼容）\n" +
+        "DX9 模式左上角显示帧数，说明兼容方式已生效\n" +
         "按键以游戏内「选项 → 控制」为准\n" +
-        "修改器是 Themida 加壳，Win11 开了\n" +
-        "内存完整性/VBS 会被反虚拟机检测拦住\n" +
+        "修改器在 Win11 可能被安全功能拦住\n" +
         "（详见 修改器说明.txt）";
     string centerNote =
-        "启动器按 DX11 原生方式开游戏，\n" +
-        "不改分辨率、不覆盖游戏设置。\n" +
+        "默认 DX11（画质最好）；\n" +
+        "进不去时，在「启动方式」里改选 DX9（最兼容）。\n" +
         "\n" +
+        "不改分辨率、不覆盖游戏设置。\n" +
         "第一次进游戏先等加载；\n" +
         "分辨率、画质请进游戏「选项」里改。\n" +
         "\n" +
@@ -87,8 +90,8 @@ class Launcher : Form
     // ---------- 启动方式 ----------
     static readonly string[] ModeNames =
     {
-        "1  DX11 原生（默认，画质最好）",
-        "2  DX9 + DXVK（兼容层）"
+        "1  DX11（画质最好，默认）",
+        "2  DX9（最兼容，老机器）"
     };
 
     // ---------- 运行状态 ----------
@@ -753,7 +756,7 @@ class Launcher : Form
         if (dx9 && (!File.Exists(Path.Combine(AppDir(), "d3d9.dll")) ||
                     !File.Exists(Path.Combine(AppDir(), "dxvk.conf"))))
         {
-            status = "缺少 DX9 兼容层，请先运行 兼容修复.bat"; statusColor = Warn; Invalidate();
+            status = "缺少 DX9 运行文件，请先运行 兼容修复.bat"; statusColor = Warn; Invalidate();
             return;
         }
         string launchArgs = dx9 ? "\"Future Soldier DX9.exe\""
@@ -761,7 +764,7 @@ class Launcher : Form
         string launchProcess = dx9 ? "Future Soldier DX9"
                                    : (gameProcess.Length > 0 ? gameProcess : "Future Soldier DX11");
         Log("点「启动游戏」：" + ModeNames[mode]);
-        SetBusy(true, dx9 ? "启动中：DX9 兼容…" : "启动中：DX11 原生…");
+        SetBusy(true, "启动中…");
         Thread t = new Thread(delegate ()
         {
             try
@@ -1017,7 +1020,7 @@ class Launcher : Form
         if (!File.Exists(dll) && layerBackupDir.Length > 0 && File.Exists(Path.Combine(dir, layerBackupDir, layerDll)))
         {
             try { File.Copy(Path.Combine(dir, layerBackupDir, layerDll), dll, true); }
-            catch (Exception ex) { message = "恢复兼容层失败：" + ex.Message; return false; }
+            catch (Exception ex) { message = "恢复运行文件失败：" + ex.Message; return false; }
         }
         if (!File.Exists(dll))
         {
