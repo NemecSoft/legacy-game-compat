@@ -99,7 +99,7 @@ class Launcher : Form
     bool autoStart;                     // game_starter.exe /go：零交互直接开
 
     // ---------- 字体（按 DPI 建一次） ----------
-    Font fTitle, fHead, fRowSel, fRow, fBody, fCap, fCapZh, fMono;
+    Font fTitle, fHead, fRowSel, fRow, fBody, fCap, fCapZh, fMono, fBrand;
     float dpi = 1f;
 
     // ---------- 布局 ----------
@@ -281,6 +281,7 @@ class Launcher : Form
         fCap = new Font(ui, 9f * dpi, FontStyle.Bold);
         fCapZh = new Font(ui, 8.5f * dpi, FontStyle.Bold);
         fMono = new Font(mono, 9f * dpi, FontStyle.Regular);
+        fBrand = new Font(ui, 12f * dpi, FontStyle.Bold);
     }
 
     static string PickFont(string[] candidates, string fallback)
@@ -455,11 +456,11 @@ class Launcher : Form
 
     static class BrandGuard
     {
-        static readonly byte[] Encoded = { 0x03, 0x0F, 0x14, 0x1D, 0x1B, 0x17, 0x1F };
+        static readonly byte[] Encoded = { 0x03, 0x2F, 0x34, 0x1D, 0x3B, 0x37, 0x3F };
         static readonly byte[] Expected =
         {
-            0x57, 0x86, 0xAA, 0x36, 0x47, 0x21, 0x56, 0xA9, 0x1E, 0x29, 0x10, 0x7A, 0xC8, 0x61, 0xFA, 0x6D,
-            0xF8, 0xF7, 0xE9, 0x87, 0x36, 0xC5, 0x16, 0x8F, 0xA6, 0x07, 0xC3, 0x8D, 0x84, 0x4B, 0xA5, 0xBC
+            0xF3, 0x2F, 0x49, 0x3D, 0x11, 0xB5, 0xFC, 0xB6, 0xBD, 0xD9, 0x20, 0xBB, 0x61, 0x8E, 0x54, 0x25,
+            0xD9, 0xC8, 0x72, 0xD1, 0x17, 0x18, 0xDC, 0xAF, 0x65, 0x56, 0x1B, 0xD6, 0xDC, 0xE4, 0xB4, 0x03
         };
         public static string Text { get { return Decode(); } }
         static string Decode()
@@ -491,9 +492,9 @@ class Launcher : Form
         Size sz = TextRenderer.MeasureText(g, hint, fMono);
         TextRenderer.DrawText(g, hint, fMono,
             new Point(ClientSize.Width - S(20) - sz.Width, y), InkDim, Color.Transparent);
-        Size brand = TextRenderer.MeasureText(g, BrandGuard.Text, fMono);
-        TextRenderer.DrawText(g, BrandGuard.Text, fMono,
-            new Point((ClientSize.Width - brand.Width) / 2, y), GoldDim, Color.Transparent);
+        Size brand = TextRenderer.MeasureText(g, BrandGuard.Text, fBrand);
+        TextRenderer.DrawText(g, BrandGuard.Text, fBrand,
+            new Point((ClientSize.Width - brand.Width) / 2, y), Gold, Color.Transparent);
     }
 
     void Card(Graphics g, Rectangle r)
