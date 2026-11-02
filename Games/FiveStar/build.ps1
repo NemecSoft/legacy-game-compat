@@ -62,8 +62,14 @@ foreach ($f in 'd3d8.dll', 'd3d9.dll') {
 Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $GameDir 'dxvk.conf') -Force
 Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $dxvk 'dxvk.conf') -Force
 
+Deploy-Bat 'game_starter.bat'
 Deploy-Bat '兼容修复.bat'
 Deploy-Bat '恢复原版.bat'
+
+$n = Join-Path $GameDir '_tools\nircmd'
+New-Item -ItemType Directory -Force -Path $n | Out-Null
+$nircmd = Join-Path $Repo 'tools\nircmd\nircmdc.exe'
+if (Test-Path $nircmd) { Copy-Item $nircmd (Join-Path $n 'ircmdc.exe') -Force }
 Backup-File 'game_starter.exe'
 Backup-File 'launcher.ini'
 Copy-Item $exe (Join-Path $GameDir 'game_starter.exe') -Force
@@ -75,5 +81,5 @@ if ($bad) { throw ("目标目录出现源码文件：" + ($bad.FullName -join ',
 Write-Host ''
 Write-Host "部署完成：$GameDir"
 Get-ChildItem $GameDir -File |
-  Where-Object { $_.Name -match '^(game_starter\.exe|launcher\.ini|兼容修复\.bat|恢复原版\.bat|d3d8\.dll|d3d9\.dll|dxvk\.conf|运行日志\.txt)$' } |
+  Where-Object { $_.Name -match '^(game_starter\.(exe|bat)|launcher\.ini|兼容修复\.bat|恢复原版\.bat|d3d8\.dll|d3d9\.dll|dxvk\.conf|运行日志\.txt)$' } |
   Select-Object Name, Length, LastWriteTime | Format-Table -AutoSize

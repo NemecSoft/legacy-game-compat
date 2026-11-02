@@ -393,8 +393,9 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   Shadow / Light / Water / Trees / DynamicLOD / StaticGameLOD 等。
   启动器重实现为 6 个画面方案 + 5 档亮度，并写 `UseFPSLimit=no`、`FPSLimit=60`；
   1920×1080 高画质实测 `FPS: 59.0`（原 30 帧上限解除）。
-- 启动器：三栏 GUI，启动前自动注册 + 写 Options.ini + 启动 `generals.exe`，等待 `Game.dat`
-  并回传它的退出码；`/go` 默认 1080p 高画质，`/preset 1-6 /gamma 1-5 /go` 可指定。
+- 启动器：三栏 GUI + 控制台 `game_starter.bat`（同选项/默认值），启动前自动注册 +
+  写 Options.ini + 启动 `generals.exe`，等待 `Game.dat` 并回传它的退出码；
+  `/go` 默认 1080p 高画质，`/preset 1-6 /gamma 1-5 /go` 可指定。
 - 证据：`Games\FiveStar\evidence\fivestar-launcher.png`、`fivestar-60fps.png`、
   `fivestar-game-1024.png`、`original-tools.png`、`registry-before.reg`、`Options-before.ini`。
   完整分析：`Games\FiveStar\适配过程分析.md`。
