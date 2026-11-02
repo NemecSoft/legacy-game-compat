@@ -1,0 +1,79 @@
+param(
+  [string]$GameDir = 'D:\YunGame\Command.and.Conquer\Command.and.Conquer.FiveStar',
+  [switch]$NoDeploy
+)
+
+$ErrorActionPreference = 'Stop'
+$Repo = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+$Src = Join-Path $PSScriptRoot 'src'
+$Out = Join-Path $PSScriptRoot 'out'
+$Backup = Join-Path $PSScriptRoot 'backup'
+New-Item -ItemType Directory -Force -Path $Out, $Backup | Out-Null
+
+$csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe' }
+if (-not (Test-Path $csc)) { throw '找不到 csc.exe' }
+$exe = Join-Path $Out 'game_starter.exe'
+$ico = Join-Path $Out 'game_starter.ico'
+$iconExe = Join-Path $GameDir 'generals.exe'
+try {
+  Add-Type -AssemblyName System.Drawing
+  if (Test-Path $iconExe) {
+    $ic = [System.Drawing.Icon]::ExtractAssociatedIcon($iconExe)
+    if ($ic) { $fs = [IO.File]::Create($ico); $ic.Save($fs); $fs.Close(); $ic.Dispose() }
+  }
+} catch { Write-Host "图标提取失败，继续无图标：$($_.Exception.Message)" }
+
+$cscArgs = @('-nologo', '-target:winexe', '-optimize+', '-platform:anycpu', '-codepage:65001',
+  '-r:System.Windows.Forms.dll', '-r:System.Drawing.dll', ('-out:' + $exe))
+if (Test-Path $ico) { $cscArgs += ('-win32icon:' + $ico) }
+$cscArgs += (Join-Path $Src 'Launcher.cs')
+& $csc @cscArgs
+if ($LASTEXITCODE -ne 0 -or -not (Test-Path $exe)) { throw '编译失败' }
+Write-Host "已编译 $exe"
+$check = Join-Path $Repo '.qoder\skills\legacy-launcher-gui\scripts\check-launcher.ps1'
+if (Test-Path $check) {
+  & $check -Exe $exe -SrcDir $Src -MaxKB 60
+  if ($LASTEXITCODE -ne 0) { throw '启动器 GUI 规范检查未通过' }
+}
+
+if ($NoDeploy) { return }
+
+$gbk = [System.Text.Encoding]::GetEncoding(936)
+function Backup-File([string]$name) {
+  $dst = Join-Path $GameDir $name
+  $bak = Join-Path $Backup ($name + '.before-fs')
+  if ((Test-Path $dst) -and -not (Test-Path $bak)) { Copy-Item $dst $bak -Force }
+}
+function Deploy-Bat([string]$name) {
+  $text = [IO.File]::ReadAllText((Join-Path $Src $name), [Text.Encoding]::UTF8)
+  $text = $text -replace "`r`n", "`n" -replace "`n", "`r`n"
+  Backup-File $name
+  [IO.File]::WriteAllBytes((Join-Path $GameDir $name), $gbk.GetBytes($text))
+  Write-Host "已部署 $name (GBK+CRLF)"
+}
+
+$dxvk = Join-Path $GameDir '_dxvk'
+New-Item -ItemType Directory -Force -Path $dxvk | Out-Null
+foreach ($f in 'd3d8.dll', 'd3d9.dll') {
+  Copy-Item (Join-Path $Repo ("tools\dxvk\x86\" + $f)) (Join-Path $GameDir $f) -Force
+  Copy-Item (Join-Path $Repo ("tools\dxvk\x86\" + $f)) (Join-Path $dxvk $f) -Force
+}
+Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $GameDir 'dxvk.conf') -Force
+Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $dxvk 'dxvk.conf') -Force
+
+Deploy-Bat '兼容修复.bat'
+Deploy-Bat '恢复原版.bat'
+Backup-File 'game_starter.exe'
+Backup-File 'launcher.ini'
+Copy-Item $exe (Join-Path $GameDir 'game_starter.exe') -Force
+Copy-Item (Join-Path $Src 'launcher.ini') (Join-Path $GameDir 'launcher.ini') -Force
+
+$bad = Get-ChildItem $GameDir -Include *.cs,*.ps1 -Recurse -ErrorAction SilentlyContinue
+if ($bad) { throw ("目标目录出现源码文件：" + ($bad.FullName -join ', ')) }
+
+Write-Host ''
+Write-Host "部署完成：$GameDir"
+Get-ChildItem $GameDir -File |
+  Where-Object { $_.Name -match '^(game_starter\.exe|launcher\.ini|兼容修复\.bat|恢复原版\.bat|d3d8\.dll|d3d9\.dll|dxvk\.conf|运行日志\.txt)$' } |
+  Select-Object Name, Length, LastWriteTime | Format-Table -AutoSize

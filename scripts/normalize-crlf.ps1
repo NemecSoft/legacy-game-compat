@@ -31,9 +31,9 @@ foreach ($rel in $files) {
   for ($i = 0; $i -lt $bytes.Length; $i++) {
     $b = $bytes[$i]
     if ($b -eq 13) {
-      $out.Add(13)
+      $out.Add(13); $out.Add(10)
       if ($i + 1 -lt $bytes.Length -and $bytes[$i + 1] -eq 10) { $i++ }
-      else { $out.Add(10); $changed = $true }
+      else { $changed = $true }
     }
     elseif ($b -eq 10) {
       $out.Add(13); $out.Add(10); $changed = $true

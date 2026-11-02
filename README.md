@@ -87,6 +87,7 @@ Native games do not run DXVK and do not show this HUD.
 | Counter-Strike 1.6 | No hardware OpenGL (GDI 1.1 only) | Mesa Gallium → D3D12 |
 | Heroes of Might and Magic III (1999) | DirectDraw display/compat issues | cnc-ddraw 7.1 GDI presets (full/4:3/window/640) + launcher/revert package |
 | Just Cause (2006) | CJK glyph boxes / crash; registry fix missing | DXVK 2.5.3 + trimmed text ASI; launcher/bat auto-write 32-bit Eidos registry |
+| C&C Generals Zero Hour: FiveStar (2003 mod) | Native D3D8 fails; original keygen/graphics tools required | DXVK 2.5.3; launcher reimplements 20-digit registration and Options.ini quality/FPS unlock |
 
 Details, including the exact error logs and probe output, are in `references/cases.md`.
 

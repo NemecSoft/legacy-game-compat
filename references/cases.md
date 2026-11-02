@@ -375,3 +375,26 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   Win11 合成按键实测窗口矩形/样式不变（`hotkey-toggle.txt`）；界面不写未验证的快捷键，
   换窗口统一用启动器的「窗口模式」预设。玩家界面只保留 `GDI（最兼容）`，不出现层名。
 - 未验证：高 DPI、多显示器、IPX 房间互连（IPXWrapper 已在目录里）。
+
+## 13. 绝命时刻：五星之光 —— Zero Hour 模组 + 注册表/画质重实现
+
+- 路径：`D:\YunGame\Command.and.Conquer\Command.and.Conquer.FiveStar`；国产 Zero Hour 模组，
+  原 `go.bat` 先跑 `初始注册程序130.exe`，再跑 `五星独立版专用画质管理器130.exe`。
+- 原生 D3D8 报 `DirectX ?` 错误；DXVK 2.5.3（x86 `d3d8.dll` + `d3d9.dll`）可用。
+  1280×800 全屏会 `Failed to change display mode`，1920×1080 正常；启动器只给显示器支持的模式。
+- **算号器（REA/Ghidra）**：`初始注册程序130.exe` 是 PE32/MFC；字符串直接给出
+  `HKLM\SOFTWARE\Electronic Arts\EA Games\Command and ConquerGeneralsFiveStar130`、
+  `InstallPath`、`Language=chinese`、`UserDataLeafName`、`\ergc`、`Import.reg`。
+  32 位视图；`ergc` 默认值为 20 位数字序列号。实测任意 20 位数字可进游戏，
+  所以启动器在缺失时生成随机 20 位数字，`/fixreg /newserial` 可重新算号。
+- **画质管理器（REA/Ghidra）**：`五星独立版专用画质管理器130.exe` 写
+  `%USERPROFILE%\Documents\Command and Conquer Generals Five Star Data\Options.ini`，
+  键包括 Resolution / Gamma / AntiAliasing / TextureReduction / MaxParticleCount /
+  Shadow / Light / Water / Trees / DynamicLOD / StaticGameLOD 等。
+  启动器重实现为 6 个画面方案 + 5 档亮度，并写 `UseFPSLimit=no`、`FPSLimit=60`；
+  1920×1080 高画质实测 `FPS: 59.0`（原 30 帧上限解除）。
+- 启动器：三栏 GUI，启动前自动注册 + 写 Options.ini + 启动 `generals.exe`，等待 `Game.dat`
+  并回传它的退出码；`/go` 默认 1080p 高画质，`/preset 1-6 /gamma 1-5 /go` 可指定。
+- 证据：`Games\FiveStar\evidence\fivestar-launcher.png`、`fivestar-60fps.png`、
+  `fivestar-game-1024.png`、`original-tools.png`、`registry-before.reg`、`Options-before.ini`。
+  完整分析：`Games\FiveStar\适配过程分析.md`。
