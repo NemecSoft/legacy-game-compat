@@ -1,24 +1,32 @@
 ============================================================
-[2026/11/02 周一  3:32:29.32] 一键应用：幽灵行动：未来战士
+[2026/11/02 周一  9:06:39.03] 一键应用：幽灵行动：未来战士
 目标目录："D:\AI\legacy-game-compat\Games\FutureSoldier\test-target"
 包目录："D:\AI\legacy-game-compat\Games\FutureSoldier\release\"
 记录说明：应用脚本只修改目标游戏目录；游戏初始化会写我的文档 default.cfg，撤回不自动还原。
 记录说明：运行日志.txt 为启动器运行产物，撤回会删除；兼容修复.bat 清理的 XP 兼容性/RUNASADMIN 不自动恢复。
 ------------------------------------------------------------
-[ 3:32:29.33] 新增文件：game_starter.exe
-[ 3:32:29.33] 复制交付文件：game_starter.exe
-[ 3:32:29.34] 备份原文件：game_starter.bat -> _legacy_compat_backup\FutureSoldier\game_starter.bat
-[ 3:32:29.35] 复制交付文件：game_starter.bat
-[ 3:32:29.36] 备份原文件：launcher.ini -> _legacy_compat_backup\FutureSoldier\launcher.ini
-[ 3:32:29.47] 复制交付文件：launcher.ini
-[ 3:32:29.47] 新增文件：兼容修复.bat
-[ 3:32:29.48] 复制交付文件：兼容修复.bat
-[ 3:32:29.49] 备份原文件：修改器说明.txt -> _legacy_compat_backup\FutureSoldier\修改器说明.txt
-[ 3:32:29.53] 复制交付文件：修改器说明.txt
-[ 3:32:29.53] 新增文件：_tools\nircmd\ircmdc.exe
-[ 3:32:29.53] 复制交付文件：_tools\nircmd\ircmdc.exe
-[ 3:32:29.53] 调用兼容修复：清理 XP 兼容性/RUNASADMIN
+[ 9:06:39.04] 新增文件：game_starter.exe
+[ 9:06:39.04] 复制交付文件：game_starter.exe
+[ 9:06:39.06] 备份原文件：game_starter.bat -> _legacy_compat_backup\FutureSoldier\game_starter.bat
+[ 9:06:39.07] 复制交付文件：game_starter.bat
+[ 9:06:39.10] 备份原文件：launcher.ini -> _legacy_compat_backup\FutureSoldier\launcher.ini
+[ 9:06:39.29] 复制交付文件：launcher.ini
+[ 9:06:39.29] 新增文件：兼容修复.bat
+[ 9:06:39.30] 复制交付文件：兼容修复.bat
+[ 9:06:39.31] 备份原文件：修改器说明.txt -> _legacy_compat_backup\FutureSoldier\修改器说明.txt
+[ 9:06:39.35] 复制交付文件：修改器说明.txt
+[ 9:06:39.35] 新增文件：d3d9.dll
+[ 9:06:39.36] 复制交付文件：d3d9.dll
+[ 9:06:39.36] 新增文件：dxvk.conf
+[ 9:06:39.36] 复制交付文件：dxvk.conf
+[ 9:06:39.36] 新增文件：_dx9_compat\d3d9.dll
+[ 9:06:39.37] 复制交付文件：_dx9_compat\d3d9.dll
+[ 9:06:39.37] 新增文件：_dx9_compat\dxvk.conf
+[ 9:06:39.38] 复制交付文件：_dx9_compat\dxvk.conf
+[ 9:06:39.38] 新增文件：_tools\nircmd\ircmdc.exe
+[ 9:06:39.38] 复制交付文件：_tools\nircmd\ircmdc.exe
+[ 9:06:39.38] 调用兼容修复：清理 XP 兼容性/RUNASADMIN
 ------------------------------------------------------------
-[ 3:32:29.66] 完成：复制 6 个，备份 3 个，错误=0
+[ 9:06:39.50] 完成：复制 10 个，备份 3 个，错误=0
 记录与备份保留在："D:\AI\legacy-game-compat\Games\FutureSoldier\test-target\_legacy_compat_backup\FutureSoldier"
 ============================================================

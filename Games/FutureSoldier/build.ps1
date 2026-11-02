@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$GameDir = 'D:\YunGame\V\Future Soldier',
   [switch]$NoDeploy
 )
@@ -73,11 +73,20 @@ New-Item -ItemType Directory -Force -Path $n | Out-Null
 $nircmd = Join-Path $Repo 'tools\nircmd\nircmdc.exe'
 if (Test-Path $nircmd) { Copy-Item $nircmd (Join-Path $n 'ircmdc.exe') -Force }
 
+$dxvk = Join-Path $GameDir '_dx9_compat'
+New-Item -ItemType Directory -Force -Path $dxvk | Out-Null
+$dxvkDll = Join-Path $Repo 'tools\dxvk\x86\d3d9.dll'
+if (-not (Test-Path $dxvkDll)) { throw "缺少 $dxvkDll" }
+Copy-Item $dxvkDll (Join-Path $GameDir 'd3d9.dll') -Force
+Copy-Item $dxvkDll (Join-Path $dxvk 'd3d9.dll') -Force
+Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $GameDir 'dxvk.conf') -Force
+Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $dxvk 'dxvk.conf') -Force
+
 $bad = Get-ChildItem $GameDir -Include *.cs,*.ps1 -Recurse -ErrorAction SilentlyContinue
 if ($bad) { throw ("目标目录出现源码文件：" + ($bad.FullName -join ', ')) }
 
 Write-Host ''
 Write-Host "部署完成：$GameDir"
 Get-ChildItem $GameDir -File |
-  Where-Object { $_.Name -match '^(game_starter\.(exe|bat)|launcher\.ini|兼容修复\.bat|修改器说明\.txt|运行日志\.txt)$' } |
+  Where-Object { $_.Name -match '^(game_starter\.(exe|bat)|launcher\.ini|兼容修复\.bat|修改器说明\.txt|d3d9\.dll|dxvk\.conf|运行日志\.txt)$' } |
   Select-Object Name, Length, LastWriteTime | Format-Table -AutoSize

@@ -307,12 +307,15 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   `~ DWM8And16BitMitigation WINXPSP3 RUNASADMIN`（DX9/DX11 都有）。这会强制管理员权限，
   普通修改器无法注入；已备份并只删除这两项（`Games\FutureSoldier\backup\`）。
   启动器不调用 go.bat，也不写兼容性；`兼容修复.bat` 可重复清理。
-- 移除 XP 兼容性后，**DX11 原生可玩**（RX 580 / Win11，1920×1080），不需要 DXVK/DX9。
-- 启动链：`init.exe` → `Future Soldier.exe "Future Soldier DX11.exe"`；
-  实际游戏进程是 `Future Soldier DX11.exe`。启动器等待实际进程并取它的退出码，
+- 移除 XP 兼容性后，**DX11 原生可玩**（RX 580 / Win11，1920×1080）。
+- **通用交付不锁死本机**：启动器另提供 **DX9 + DXVK 2.5.3** 模式（`d3d9.dll` + `dxvk.conf`），
+  适合 DX11 原生失败/老驱动机器。DX9 模式只在本次进程树设置 `__COMPAT_LAYER=WINXPSP3`
+  让游戏包装器选择 DX9，**不写注册表兼容性项**；退出即清除。DX11 默认模式不设置。
+- 启动链：`init.exe` → `Future Soldier.exe`（按模式传 DX11/DX9 路径）；
+  实际游戏进程是 `Future Soldier DX11` 或 `Future Soldier DX9`。启动器等待实际进程并取它的退出码，
   不是只拿包装器的 0；游戏是孙进程（游戏自身分层）。
-- 原生 DX11 没有 DXVK 层，不显示 DXVK HUD；`/DisplayFPS 1` 参数实测转发到实际游戏但画面未出现 FPS，
-  不作为层证据。其他 DXVK 交付统一保留 `version,api,fps`。
+- DX9+DXVK 模式实测 HUD `DXVK v2.5.3 / D3D9 / FPS 62.5` 并进游戏；DX11 原生没有 DXVK HUD，
+  `/DisplayFPS 1` 实测未显示 FPS，不作为层证据。其他 DXVK 交付统一保留 `version,api,fps`。
 - 修改器：LinGon v1.8 DX9/DX11 都是 Themida/WinLicense 加壳，带反虚拟机检测；本机
   `HypervisorPresent=True` / VBS 运行中，启动即报
   `Sorry, this application cannot run under a Virtual Machine.`，点确定退出。
@@ -320,7 +323,9 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   未关闭 VBS/Hyper-V、未脱壳第三方修改器。替代：无壳修改器 / Cheat Engine 表，或用户自行
   关闭内存完整性/VBS 后重启再试。
 - 交付：`Games\FutureSoldier\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest），
-  应用会调用 `兼容修复.bat /quiet` 清 XP 兼容性并写记录；撤回保留被玩家改过的文件并记录跳过。
+  payload 含 DX9 的 DXVK 2.5.3；应用会调用 `兼容修复.bat /quiet` 清 XP 兼容性、恢复 DX9 层并写记录；
+  撤回保留被玩家改过的文件并记录跳过。
 - 证据：`Games\FutureSoldier\evidence\future-soldier-dx11.png`、
   `future-soldier-launcher-game.png`、`future-soldier-bat-game.png`、
+  `future-soldier-dx9-dxvk-2.png`、`future-soldier-dx9-launcher.png`、
   `future-soldier-launcher.png`、`launcher-log.txt`。

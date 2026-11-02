@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$ReleaseDir = (Join-Path $PSScriptRoot 'release')
 )
 
@@ -12,7 +12,7 @@ $gbk = [Text.Encoding]::GetEncoding(936)
 $exe = Join-Path $Out 'game_starter.exe'
 if (-not (Test-Path $exe)) { throw '缺少 out\game_starter.exe，请先运行 build.ps1' }
 if (Test-Path $ReleaseDir) { Remove-Item $ReleaseDir -Recurse -Force }
-New-Item -ItemType Directory -Force -Path $Payload, (Join-Path $Payload '_tools\nircmd') | Out-Null
+New-Item -ItemType Directory -Force -Path $Payload, (Join-Path $Payload '_dx9_compat'), (Join-Path $Payload '_tools\nircmd') | Out-Null
 
 function Copy-Text([string]$name, [string]$destDir) {
   $text = [IO.File]::ReadAllText((Join-Path $Src $name), [Text.Encoding]::UTF8)
@@ -22,6 +22,12 @@ function Copy-Text([string]$name, [string]$destDir) {
 
 Copy-Item $exe (Join-Path $Payload 'game_starter.exe') -Force
 Copy-Item (Join-Path $Src 'launcher.ini') (Join-Path $Payload 'launcher.ini') -Force
+$dxvk = Join-Path $Root 'tools\dxvk\x86\d3d9.dll'
+if (-not (Test-Path $dxvk)) { throw "缺少 $dxvk" }
+Copy-Item $dxvk (Join-Path $Payload 'd3d9.dll') -Force
+Copy-Item $dxvk (Join-Path $Payload '_dx9_compat\d3d9.dll') -Force
+Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $Payload 'dxvk.conf') -Force
+Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $Payload '_dx9_compat\dxvk.conf') -Force
 Copy-Item (Join-Path $Root 'tools\nircmd\nircmdc.exe') (Join-Path $Payload '_tools\nircmd\ircmdc.exe') -Force
 foreach ($name in 'game_starter.bat', '兼容修复.bat', '修改器说明.txt') { Copy-Text $name $Payload }
 foreach ($name in '一键应用.bat', '一键撤回.bat') { Copy-Text $name $ReleaseDir }
@@ -32,6 +38,10 @@ $manifest = @(
   'launcher.ini',
   '兼容修复.bat',
   '修改器说明.txt',
+  'd3d9.dll',
+  'dxvk.conf',
+  '_dx9_compat\d3d9.dll',
+  '_dx9_compat\dxvk.conf',
   '_tools\nircmd\ircmdc.exe'
 )
 [IO.File]::WriteAllText((Join-Path $Payload 'manifest.txt'), (($manifest -join "`r`n") + "`r`n"), $gbk)

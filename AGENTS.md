@@ -85,6 +85,11 @@
     `_legacy_compat_backup\<游戏>\`，写 `交付记录.txt`，再复制 payload；撤回按记录恢复被替换文件、
     删除未被修改的交付文件，被玩家改过的文件跳过并写记录。存档、游戏资源、ReShade.ini 等
     非交付文件不碰；外部配置（如我的文档 config.ini）和运行产物无法完全恢复时，必须在记录里写明。
+18. **交付必须绿色、通用，不能只按开发机锁死**：开发机原生能跑（如 Future Soldier DX11）不等于
+    其他机器也能跑；除默认方式外，必须提供可在其他机器工作的兼容启动方式（如 Future Soldier
+    的 DX9 + DXVK），兼容 DLL/配置随包，换机器先探针。禁止把本机注册表开关/系统设置写进交付；
+    DX9 模式若需要 `__COMPAT_LAYER=WINXPSP3`，只对本次进程树生效、退出即清除，不写入
+    `AppCompatFlags\Layers`。参考 `Games\FutureSoldier\`。
 
 ## 本机（当前开发机）事实
 

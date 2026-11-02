@@ -1,0 +1,3 @@
+launcher=19620
+dx11_pid=20584
+launcher_exit=-1

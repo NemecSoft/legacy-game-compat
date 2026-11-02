@@ -35,6 +35,9 @@ for %%E in ("Future Soldier DX11.exe" "Future Soldier DX9.exe") do (
     )
   )
 )
+if not exist "d3d9.dll" if exist "_dx9_compat\d3d9.dll" copy /y "_dx9_compat\d3d9.dll" "d3d9.dll" >nul 2>&1
+if not exist "dxvk.conf" if exist "_dx9_compat\dxvk.conf" copy /y "_dx9_compat\dxvk.conf" "dxvk.conf" >nul 2>&1
+>>"%REC%" echo DX9 兼容层：d3d9.dll + dxvk.conf（DXVK 2.5.3）已就绪
 >>"%REC%" echo 备份："%BAK%\AppCompat-Layers-before.reg"
 >>"%REC%" echo 说明：XP 兼容性不自动恢复；如需恢复请手动导入备份。
 >>"%REC%" echo ============================================================

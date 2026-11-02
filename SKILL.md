@@ -102,7 +102,7 @@ D3D9Probe32.exe
 | D3D8 | **DXVK 2.5.3**（`d3d8.dll` + `d3d9.dll`） | dgVoodoo2 D3D8 | NovaLogic 系（DFBHD）实测 DXVK 的 d3d8 一次过 |
 | DirectDraw 1-7 | **cnc-ddraw 7.1**（`ddraw.dll` + `ddraw.ini`） | dgVoodoo2 DDraw | 2D/软件渲染老游戏优先 cnc-ddraw；自带很多游戏的 `[段名]` 配置 |
 | DirectDraw + 想硬件加速 | cnc-ddraw 的 `renderer=direct3d9` + **DXVK d3d9.dll** | cnc-ddraw GDI | 硬件模式更锐利；需要 Vulkan。GDI 是通用回退，无 Vulkan 也能跑 |
-| D3D11/D3D12 | 一般不需要 | DXVK d3d11 + dxgi | 只在驱动残缺时用 |
+| D3D11/D3D12 | **原生**（探针/实测） | DXVK d3d11 + dxgi；游戏自带 DX9 版时优先加 **DX9 + DXVK** 兼容启动 | 不要只按开发机锁死；Future Soldier 实测双启动 |
 | OpenGL | **Mesa Gallium**（`opengl32.dll`+`libgallium_wgl.dll`+`dxil.dll`） | — | 无硬件 OpenGL 的机器（CS 1.6 案例） |
 
 **本机（RX 580 / Win11）实测：dgVoodoo2 的 D3D11 / D3D12 后端不可用**，所以本机交付一律不走

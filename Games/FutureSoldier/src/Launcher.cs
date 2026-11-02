@@ -84,8 +84,16 @@ class Launcher : Form
         "\n" +
         "修改器限制请看右侧提示。";
 
+    // ---------- 启动方式 ----------
+    static readonly string[] ModeNames =
+    {
+        "1  DX11 原生（默认，画质最好）",
+        "2  DX9 + DXVK（兼容层）"
+    };
+
     // ---------- 运行状态 ----------
     const int NoFocus = -99;
+    int mode;
     int hover = -1, focus = NoFocus;
     int rightScroll, rightScrollMax;
     bool busy, layerOk;
@@ -101,7 +109,8 @@ class Launcher : Form
     Font fTitle, fHead, fRowSel, fRow, fBody, fCap, fCapZh, fMono;
     float dpi = 1f;
     Rectangle colLeft, colCenter, colRight;
-    Rectangle rcStart, rcFolder, rcExit;
+    Rectangle rcLabelMode, rcComboMode, rcStart, rcFolder, rcExit;
+    ComboBox cbMode;
 
     class LegendItem { public string Caption; public string[] Caps; public string Note; }
 
@@ -115,7 +124,10 @@ class Launcher : Form
         Application.EnableVisualStyles();
         Launcher l = new Launcher();
         foreach (string a in args)
+        {
             if (a == "/go" || a == "-go" || a == "--go" || a == "/auto") l.autoStart = true;
+            if (a == "/dx9" || a == "-dx9" || a == "--dx9") l.mode = 1;
+        }
         Application.Run(l);
         return l.exitCode;
     }
@@ -217,6 +229,11 @@ class Launcher : Form
         MakeFonts();
         ClientSize = new Size(S(900), S(620));
         RebuildLegend();
+        if (cbMode == null)
+        {
+            cbMode = MakeCombo(ModeNames, mode, delegate { mode = cbMode.SelectedIndex; });
+            cbMode.TabIndex = 0;
+        }
         LayoutRects();
         string msg;
         layerOk = EnsureLayer(out msg);
@@ -271,9 +288,12 @@ class Launcher : Form
 
         int inner = colCenter.X + S(16), innerW = colCenter.Width - S(32);
         int btnY = colCenter.Bottom - S(14) - S(34) - S(10) - S(44);
+        rcLabelMode = new Rectangle(inner, btnY - S(66), innerW, S(22));
+        rcComboMode = new Rectangle(inner, btnY - S(40), innerW, S(30));
         rcStart = new Rectangle(inner, btnY, innerW, S(44));
         rcFolder = new Rectangle(inner, btnY + S(44) + S(10), (innerW - S(8)) * 9 / 16, S(34));
         rcExit = new Rectangle(rcFolder.Right + S(8), rcFolder.Y, innerW - (rcFolder.Right + S(8) - inner), S(34));
+        PlaceCombo(cbMode, rcComboMode);
     }
 
     // ---------- 绘制 ----------
@@ -326,6 +346,8 @@ class Launcher : Form
         TextRenderer.DrawText(g, "准备开玩", fHead, new Point(x, y), Gold, Color.Transparent);
         y += S(32);
         DrawWrapped(g, centerNote, x, y, colCenter.Width - S(32), fBody, Ink);
+
+        TextRenderer.DrawText(g, "启动方式", fHead, new Point(rcLabelMode.X, rcLabelMode.Y), Gold, Color.Transparent);
 
         DrawButton(g, rcStart, busy ? "游戏运行中…" : "启动游戏", true, !busy && layerOk,
             hover == 0 || focus == 0, focus == 0);
@@ -622,6 +644,26 @@ class Launcher : Form
 
     void RepaintControls() { Invalidate(ButtonsRect); }
 
+    static void PlaceCombo(ComboBox cb, Rectangle slot)
+    {
+        if (cb == null) return;
+        cb.SetBounds(slot.X, slot.Y + (slot.Height - cb.Height) / 2, slot.Width, 0);
+    }
+
+    ComboBox MakeCombo(string[] items, int selected, EventHandler changed)
+    {
+        ComboBox cb = new ComboBox();
+        cb.DropDownStyle = ComboBoxStyle.DropDownList;
+        cb.BackColor = Color.FromArgb(0x4A, 0x00, 0x12);
+        cb.ForeColor = Ink;
+        cb.Font = fRowSel;
+        cb.Items.AddRange(items);
+        cb.SelectedIndex = selected;
+        cb.SelectedIndexChanged += changed;
+        Controls.Add(cb);
+        return cb;
+    }
+
     protected override void OnMouseMove(MouseEventArgs e)
     {
         int h = HitTest(e.Location);
@@ -701,21 +743,34 @@ class Launcher : Form
             return;
         }
         layerOk = true;
+        bool dx9 = mode == 1;
         string exePath = Path.Combine(AppDir(), gameExe);
         if (!File.Exists(exePath))
         {
             status = "找不到游戏程序 " + gameExe; statusColor = Warn; Invalidate();
             return;
         }
-        Log("点「启动游戏」：" + gameTitle);
-        SetBusy(true, "启动中…");
+        if (dx9 && (!File.Exists(Path.Combine(AppDir(), "d3d9.dll")) ||
+                    !File.Exists(Path.Combine(AppDir(), "dxvk.conf"))))
+        {
+            status = "缺少 DX9 兼容层，请先运行 兼容修复.bat"; statusColor = Warn; Invalidate();
+            return;
+        }
+        string launchArgs = dx9 ? "\"Future Soldier DX9.exe\""
+                                : (gameArgs.Length > 0 ? gameArgs : "\"Future Soldier DX11.exe\"");
+        string launchProcess = dx9 ? "Future Soldier DX9"
+                                   : (gameProcess.Length > 0 ? gameProcess : "Future Soldier DX11");
+        Log("点「启动游戏」：" + ModeNames[mode]);
+        SetBusy(true, dx9 ? "启动中：DX9 兼容…" : "启动中：DX11 原生…");
         Thread t = new Thread(delegate ()
         {
             try
             {
                 SetStatus("游戏运行中…", Ok);
                 PrepareGame();
-                int code = RunGameWithAffinity(exePath);
+                // 游戏启动器只有在系统报告 XP 时才会选 DX9；只对本进程树生效，不写注册表。
+                Environment.SetEnvironmentVariable("__COMPAT_LAYER", dx9 ? "WINXPSP3" : null);
+                int code = RunGameWithAffinity(exePath, launchArgs, launchProcess);
                 Log("游戏退出，退出码 0x" + ((uint)code).ToString("X8") + "，启动器随之退出");
                 FinishWith(code);
             }
@@ -735,7 +790,11 @@ class Launcher : Form
                 catch { }
                 SetStatus("启动失败：" + ex.Message + "（关窗退出）", Warn);
             }
-            finally { SetBusy(false, null); }
+            finally
+            {
+                Environment.SetEnvironmentVariable("__COMPAT_LAYER", null);
+                SetBusy(false, null);
+            }
         });
         t.IsBackground = true;
         t.Start();
@@ -804,13 +863,13 @@ class Launcher : Form
     [DllImport("kernel32.dll", SetLastError = true)]
     static extern IntPtr OpenProcess(uint access, bool inherit, int pid);
 
-    int RunGameWithAffinity(string exePath)
+    int RunGameWithAffinity(string exePath, string launchArgs, string launchProcess)
     {
         DateTime startedAt = DateTime.Now;
         STARTUPINFO si = new STARTUPINFO();
         si.cb = Marshal.SizeOf(typeof(STARTUPINFO));
         PROCESS_INFORMATION pi;
-        string cmd = "\"" + exePath + "\"" + (gameArgs.Length > 0 ? " " + gameArgs : "");
+        string cmd = "\"" + exePath + "\"" + (launchArgs.Length > 0 ? " " + launchArgs : "");
         bool started = CreateProcess(exePath, cmd, IntPtr.Zero, IntPtr.Zero,
             false, 0x4, IntPtr.Zero, AppDir(), ref si, out pi);     // CREATE_SUSPENDED
         if (started)
@@ -830,7 +889,7 @@ class Launcher : Form
             DateTime deadline = DateTime.UtcNow.AddSeconds(30);
             while (DateTime.UtcNow < deadline && actual == null)
             {
-                foreach (Process p in Process.GetProcessesByName(gameProcess))
+                foreach (Process p in Process.GetProcessesByName(launchProcess))
                 {
                     bool match;
                     try { match = p.StartTime >= startedAt.AddSeconds(-2); }
@@ -847,7 +906,7 @@ class Launcher : Form
             {
                 int actualPid = actual.Id;
                 actual.Dispose();
-                Log("实际游戏进程 " + actualPid + "（" + gameProcess + "）");
+                Log("实际游戏进程 " + actualPid + "（" + launchProcess + "）");
                 IntPtr hActual = OpenProcess(0x101000, false, actualPid);   // SYNCHRONIZE | QUERY_LIMITED_INFORMATION
                 if (hActual != IntPtr.Zero)
                 {
@@ -865,7 +924,7 @@ class Launcher : Form
             }
             else
             {
-                Log("未找到 " + gameProcess + "，等待包装进程");
+                Log("未找到 " + launchProcess + "，等待包装进程");
                 WaitForSingleObject(pi.hProcess, 0xFFFFFFFF);   // INFINITE
             }
 
@@ -876,7 +935,7 @@ class Launcher : Form
             return gotActualCode ? actualCode : (int)wrapperCode;
         }
         Log("CreateProcess 失败，退回普通启动：错误 " + Marshal.GetLastWin32Error());
-        ProcessStartInfo psi = new ProcessStartInfo(exePath, gameArgs);
+        ProcessStartInfo psi = new ProcessStartInfo(exePath, launchArgs);
         psi.WorkingDirectory = AppDir();
         psi.UseShellExecute = false;
         using (Process game = Process.Start(psi))
@@ -1009,6 +1068,7 @@ class Launcher : Form
         busy = value;
         hover = -1;
         if (value) focus = NoFocus;
+        if (cbMode != null) cbMode.Enabled = !value;
         if (text != null) { status = text; statusColor = value ? Ok : statusColor; }
         RepaintControls();
     }

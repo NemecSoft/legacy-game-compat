@@ -3,4 +3,8 @@ game_starter.bat
 launcher.ini
 ¼æÈÝÐÞ¸´.bat
 ÐÞ¸ÄÆ÷ËµÃ÷.txt
+d3d9.dll
+dxvk.conf
+_dx9_compat\d3d9.dll
+_dx9_compat\dxvk.conf
 _tools\nircmd\ircmdc.exe
