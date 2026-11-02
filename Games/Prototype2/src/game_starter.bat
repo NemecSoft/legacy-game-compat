@@ -16,9 +16,6 @@ if not exist "d3d9.dll" (
   if /i not "%~1"=="/go" pause
   exit /b 1
 )
-set "SAVEDIR=%USERPROFILE%\Documents\Activision\Prototype 2"
-if not exist "%SAVEDIR%" mkdir "%SAVEDIR%" >nul 2>&1
-for %%F in (profile.bin slot-A.bin slot-B.bin slot-C.bin) do @if not exist "%SAVEDIR%\%%F" copy /y "%~dp0yx\BuDing\cd\%%F" "%SAVEDIR%\%%F" >nul 2>&1
 set "sel=1"
 if /i not "%~1"=="/go" (
   cls

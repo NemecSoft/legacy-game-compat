@@ -298,7 +298,8 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   + `0x3ff` 亲和性（其中 `./init.exe` 在 cmd 报错，但游戏不依赖它）。用户确认 go.bat 正常，启动器不改它。
 - 启动器：`Games\Prototype1` / `Games\Prototype2`，900×620 三栏、规范红渐变、正常 TextRenderer；
   P1 先跑 init，再以 `CREATE_SUSPENDED + SetProcessAffinityMask(0x3ff) + ResumeThread` 启动游戏；
-  P2 直接启动；都不传分辨率/窗口参数，不覆盖分辨率/画质/存档。`game_starter.bat` 同菜单（启动/日志/退出）。
+  P2 直接启动；都不传分辨率/窗口参数，不覆盖分辨率/画质，不写存档位置、不复制存档。
+  `game_starter.bat` 同菜单（启动/日志/退出）。
 - 兼容层/回滚：`_dxvk` 留底，`兼容修复.bat` / `恢复原版.bat`；游戏、汉化、go.bat 均保留。
 - 两个启动器 exe 均已嵌入游戏图标（构建时从游戏 exe 抽 `.ico` + `-win32icon`，与游戏图标一致），
   体积 31.5 KB；`devinfo` 不再用于 HUD 取证。

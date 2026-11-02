@@ -46,8 +46,6 @@ class Launcher : Form
     string initExe = "init.exe";
     bool runInit = true;
     long affinity = 0x3ff;
-    string savesSource = "";
-    string savesTarget = "";
     string layerDll = "d3d9.dll";
     string layerBackupDir = "_dxvk";
     string intro =
@@ -68,16 +66,13 @@ class Launcher : Form
     string tips =
         "# 提示\n" +
         "启动器按游戏原本方式启动，不加参数\n" +
-        "按键以游戏内「选项 → 控制」为准\n" +
-        "存档在 我的文档\\Prototype";
+        "按键以游戏内「选项 → 控制」为准";
     string centerNote =
         "启动器按游戏原本的方式开游戏，\n" +
         "不改分辨率、不覆盖游戏设置。\n" +
         "\n" +
         "第一次进游戏先等加载；\n" +
-        "分辨率、画质请进游戏「选项」里改。\n" +
-        "\n" +
-        "存档：我的文档\\Prototype";
+        "分辨率、画质请进游戏「选项」里改。";
 
     // ---------- 运行状态 ----------
     const int NoFocus = -99;
@@ -749,25 +744,6 @@ class Launcher : Form
             }
             catch (Exception ex) { Log("init.exe 执行失败（继续启动）：" + ex.Message); }
         }
-        if (savesSource.Length > 0 && savesTarget.Length > 0)
-        {
-            try
-            {
-                string target = Environment.ExpandEnvironmentVariables(savesTarget);
-                Directory.CreateDirectory(target);
-                string src = Path.Combine(AppDir(), savesSource);
-                if (Directory.Exists(src))
-                {
-                    foreach (string f in new[] { "profile.bin", "slot-A.bin", "slot-B.bin", "slot-C.bin" })
-                    {
-                        string s = Path.Combine(src, f), d = Path.Combine(target, f);
-                        if (File.Exists(s) && !File.Exists(d)) File.Copy(s, d, true);
-                    }
-                    Log("存档目录已检查：" + target);
-                }
-            }
-            catch (Exception ex) { Log("存档准备失败（继续启动）：" + ex.Message); }
-        }
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -1030,8 +1006,6 @@ class Launcher : Form
                     if (long.TryParse(val, System.Globalization.NumberStyles.HexNumber, null, out a)) affinity = a;
                     else if (long.TryParse(val, out a)) affinity = a;
                     break;
-                case "savessource": savesSource = val; break;
-                case "savestarget": savesTarget = val; break;
                 case "layerdll": layerDll = val; break;
                 case "layerbackupdir": layerBackupDir = val; break;
                 case "intro": intro = val; break;
