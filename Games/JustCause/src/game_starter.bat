@@ -50,9 +50,17 @@ if not "%sel%"=="1" if not "%sel%"=="2" if not "%sel%"=="3" if not "%sel%"=="4" 
 if "%sel%"=="3" start "" notepad "%~dp0运行日志.txt"
 if "%sel%"=="3" exit /b 0
 if "%sel%"=="4" exit /b 0
+if exist "%~dp0game_starter.exe" (
+  "%~dp0game_starter.exe" /fixreg
+  if errorlevel 1 (
+    echo   注册表写入失败，请右键「修复注册表.bat」以管理员身份运行
+    if /i not "%~1"=="/go" pause
+    exit /b 1
+  )
+)
 if "%sel%"=="1" (
   >"dxvk.conf" echo # 由 game_starter.bat 按菜单选择生成：显示帧数 HUD
-  >>"dxvk.conf" echo dxvk.hud = version,api,fps
+  >>"dxvk.conf" echo dxvk.hud = fps
 ) else (
   copy /y "_dxvk\dxvk.conf" "dxvk.conf" >nul
 )

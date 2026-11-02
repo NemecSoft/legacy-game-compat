@@ -84,8 +84,8 @@ Games\<游戏>\
 
 - cnc-ddraw 没有可开关的 logo 水印；软件渲染回退时会在顶部显示 15 秒
   `-WARNING- Using slow software rendering...`，可作为“软件渲染水印”。
-- 硬件渲染：cnc-ddraw `renderer=direct3d9` + DXVK，`dxvk.conf` 写 `dxvk.hud = version,api,fps`，
-  左上角显示 `DXVK v2.5.3 / D3D9 / FPS`。
+- 硬件渲染：cnc-ddraw `renderer=direct3d9` + DXVK，`dxvk.conf` 写 `dxvk.hud = fps`，
+  左上角只显示 FPS；排障时才临时加 `version,api`。
 - dgVoodoo2 用 `dgVoodooWatermark = true`。
 - 流程：开水印 → 截图存 `evidence\` → 确认层生效和硬件/软件 → 交付配置关掉 HUD/水印。
 - 1080p：先确认引擎内部分辨率；DirectDraw 固定 640×480 的游戏，1080p 是 cnc-ddraw 输出放大，

@@ -6,9 +6,11 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 // 正当防卫 Just Cause 启动器（game_starter.exe），界面规范见仓库
 // .qoder/skills/legacy-launcher-gui/SKILL.md：纯 GDI+ 自绘、零图片、三栏布局。
@@ -112,6 +114,8 @@ class Launcher : Form
     {
         if (args.Length > 0 && (args[0] == "/selftest" || args[0] == "-selftest"))
             return SelfTest(Tail(args));
+        if (args.Length > 0 && (args[0] == "/fixreg" || args[0] == "-fixreg"))
+            return FixRegistryMode();
         foreach (string a in args)
             if (a == "/hideparent" || a == "-hideparent") HideParentConsole();   // bat 包装入口：不留黑框
         Application.EnableVisualStyles();
@@ -691,6 +695,14 @@ class Launcher : Form
             Invalidate();
             return;
         }
+        if (!EnsureRegistry(out message))
+        {
+            status = message;
+            statusColor = Warn;
+            Invalidate();
+            return;
+        }
+        Log("注册表：" + message);
         if (!ApplyHud(hud, out message))
         {
             status = message;
@@ -816,7 +828,7 @@ class Launcher : Form
         try
         {
             string text = "# 由 game_starter.exe 每次启动按界面选择生成；默认模板见 " + layerBackupDir + "\\" + layerIni + "\r\n";
-            if (index == 0) text += "dxvk.hud = version,api,fps\r\n";
+            if (index == 0) text += "dxvk.hud = fps\r\n";
             File.WriteAllText(Path.Combine(AppDir(), layerIni), text, new UTF8Encoding(false));
             message = HudSubNames[index];
             return true;
@@ -933,6 +945,100 @@ class Launcher : Form
     }
 
     static string AppDir() { return Path.GetDirectoryName(Application.ExecutablePath); }
+
+    // ---------- 注册表（reg.fix.exe 原逻辑：32 位视图） ----------
+    const string JustCauseKey = @"SOFTWARE\Eidos\Just Cause";
+    const int JustCauseLanguage = 0x409;
+
+    static bool IsAdmin()
+    {
+        try { return new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator); }
+        catch { return false; }
+    }
+
+    static bool RegistryMatches()
+    {
+        try
+        {
+            using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            using (RegistryKey key = baseKey.OpenSubKey(JustCauseKey))
+            {
+                if (key == null) return false;
+                object language = key.GetValue("Language");
+                object install = key.GetValue("InstallPath");
+                if (language == null || Convert.ToInt32(language) != JustCauseLanguage) return false;
+                if (install == null || !string.Equals(Convert.ToString(install).TrimEnd('\\'),
+                        AppDir().TrimEnd('\\'), StringComparison.OrdinalIgnoreCase)) return false;
+                using (RegistryKey version = baseKey.OpenSubKey(JustCauseKey + @"\1.00.0000"))
+                    return version != null;
+            }
+        }
+        catch { return false; }
+    }
+
+    static bool WriteRegistry()
+    {
+        using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+        using (RegistryKey key = baseKey.CreateSubKey(JustCauseKey))
+        {
+            key.SetValue("Language", JustCauseLanguage, RegistryValueKind.DWord);
+            key.SetValue("InstallPath", AppDir().TrimEnd('\\'), RegistryValueKind.String);
+            using (RegistryKey version = baseKey.CreateSubKey(JustCauseKey + @"\1.00.0000")) { }
+        }
+        return RegistryMatches();
+    }
+
+    static bool EnsureRegistry(out string message)
+    {
+        if (RegistryMatches()) { message = "已就绪"; return true; }
+        try
+        {
+            if (WriteRegistry()) { message = "已写入"; return true; }
+        }
+        catch (Exception ex) { Log("直接写注册表失败：" + ex.Message); }
+
+        // 没权限时用自身 /fixreg 提权写一次；UAC 取消则返回失败。
+        try
+        {
+            ProcessStartInfo psi = new ProcessStartInfo(Application.ExecutablePath, "/fixreg");
+            psi.UseShellExecute = true;
+            psi.Verb = "runas";
+            psi.WorkingDirectory = AppDir();
+            using (Process p = Process.Start(psi))
+            {
+                p.WaitForExit();
+                Log("提权写注册表，退出码 " + p.ExitCode);
+            }
+            if (RegistryMatches()) { message = "已写入"; return true; }
+        }
+        catch (Exception ex) { Log("提权写注册表失败：" + ex.Message); }
+
+        message = "注册表写入失败，请右键「修复注册表.bat」以管理员身份运行";
+        return false;
+    }
+
+    static int FixRegistryMode()
+    {
+        if (RegistryMatches()) return 0;
+        if (!IsAdmin())
+        {
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo(Application.ExecutablePath, "/fixreg");
+                psi.UseShellExecute = true;
+                psi.Verb = "runas";
+                psi.WorkingDirectory = AppDir();
+                using (Process p = Process.Start(psi))
+                {
+                    p.WaitForExit();
+                    return p.ExitCode;
+                }
+            }
+            catch { return 1; }
+        }
+        try { return WriteRegistry() ? 0 : 1; }
+        catch { return 1; }
+    }
 
     // ---------- 运行日志：玩家出问题直接把「运行日志.txt」发给管理员 ----------
     static readonly object logGate = new object();

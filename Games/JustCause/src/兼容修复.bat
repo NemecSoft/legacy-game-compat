@@ -1,6 +1,10 @@
 @echo off&color 4f
 title 兼容修复 - 正当防卫
 cd /d "%~dp0"
+if exist "game_starter.exe" (
+  "game_starter.exe" /fixreg
+  if errorlevel 1 echo   注册表写入失败，请右键本文件「以管理员身份运行」。
+)
 if not exist "_dxvk\d3d9.dll" echo   缺少 _dxvk\d3d9.dll，无法修复&pause&exit /b
 if not exist "_backup\JCTextFix.asi" echo   缺少 _backup\JCTextFix.asi，无法修复&pause&exit /b
 if exist "d3d9.dll" if not exist "d3d9.dll.原版-bak" ren "d3d9.dll" "d3d9.dll.原版-bak"

@@ -77,9 +77,10 @@
   `launcher.ini`）。5 档分辨率（1920×1080 默认 / 1600×900 / 1280×720 / 1024×768 / 800×600）由启动器
   写我的文档 `My Games\The Saboteur™\SaveGames\config.ini` 的 `ScreenWidth/ScreenHeight`；`/setres N`
   实测 1280×720 → 1920×1080 可逆，退出码 0。游戏是启动器直接子进程，陪跑并回传退出码。
-  exe 已嵌入 `Saboteur.exe` 图标（32.5 KB）；交付 `dxvk.conf` 保留
-  `dxvk.hud = version,api,fps` 作为层挂载标志。
-  证据：`Games\TheSaboteur\evidence\saboteur-first.png`（`DXVK v2.5.3 / D3D9 / 59.4 FPS`）、
+  exe 已嵌入 `Saboteur.exe` 图标（32.5 KB）；当前交付 `dxvk.conf` 只写
+  `dxvk.hud = fps`（历史取证截图带 version/api）。
+  证据：`Games\TheSaboteur\evidence\saboteur-first.png`（历史，`DXVK v2.5.3 / D3D9 / 59.4 FPS`）、
+  `saboteur-fps-only.png`（当前交付，仅 `FPS: 50.7`）、
   `saboteur-menu.png`（中文游戏内）、`saboteur-launcher.png`。
 - **跨机器交付包**：`Games\TheSaboteur\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest）。
   应用到目标目录前先备份同名文件到 `_legacy_compat_backup\TheSaboteur\` 并写 `交付记录.txt`；
@@ -132,8 +133,9 @@
     内部仍 640×480，画面 1440×1080 + 左右黑边。GDI 双线性柔和；DXVK bicubic 更锐利。
   - 默认 `renderer=auto`：本机有 Vulkan → cnc-ddraw 的 D3D9 渲染器加载 DXVK 2.5.3（硬件，60FPS）；
     无 Vulkan 自动回退 GDI。另留 `renderer=gdi` 的纯软件启动、640×480 原版启动。
-- 水印验证：软件 = GDI 回退警告；硬件 = `dxvk.hud = version,api,fps`（`DXVK v2.5.3 / D3D9 / 60FPS`）。
-  交付 `dxvk.conf` 保留该 HUD 作为层挂载标志；GDI 软件警告只用于测试。测试截图存 `Games\RoadRash\evidence\`。
+- 水印验证：软件 = GDI 回退警告；硬件 = `dxvk.hud = fps`（左上角只显示帧数）。
+  交付 `dxvk.conf` 只写 fps 作为层挂载标志；GDI 软件警告和 version/api 只用于测试。
+  当前截图 `Games\RoadRash\evidence\roadrash-fps-only.png`（仅 `FPS: 60.4`）。
 - 注意：DXVK + 640×480 组合在本机开场 8~16 秒黑屏（20 秒后进比赛）；1080p + DXVK 正常。
 - 启动器：`game_starter.bat` + `game_starter.exe`（中国红，同逻辑），另有 `game_starter-soft.bat` / `game_starter-640.bat`。
 - 键位：注册表 `HKLM\...\RoadRash 95\Controls`（22 字节），11 个 WORD 低字节恒 0、
@@ -191,13 +193,19 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 - 结果：原生菜单 / HUD / 任务提示 / 字幕全部中文（不再需要 ASI 自绘字幕层），跑 150 秒稳定；
   DXVK HUD `FPS: 230.9` 证明渲染路径。
 - 交付：DXVK 2.5.3 + `_dxvk\` 留底、`scripts\JCTextFix.asi`（原版 ASI 存 `_backup\`）、
-  `兼容修复.bat` / `恢复原版.bat`、`game_starter.exe`（27.5 KB，中国红渐变三栏，HUD 开关）+
+  `兼容修复.bat` / `恢复原版.bat` / `修复注册表.bat`、`game_starter.exe`（31 KB，中国红渐变三栏，
+  HUD 开关，启动前自动写注册表）+
   `game_starter.bat`（控制台菜单版，与 exe 同选项/同默认值，自己启动游戏，`/go` 零交互，
   `_tools\nircmd` 负责控制台窗口居中）+ `launcher.ini`。
   汉化补丁本体（Archives / dinput8.dll / 其它 asi）不动。托管契约：假游戏 5/5 PASS，
   真游戏 `/go` 正常退出回传 `0x00000000`、强杀回传 `0xFFFFFFFF`；bat 菜单 6/6 PASS。
+- 注册表：`reg.fix.exe` 是 UPX + AutoIt3；REA/Ghidra 解包 + AutoIt-Ripper 提取出原脚本，
+  写入 32 位视图 `HKLM\SOFTWARE\Eidos\Just Cause`：`Language=0x409`、`InstallPath=游戏目录`、
+  子项 `1.00.0000`。启动器启动前自动写（缺失才写，必要时 `/fixreg` 提权），
+  `修复注册表.bat` 可独立执行；删除后重建实测通过（`JustCause-registry-before.reg` 为原始导出）。
 - 证据：`Games\JustCause\evidence\`（`text3-07` 加载界面、`run-06` 字幕、`run-07` 任务提示、
-  `menu2-04` 主菜单、`menu-esc` HUD、`hud-06`/`hud-crop` HUD 帧数、`starter-ui` 启动器）。
+  `menu2-04` 主菜单、`menu-esc` HUD、`hud-06`/`hud-crop` HUD 帧数、`starter-ui` 启动器、
+  `justcause-fps-only.png`（当前交付仅 FPS 29.9）、`JustCause-registry-before.reg`）。
 - 完整过程与测试矩阵：`Games\JustCause\适配过程分析.md`。
 
 ---
@@ -296,8 +304,9 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   体积 31.5 KB；`devinfo` 不再用于 HUD 取证。
 - 注意：黑边/宽高比/人物比例不是启动器参数问题，启动器严格不加参数；请在游戏内「选项」里设置。
   之前测试中出现过不同结果，是测试启动方式差异，不作为交付链。
-- 证据：`Games\Prototype1\evidence\prototype1-launcher.png`、`prototype1-hud.png`；
-  `Games\Prototype2\evidence\prototype2-launcher.png`。
+- 证据：`Games\Prototype1\evidence\prototype1-launcher.png`、`prototype1-hud.png`、
+  `prototype1-fps-only.png`（当前交付仅 FPS 60.8）；
+  `Games\Prototype2\evidence\prototype2-launcher.png`、`prototype2-fps-only.png`（仅 FPS 59.9）。
 - 启动器实测：P1 `/go` → init.exe → prototypef 的父进程是启动器、亲和性 0x3FF；
   关闭游戏后启动器退出码 0、桌面恢复 1920×1080。P2 使用同一套 CreateProcess/亲和性/退出码逻辑。
 
@@ -316,8 +325,9 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 - 启动链：`init.exe` → `Future Soldier.exe`（按模式传 DX11/DX9 路径）；
   实际游戏进程是 `Future Soldier DX11` 或 `Future Soldier DX9`。启动器等待实际进程并取它的退出码，
   不是只拿包装器的 0；游戏是孙进程（游戏自身分层）。
-- DX9+DXVK 模式实测 HUD `DXVK v2.5.3 / D3D9 / FPS 62.5` 并进游戏；DX11 原生没有 DXVK HUD，
-  `/DisplayFPS 1` 实测未显示 FPS，不作为层证据。其他 DXVK 交付统一保留 `version,api,fps`。
+- DX9+DXVK 模式历史实测 HUD `DXVK v2.5.3 / D3D9 / FPS 62.5` 并进游戏；当前交付只写
+  `dxvk.hud = fps`，实机截图 `future-soldier-dx9-fps-only.png`（仅 `FPS: 29.7`）。
+  DX11 原生没有 DXVK HUD，`/DisplayFPS 1` 实测未显示 FPS，不作为层证据。
 - 修改器：LinGon v1.8 DX9/DX11 都是 Themida/WinLicense 加壳，带反虚拟机检测；本机
   `HypervisorPresent=True` / VBS 运行中，启动即报
   `Sorry, this application cannot run under a Virtual Machine.`，点确定退出。

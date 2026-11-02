@@ -231,9 +231,9 @@ FixTips=...\n...                    ; 自绘版右栏故障说明
 
 - cnc-ddraw 软件渲染：`renderer=auto` 且 D3D9/OpenGL 不可用时会显示 15 秒
   `-WARNING- Using slow software rendering...`；测试时截图存 `Games\<游戏>\evidence\`。
-- DXVK 硬件渲染：`dxvk.conf` 写 `dxvk.hud = version,api,fps`，左上角显示 DXVK 版本/API/FPS；
-  交付时删掉这行。
-- DXVK 交付默认配置保留 `dxvk.hud = version,api,fps` 作为层挂载标志；cnc-ddraw 软件警告 /
+- DXVK 硬件渲染：`dxvk.conf` 写 `dxvk.hud = fps`，左上角只显示 FPS；排障时才临时加
+  `version,api` 看版本/API。
+- DXVK 交付配置只写 `dxvk.hud = fps` 作为层挂载标志；cnc-ddraw 软件警告 /
   dgVoodoo 水印只作为诊断信息，交付关闭。原生游戏没有 DXVK 层，不能用这个 HUD 判断。
 - **玩家界面说人话**：启动方式只给玩家能懂的结果——`DX11（画质最好）`、`DX9（老机器）`、
   `GDI（最兼容，推荐）`；界面不写 DXVK/dgVoodoo/cnc-ddraw/Mesa/兼容层/HUD/注册表/亲和性/DLL

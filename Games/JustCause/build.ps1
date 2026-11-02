@@ -54,6 +54,7 @@ function Deploy-Bat([string]$name) {
 Deploy-Bat 'game_starter.bat'
 Deploy-Bat '兼容修复.bat'
 Deploy-Bat '恢复原版.bat'
+Deploy-Bat '修复注册表.bat'
 
 # 4. 兼容层：DXVK 2.5.3 + dxvk.conf，游戏目录生效 + _dxvk 留底
 New-Item -ItemType Directory -Force -Path (Join-Path $GameDir '_dxvk') | Out-Null
@@ -88,5 +89,5 @@ if ($bad) { throw ("目标目录出现源码文件：" + ($bad.FullName -join ',
 
 Write-Host ""
 Write-Host "部署完成：$GameDir"
-Get-ChildItem $GameDir -File | Where-Object { $_.Name -match '^(game_starter\.(exe|bat)|launcher\.ini|运行日志\.txt|d3d9\.dll|dxvk\.conf|兼容修复\.bat|恢复原版\.bat)$' } |
+Get-ChildItem $GameDir -File | Where-Object { $_.Name -match '^(game_starter\.(exe|bat)|launcher\.ini|运行日志\.txt|d3d9\.dll|dxvk\.conf|兼容修复\.bat|恢复原版\.bat|修复注册表\.bat)$' } |
   Select-Object Name, Length, LastWriteTime | Format-Table -AutoSize

@@ -71,8 +71,8 @@ Then double-click `game_starter.bat` in the game folder.
 DXVK versions are scene-sensitive: a game that white-screens on 2.3.1 may be perfect on 2.5.3 (and vice
 versa). Keep both binaries around. On this machine dgVoodoo2's D3D11/D3D12 backends are unusable, so
 layered D3D9 games use DXVK (Vulkan); re-probe before applying that conclusion to another machine.
-DXVK deliveries normally keep `dxvk.hud = version,api,fps` so players can see the DXVK version/API/FPS
-and confirm the layer is active; Delta Force is the exception and shows FPS only, by request.
+DXVK deliveries show FPS only (`dxvk.hud = fps`) so players can confirm the layer is active without
+version/API clutter; version/API HUD is enabled temporarily for diagnostics only.
 Native games do not run DXVK and do not show this HUD.
 
 ## Verified cases
@@ -86,6 +86,7 @@ Native games do not run DXVK and do not show this HUD.
 | Ghost Recon Future Soldier (2012) | go.bat XP/RUNASADMIN; DX11 native only on dev PC | DX11 native default + DX9/DXVK fallback; launcher + revert package; trainer blocked by VBS |
 | Counter-Strike 1.6 | No hardware OpenGL (GDI 1.1 only) | Mesa Gallium → D3D12 |
 | Heroes of Might and Magic III (1999) | DirectDraw display/compat issues | cnc-ddraw 7.1 GDI presets (full/4:3/window/640) + launcher/revert package |
+| Just Cause (2006) | CJK glyph boxes / crash; registry fix missing | DXVK 2.5.3 + trimmed text ASI; launcher/bat auto-write 32-bit Eidos registry |
 
 Details, including the exact error logs and probe output, are in `references/cases.md`.
 

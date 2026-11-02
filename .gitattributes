@@ -12,6 +12,7 @@
 *.xml text eol=crlf
 *.conf text eol=crlf
 *.py text eol=crlf
+*.au3 text eol=crlf
 *.java text eol=crlf
 *.cpp text eol=crlf
 *.h text eol=crlf

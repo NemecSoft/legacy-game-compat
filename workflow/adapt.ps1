@@ -176,7 +176,7 @@ function Install-Layer($info, [string]$layer) {
         if (-not (Test-Path $conf)) {
             Log "写入 dxvk.conf"
             if (-not $DryRun) {
-                Save-Utf8NoBom $conf "# 显示后端信息: 取消注释下一行`r`n#dxvk.hud = version,api,fps`r`nd3d9.presentInterval = 1`r`n"
+                Save-Utf8NoBom $conf "# 左上角只显示帧数`r`ndxvk.hud = fps`r`nd3d9.presentInterval = 1`r`n"
             }
         }
     }

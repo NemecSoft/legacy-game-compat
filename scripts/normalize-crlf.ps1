@@ -4,7 +4,7 @@ Set-Location $root
 
 $textExt = @(
   '.md', '.ps1', '.cs', '.bat', '.cmd', '.ini', '.txt', '.json', '.xml',
-  '.conf', '.py', '.java', '.cpp', '.h', '.hpp', '.sln', '.vcxproj',
+  '.conf', '.py', '.java', '.cpp', '.h', '.hpp', '.sln', '.vcxproj', '.au3',
   '.yml', '.yaml', '.csv', '.sample', '.prp'
 )
 $plainNames = @('LICENSE', '.gitignore', '.gitattributes')

@@ -14,6 +14,6 @@ if exist "d3d9.dll" if not exist "d3d9.dll.reshade-bak" copy /y "d3d9.dll" "d3d9
 copy /y "_dxvk\d3d9.dll" "d3d9.dll" >nul
 if exist "_dxvk\dxvk.conf" copy /y "_dxvk\dxvk.conf" "dxvk.conf" >nul
 echo.
-echo   已启用 DXVK 2.5.3（D3D9 转 Vulkan，HUD=version,api,fps）
+echo   已启用 DXVK 2.5.3（D3D9 转 Vulkan，左上角只显示帧数）
 echo   双击 game_starter.exe 进游戏
 pause

@@ -26,8 +26,8 @@ description: 诊断并修复老游戏在新系统/新显卡上的崩溃、黑屏
    多套按键/设置用启动器里的选择或单独的 `切键-*.bat`（落地走同一个只改写单值的工具）。
 8. **启动器用中国红**：bat 用 `color 4f`；exe 背景 `#C0121E` + 金色 `#FFD85E`，不要黑底。
    game_starter.exe 的界面（令牌、三栏布局、键帽画法、体积红线）按技能 `.qoder\skills\legacy-launcher-gui` 做。
-9. **DXVK 交付默认开水印，其他水印测试后关**：DXVK 交付在 `dxvk.conf` 写
-   `dxvk.hud = version,api,fps`，看到 `DXVK v... / D3D9 / FPS` 才说明兼容层挂载；cnc-ddraw 的
+9. **DXVK 交付只显示帧数**：DXVK 交付在 `dxvk.conf` 写 `dxvk.hud = fps`，看到 FPS 就说明兼容层挂载；
+   版本/API 只在排障取证时临时开（`version,api,fps`），交付前改回 `fps`。cnc-ddraw 的
    GDI 软件警告 / dgVoodoo 水印仍只在测试/排障时开，证据存 `Games\<游戏>\evidence\`。
    原生游戏没有 DXVK 层，不能拿这个 HUD 判断。
 10. **分辨率要诚实**：先确认引擎内部渲染分辨率；DirectDraw 老游戏多为固定 640×480，1080p 只是
@@ -134,7 +134,7 @@ dgVoodoo2；能上 DXVK 就上 DXVK（走 Vulkan）。换一台机器/dgVoodoo2 
   ddraw.ini                ← cnc-ddraw 默认配置（分辨率/渲染器）
   ddraw-soft.ini           ← 可选：强制软件渲染
   ddraw-640.ini            ← 可选：原版 640×480
-  dxvk.conf                ← 可选，DXVK 配置（交付写 dxvk.hud = version,api,fps）
+  dxvk.conf                ← 可选，DXVK 配置（交付写 dxvk.hud = fps）
   _cnc-ddraw\              ← 留底（重装用，含全部 ini/dll）
   兼容修复.bat             ← 从 _cnc-ddraw 复制上来
   恢复原版.bat             ← 删掉翻译层并还原备份
@@ -179,7 +179,8 @@ FixGame.exe D:\Games\某游戏 /undo       :: 回滚
 ## 验证清单
 
 1. **水印验证层生效**：测试时开 cnc-ddraw 的 GDI 软件警告（auto 回退）或 DXVK HUD
-   （`dxvk.hud = version,api,fps`，或临时设环境变量 `DXVK_HUD=version,api,fps`），截图确认走硬件还是软件；
+   （交付 `dxvk.hud = fps`；需要版本/API 时临时用 `version,api,fps` 或环境变量
+   `DXVK_HUD=version,api,fps`），截图确认走硬件还是软件；
    `devinfo` 只显示显卡型号，不能当兼容层证据。证据存 `Games\<游戏>\evidence\`。
    半自动取证可用 `scripts\capture-dxvk-hud.ps1 -GameDir <目录> -ProcessName <进程> -OutDir <目录>`：
    它临时设 `DXVK_HUD`，截完自动清掉，不改游戏配置。
@@ -188,7 +189,7 @@ FixGame.exe D:\Games\某游戏 /undo       :: 回滚
    各自配置生效，退出后恢复默认配置。
 4. **分辨率对比**：640×480 与 1920×1080 各截一张，确认黑边/比例/清晰度；1080p 要说明是输出放大。
 5. 退出后桌面分辨率复原、启动窗口自动关闭；`恢复原版.bat` 能回滚。
-6. **交付水印**：DXVK 交付保留 `version,api,fps` 层挂载标志；cnc-ddraw GDI 警告/dgVoodoo 水印关闭，
+6. **交付水印**：DXVK 交付只写 `dxvk.hud = fps` 层挂载标志；cnc-ddraw GDI 警告/dgVoodoo 水印关闭，
    默认配置不触发软件警告；测试水印只留在 `evidence\`。
 
 ## 分辨率

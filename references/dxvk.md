@@ -19,18 +19,17 @@ D3D8/9/10/11 → Vulkan。Windows 上直接丢 DLL 就能用（不需要 Wine）
 `dxvk.conf`：
 
 ```ini
-dxvk.hud = version,api,fps
+dxvk.hud = fps
 ```
 
-左上角会显示 `DXVK v2.5.3` / `D3D9` / `FPS`。可选字段：`version api fps frametimes memory gpuload
+左上角只显示 `FPS: ...`。取证/排障时可临时用 `dxvk.hud = version,api,fps`，会显示
+`DXVK v2.5.3` / `D3D9` / `FPS`；可选字段：`version api fps frametimes memory gpuload
 devinfo drawcalls compiler`。
 
-**取证只用 `version,api,fps`**：`devinfo` 显示的是显卡型号（如 RX 580），不能证明走的是兼容层；
-玩家/审核看 HUD 要先看到 `DXVK vX.Y.Z`。
+**交付只写 `fps`**：玩家看到 FPS 说明 DXVK 已挂载；版本/API 只在诊断时临时开，截完图改回 `fps`。
+`devinfo` 显示的是显卡型号（如 RX 580），不能证明走的是兼容层。
 
-**HUD 只用于测试**：它证明 DXVK 真的在用、走的是哪个 API、帧率多少；截图存 `Games\<游戏>\evidence\`。
-**本项目交付保留这一行**：`dxvk.hud = version,api,fps` 是层挂载标志，玩家看到 DXVK 版本
-才说明兼容层生效；只有确实需要纯净画面时才注释，不要用 `devinfo` 代替。
+**HUD 截图存 `Games\<游戏>\evidence\`**；不要用 `devinfo` 代替层证据。
 
 ## 作为 cnc-ddraw 的后端（DirectDraw 游戏）
 
@@ -39,9 +38,9 @@ devinfo drawcalls compiler`。
 1. 游戏目录放 cnc-ddraw 的 `ddraw.dll` + `ddraw.ini`；
 2. 再放 DXVK 的 `d3d9.dll`；
 3. `ddraw.ini` 写 `renderer=direct3d9`（或 `auto`，有 DXVK 时会选 D3D9）；
-4. `dxvk.conf` 按需配置；本项目的 DXVK 交付默认保留 `dxvk.hud = version,api,fps`，作为层挂载标志。
+4. `dxvk.conf` 按需配置；本项目的 DXVK 交付写 `dxvk.hud = fps`，作为层挂载标志。
 
-实测 RoadRash：`renderer=auto` 自动加载同目录 DXVK，HUD 显示 `DXVK v2.5.3 / D3D9 / 60FPS`；
+实测 RoadRash：`renderer=auto` 自动加载同目录 DXVK，左上角只显示 `FPS: 60.4`；
 无 Vulkan 的机器回退 cnc-ddraw GDI。DXVK + 640×480 组合在该游戏开场黑屏 8~16 秒，
 1080p 输出正常；遇到类似情况先换输出分辨率，再怀疑层。
 
