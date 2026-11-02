@@ -126,6 +126,11 @@ class Launcher : Form
         Log("启动参数：" + (args.Length == 0 ? "（无）" : string.Join(" ", args)) +
             "；父进程：" + (parentName.Length == 0 ? "未知" : parentName) +
             "；零交互：" + (l.autoStart ? "是" : "否"));
+        if (!BrandGuard.Verify())
+        {
+            MessageBox.Show("启动器文件被修改，请重新解压。", "启动器");
+            return 3;
+        }
         Application.Run(l);
         return l.exitCode;
     }
@@ -448,6 +453,34 @@ class Launcher : Form
         DrawWrapped(g, tips, x, y, w, fBody, Ink);
     }
 
+    static class BrandGuard
+    {
+        static readonly byte[] Encoded = { 0x03, 0x0F, 0x14, 0x1D, 0x1B, 0x17, 0x1F };
+        static readonly byte[] Expected =
+        {
+            0x57, 0x86, 0xAA, 0x36, 0x47, 0x21, 0x56, 0xA9, 0x1E, 0x29, 0x10, 0x7A, 0xC8, 0x61, 0xFA, 0x6D,
+            0xF8, 0xF7, 0xE9, 0x87, 0x36, 0xC5, 0x16, 0x8F, 0xA6, 0x07, 0xC3, 0x8D, 0x84, 0x4B, 0xA5, 0xBC
+        };
+        public static string Text { get { return Decode(); } }
+        static string Decode()
+        {
+            char[] chars = new char[Encoded.Length];
+            for (int i = 0; i < Encoded.Length; i++) chars[i] = (char)(Encoded[i] ^ 0x5A);
+            return new string(chars);
+        }
+        public static bool Verify()
+        {
+            string text = Decode();
+            using (System.Security.Cryptography.SHA256 sha = System.Security.Cryptography.SHA256.Create())
+            {
+                byte[] hash = sha.ComputeHash(System.Text.Encoding.ASCII.GetBytes(text));
+                if (hash.Length != Expected.Length) return false;
+                for (int i = 0; i < hash.Length; i++) if (hash[i] != Expected[i]) return false;
+            }
+            return text.Length == 7;
+        }
+    }
+
     void DrawFooter(Graphics g)
     {
         int y = S(578);
@@ -458,8 +491,8 @@ class Launcher : Form
         Size sz = TextRenderer.MeasureText(g, hint, fMono);
         TextRenderer.DrawText(g, hint, fMono,
             new Point(ClientSize.Width - S(20) - sz.Width, y), InkDim, Color.Transparent);
-        Size brand = TextRenderer.MeasureText(g, "YUNGAME", fMono);
-        TextRenderer.DrawText(g, "YUNGAME", fMono,
+        Size brand = TextRenderer.MeasureText(g, BrandGuard.Text, fMono);
+        TextRenderer.DrawText(g, BrandGuard.Text, fMono,
             new Point((ClientSize.Width - brand.Width) / 2, y), GoldDim, Color.Transparent);
     }
 
