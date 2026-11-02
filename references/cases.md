@@ -79,9 +79,13 @@
   实测 1280×720 → 1920×1080 可逆，退出码 0。游戏是启动器直接子进程，陪跑并回传退出码。
   exe 已嵌入 `Saboteur.exe` 图标（32.5 KB）；当前交付 `dxvk.conf` 只写
   `dxvk.hud = fps`（历史取证截图带 version/api）。
+  平台用 `PowerShell Start-Process` 且不传 `/go` 时，旧版停在菜单会被 10 秒超时结束；
+  启动器已识别 `powershell`/`pwsh` 父进程并自动进游戏（`evidence/platform-noarg-test.txt`），
+  普通双击仍显示菜单。
   证据：`Games\TheSaboteur\evidence\saboteur-first.png`（历史，`DXVK v2.5.3 / D3D9 / 59.4 FPS`）、
   `saboteur-fps-only.png`（当前交付，仅 `FPS: 50.7`）、
-  `saboteur-menu.png`（中文游戏内）、`saboteur-launcher.png`。
+  `saboteur-menu.png`（中文游戏内）、`saboteur-launcher.png`、
+  `platform-noarg-test.txt`（PowerShell 无参数启动自动进游戏）。
 - **跨机器交付包**：`Games\TheSaboteur\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest）。
   应用到目标目录前先备份同名文件到 `_legacy_compat_backup\TheSaboteur\` 并写 `交付记录.txt`；
   撤回恢复备份、删除未被修改的交付文件，玩家改过的文件跳过并记录。假目标 + 修改文件撤回测试全 PASS，

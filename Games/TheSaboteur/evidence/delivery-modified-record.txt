@@ -1,54 +1,54 @@
 ============================================================
-[2026/11/02 周一  2:17:13.13] 一键应用：破坏者 The Saboteur
+[2026/11/02 周一 13:13:25.39] 一键应用：破坏者 The Saboteur
 目标目录："D:\AI\legacy-game-compat\Games\TheSaboteur\test-target-modified"
 包目录："D:\AI\legacy-game-compat\Games\TheSaboteur\release\"
 记录说明：应用脚本只修改目标游戏目录；启动器运行时会写我的文档 config.ini 的分辨率，撤回不自动还原。
 记录说明：运行日志.txt / Saboteur_d3d9.log / Saboteur.dxvk-cache 为运行产物，撤回会删除。
 ------------------------------------------------------------
-[ 2:17:13.14] 新增文件：game_starter.exe
-[ 2:17:13.14] 复制交付文件：game_starter.exe
-[ 2:17:13.19] 备份原文件：game_starter.bat -> _legacy_compat_backup\TheSaboteur\game_starter.bat
-[ 2:17:13.20] 复制交付文件：game_starter.bat
-[ 2:17:13.20] 新增文件：launcher.ini
-[ 2:17:13.21] 复制交付文件：launcher.ini
-[ 2:17:13.21] 新增文件：兼容修复.bat
-[ 2:17:13.21] 复制交付文件：兼容修复.bat
-[ 2:17:13.21] 新增文件：恢复原版.bat
-[ 2:17:13.22] 复制交付文件：恢复原版.bat
-[ 2:17:13.26] 备份原文件：d3d9.dll -> _legacy_compat_backup\TheSaboteur\d3d9.dll
-[ 2:17:13.45] 复制交付文件：d3d9.dll
-[ 2:17:13.47] 备份原文件：dxvk.conf -> _legacy_compat_backup\TheSaboteur\dxvk.conf
-[ 2:17:13.47] 复制交付文件：dxvk.conf
-[ 2:17:13.48] 新增文件：_dxvk\d3d9.dll
-[ 2:17:13.48] 复制交付文件：_dxvk\d3d9.dll
-[ 2:17:13.49] 新增文件：_dxvk\dxvk.conf
-[ 2:17:13.49] 复制交付文件：_dxvk\dxvk.conf
-[ 2:17:13.49] 新增文件：_tools\nircmd\ircmdc.exe
-[ 2:17:13.50] 复制交付文件：_tools\nircmd\ircmdc.exe
+[13:13:25.40] 新增文件：game_starter.exe
+[13:13:25.40] 复制交付文件：game_starter.exe
+[13:13:25.42] 备份原文件：game_starter.bat -> _legacy_compat_backup\TheSaboteur\game_starter.bat
+[13:13:25.42] 复制交付文件：game_starter.bat
+[13:13:25.42] 新增文件：launcher.ini
+[13:13:25.43] 复制交付文件：launcher.ini
+[13:13:25.43] 新增文件：兼容修复.bat
+[13:13:25.43] 复制交付文件：兼容修复.bat
+[13:13:25.43] 新增文件：恢复原版.bat
+[13:13:25.44] 复制交付文件：恢复原版.bat
+[13:13:25.45] 备份原文件：d3d9.dll -> _legacy_compat_backup\TheSaboteur\d3d9.dll
+[13:13:25.50] 复制交付文件：d3d9.dll
+[13:13:25.52] 备份原文件：dxvk.conf -> _legacy_compat_backup\TheSaboteur\dxvk.conf
+[13:13:25.52] 复制交付文件：dxvk.conf
+[13:13:25.53] 新增文件：_dxvk\d3d9.dll
+[13:13:25.53] 复制交付文件：_dxvk\d3d9.dll
+[13:13:25.53] 新增文件：_dxvk\dxvk.conf
+[13:13:25.54] 复制交付文件：_dxvk\dxvk.conf
+[13:13:25.54] 新增文件：_tools\nircmd\ircmdc.exe
+[13:13:25.54] 复制交付文件：_tools\nircmd\ircmdc.exe
 ------------------------------------------------------------
-[ 2:17:13.51] 完成：复制 10 个，备份 3 个，错误=0
+[13:13:25.55] 完成：复制 10 个，备份 3 个，错误=0
 记录与备份保留在："D:\AI\legacy-game-compat\Games\TheSaboteur\test-target-modified\_legacy_compat_backup\TheSaboteur"
 ============================================================
 ============================================================
-[2026/11/02 周一  2:17:13.65] 一键撤回：破坏者 The Saboteur
+[2026/11/02 周一 13:13:25.66] 一键撤回：破坏者 The Saboteur
 目标目录："D:\AI\legacy-game-compat\Games\TheSaboteur\test-target-modified"
 ------------------------------------------------------------
-[ 2:17:13.72] 删除交付文件：game_starter.exe
-[ 2:17:13.74] 跳过恢复（目标文件已被修改）：game_starter.bat
-[ 2:17:13.82] 删除交付文件：launcher.ini
-[ 2:17:13.85] 删除交付文件：兼容修复.bat
-[ 2:17:13.86] 删除交付文件：恢复原版.bat
-[ 2:17:13.91] 跳过恢复（目标文件已被修改）：d3d9.dll
-[ 2:17:13.93] 恢复原文件：dxvk.conf
-[ 2:17:14.14] 删除交付文件：_dxvk\d3d9.dll
-[ 2:17:14.16] 删除交付文件：_dxvk\dxvk.conf
-[ 2:17:14.25] 删除交付文件：_tools\nircmd\ircmdc.exe
-[ 2:17:14.34] 删除运行产物：运行日志.txt
-[ 2:17:14.38] 删除运行产物：Saboteur_d3d9.log
-[ 2:17:14.38] 删除运行产物：Saboteur.dxvk-cache
+[13:13:25.71] 删除交付文件：game_starter.exe
+[13:13:25.72] 跳过恢复（目标文件已被修改）：game_starter.bat
+[13:13:25.76] 删除交付文件：launcher.ini
+[13:13:25.77] 删除交付文件：兼容修复.bat
+[13:13:25.79] 删除交付文件：恢复原版.bat
+[13:13:25.80] 跳过恢复（目标文件已被修改）：d3d9.dll
+[13:13:25.82] 恢复原文件：dxvk.conf
+[13:13:25.93] 删除交付文件：_dxvk\d3d9.dll
+[13:13:25.95] 删除交付文件：_dxvk\dxvk.conf
+[13:13:25.98] 删除交付文件：_tools\nircmd\ircmdc.exe
+[13:13:26.02] 删除运行产物：运行日志.txt
+[13:13:26.02] 删除运行产物：Saboteur_d3d9.log
+[13:13:26.02] 删除运行产物：Saboteur.dxvk-cache
 ------------------------------------------------------------
-[ 2:17:14.39] 记录：外部 config.ini 未自动还原；启动器可能改过分辨率，请按需手动处理。
-[ 2:17:14.39] 记录：目标文件若被修改过，已保留现文件并跳过覆盖。
-[ 2:17:14.39] 完成：恢复 1 个，删除 10 个，跳过 2 个，错误=0
+[13:13:26.03] 记录：外部 config.ini 未自动还原；启动器可能改过分辨率，请按需手动处理。
+[13:13:26.03] 记录：目标文件若被修改过，已保留现文件并跳过覆盖。
+[13:13:26.03] 完成：恢复 1 个，删除 10 个，跳过 2 个，错误=0
 记录与备份保留在："D:\AI\legacy-game-compat\Games\TheSaboteur\test-target-modified\_legacy_compat_backup\TheSaboteur"
 ============================================================

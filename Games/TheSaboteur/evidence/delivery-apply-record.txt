@@ -1,31 +1,31 @@
 ============================================================
-[2026/11/02 周一  2:17:10.18] 一键应用：破坏者 The Saboteur
+[2026/11/02 周一 13:13:24.52] 一键应用：破坏者 The Saboteur
 目标目录："D:\AI\legacy-game-compat\Games\TheSaboteur\test-target"
 包目录："D:\AI\legacy-game-compat\Games\TheSaboteur\release\"
 记录说明：应用脚本只修改目标游戏目录；启动器运行时会写我的文档 config.ini 的分辨率，撤回不自动还原。
 记录说明：运行日志.txt / Saboteur_d3d9.log / Saboteur.dxvk-cache 为运行产物，撤回会删除。
 ------------------------------------------------------------
-[ 2:17:10.19] 新增文件：game_starter.exe
-[ 2:17:10.20] 复制交付文件：game_starter.exe
-[ 2:17:10.44] 备份原文件：game_starter.bat -> _legacy_compat_backup\TheSaboteur\game_starter.bat
-[ 2:17:10.44] 复制交付文件：game_starter.bat
-[ 2:17:10.45] 新增文件：launcher.ini
-[ 2:17:10.45] 复制交付文件：launcher.ini
-[ 2:17:10.46] 新增文件：兼容修复.bat
-[ 2:17:10.46] 复制交付文件：兼容修复.bat
-[ 2:17:10.47] 新增文件：恢复原版.bat
-[ 2:17:10.47] 复制交付文件：恢复原版.bat
-[ 2:17:10.50] 备份原文件：d3d9.dll -> _legacy_compat_backup\TheSaboteur\d3d9.dll
-[ 2:17:10.83] 复制交付文件：d3d9.dll
-[ 2:17:10.85] 备份原文件：dxvk.conf -> _legacy_compat_backup\TheSaboteur\dxvk.conf
-[ 2:17:10.86] 复制交付文件：dxvk.conf
-[ 2:17:10.86] 新增文件：_dxvk\d3d9.dll
-[ 2:17:11.00] 复制交付文件：_dxvk\d3d9.dll
-[ 2:17:11.01] 新增文件：_dxvk\dxvk.conf
-[ 2:17:11.01] 复制交付文件：_dxvk\dxvk.conf
-[ 2:17:11.01] 新增文件：_tools\nircmd\ircmdc.exe
-[ 2:17:11.10] 复制交付文件：_tools\nircmd\ircmdc.exe
+[13:13:24.53] 新增文件：game_starter.exe
+[13:13:24.53] 复制交付文件：game_starter.exe
+[13:13:24.55] 备份原文件：game_starter.bat -> _legacy_compat_backup\TheSaboteur\game_starter.bat
+[13:13:24.56] 复制交付文件：game_starter.bat
+[13:13:24.56] 新增文件：launcher.ini
+[13:13:24.56] 复制交付文件：launcher.ini
+[13:13:24.56] 新增文件：兼容修复.bat
+[13:13:24.57] 复制交付文件：兼容修复.bat
+[13:13:24.57] 新增文件：恢复原版.bat
+[13:13:24.57] 复制交付文件：恢复原版.bat
+[13:13:24.59] 备份原文件：d3d9.dll -> _legacy_compat_backup\TheSaboteur\d3d9.dll
+[13:13:24.65] 复制交付文件：d3d9.dll
+[13:13:24.67] 备份原文件：dxvk.conf -> _legacy_compat_backup\TheSaboteur\dxvk.conf
+[13:13:24.67] 复制交付文件：dxvk.conf
+[13:13:24.67] 新增文件：_dxvk\d3d9.dll
+[13:13:24.68] 复制交付文件：_dxvk\d3d9.dll
+[13:13:24.68] 新增文件：_dxvk\dxvk.conf
+[13:13:24.68] 复制交付文件：_dxvk\dxvk.conf
+[13:13:24.69] 新增文件：_tools\nircmd\ircmdc.exe
+[13:13:24.69] 复制交付文件：_tools\nircmd\ircmdc.exe
 ------------------------------------------------------------
-[ 2:17:11.10] 完成：复制 10 个，备份 3 个，错误=0
+[13:13:24.69] 完成：复制 10 个，备份 3 个，错误=0
 记录与备份保留在："D:\AI\legacy-game-compat\Games\TheSaboteur\test-target\_legacy_compat_backup\TheSaboteur"
 ============================================================
