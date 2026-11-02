@@ -5,8 +5,8 @@ title %tl%
 mode con: lines=34 cols=92 >nul 2>&1
 if exist "%~dp0_tools\nircmd\nircmdc.exe" "%~dp0_tools\nircmd\nircmdc.exe" win center ititle "%tl%"
 cd /d "%~dp0"
-if not exist "generals.exe" (
-  echo   找不到 generals.exe
+if not exist "FiveStarHX.exe" (
+  echo   找不到 FiveStarHX.exe
   if /i not "%~1"=="/go" pause
   exit /b 1
 )

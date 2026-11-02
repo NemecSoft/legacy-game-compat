@@ -17,7 +17,7 @@ using Microsoft.Win32;
 // .qoder/skills/legacy-launcher-gui/SKILL.md：纯 GDI+ 自绘、三栏 900×620、红渐变、正常 TextRenderer。
 //
 // 游戏是 Command & Conquer: Generals – Zero Hour 的国产模组；兼容层为 DXVK 2.5.3
-// （d3d8.dll + d3d9.dll）。启动器直接启动 generals.exe，等待实际的 Game.dat 进程，
+// （d3d8.dll + d3d9.dll）。启动器直接启动 FiveStarHX.exe，等待实际的 Game.dat 进程，
 // 并重新实现原「初始注册程序」的注册表写入和「画质管理器」的 Options.ini 设置。
 
 class Launcher : Form
@@ -43,10 +43,10 @@ class Launcher : Form
 
     // ---------- launcher.ini 可覆盖 ----------
     string gameTitle = "绝命时刻：五星之光";
-    string gameExe = "generals.exe";
+    string gameExe = "FiveStarHX.exe";
     string gameArgs = "";
     string gameProcess = "Game.dat";
-    string gameIconExe = "generals.exe";
+    string gameIconExe = "FiveStarHX.exe";
     string initExe = "";
     bool runInit = false;
     long affinity = 0;

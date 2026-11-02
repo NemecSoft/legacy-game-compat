@@ -15,7 +15,7 @@ if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framewo
 if (-not (Test-Path $csc)) { throw '找不到 csc.exe' }
 $exe = Join-Path $Out 'game_starter.exe'
 $ico = Join-Path $Out 'game_starter.ico'
-$iconExe = Join-Path $GameDir 'generals.exe'
+$iconExe = Join-Path $GameDir 'FiveStarHX.exe'
 try {
   Add-Type -AssemblyName System.Drawing
   if (Test-Path $iconExe) {
