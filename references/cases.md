@@ -79,13 +79,11 @@
   实测 1280×720 → 1920×1080 可逆，退出码 0。游戏是启动器直接子进程，陪跑并回传退出码。
   exe 已嵌入 `Saboteur.exe` 图标（32.5 KB）；当前交付 `dxvk.conf` 只写
   `dxvk.hud = fps`（历史取证截图带 version/api）。
-  平台用 `PowerShell Start-Process` 且不传 `/go` 时，旧版停在菜单会被 10 秒超时结束；
-  启动器已识别 `powershell`/`pwsh` 父进程并自动进游戏（`evidence/platform-noarg-test.txt`），
-  普通双击仍显示菜单。
+  平台启动：要保留 GUI 选择时直接无参数启动 `game_starter.exe`，只有零交互才传 `/go`；
+  自动跳过菜单的方案已撤回，避免玩家失去选择权。
   证据：`Games\TheSaboteur\evidence\saboteur-first.png`（历史，`DXVK v2.5.3 / D3D9 / 59.4 FPS`）、
   `saboteur-fps-only.png`（当前交付，仅 `FPS: 50.7`）、
-  `saboteur-menu.png`（中文游戏内）、`saboteur-launcher.png`、
-  `platform-noarg-test.txt`（PowerShell 无参数启动自动进游戏）。
+  `saboteur-menu.png`（中文游戏内）、`saboteur-launcher.png`。
 - **跨机器交付包**：`Games\TheSaboteur\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest）。
   应用到目标目录前先备份同名文件到 `_legacy_compat_backup\TheSaboteur\` 并写 `交付记录.txt`；
   撤回恢复备份、删除未被修改的交付文件，玩家改过的文件跳过并记录。假目标 + 修改文件撤回测试全 PASS，
@@ -142,6 +140,10 @@
   当前截图 `Games\RoadRash\evidence\roadrash-fps-only.png`（仅 `FPS: 60.4`）。
 - 注意：DXVK + 640×480 组合在本机开场 8~16 秒黑屏（20 秒后进比赛）；1080p + DXVK 正常。
 - 启动器：`game_starter.bat` + `game_starter.exe`（中国红，同逻辑），另有 `game_starter-soft.bat` / `game_starter-640.bat`。
+- 平台集成：Playnite 的 PowerShell 启动动作会触发火绒“系统加固 → 隐藏执行 PowerShell”；
+  改用「文件」动作直接启动无参数 `game_starter.exe`，保留存档/级别/按键选择。
+  `game_starter.exe /go` 只用于零交互默认启动；手动强退的退出码 1 不是游戏崩溃。
+  证据：`Games\RoadRash\evidence\roadrash-launcher-menu.png`（无参数启动保持菜单）。
 - 键位：注册表 `HKLM\...\RoadRash 95\Controls`（22 字节），11 个 WORD 低字节恒 0、
   高字节为键码；槽序 = 前进/刹车/左转/左倾/加速/拳打/脚踢/重击/下车/右转/右倾。
   **VK→键码映射表实测自运行中的进程内存 `0x4c5d90`**：`Shift=0x90 Ctrl=0x91 Alt=0x92`、
@@ -203,16 +205,15 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   `_tools\nircmd` 负责控制台窗口居中）+ `launcher.ini`。
   汉化补丁本体（Archives / dinput8.dll / 其它 asi）不动。托管契约：假游戏 5/5 PASS，
   真游戏 `/go` 正常退出回传 `0x00000000`、强杀回传 `0xFFFFFFFF`；bat 菜单 6/6 PASS。
-- 平台入口：`PowerShell Start-Process` 无参数启动时，启动器识别 `powershell` 父进程自动按默认项
-  进游戏（实测 `game_running=True`）；普通双击仍显示菜单。所有 GUI 启动器都加了这一兜底。
+- 平台入口：要保留 GUI 选择时直接无参数启动 `game_starter.exe`；只有零交互才传 `/go`。
+  自动跳过菜单的方案已撤回，避免玩家失去显示/按键等选择。
 - 注册表：`reg.fix.exe` 是 UPX + AutoIt3；REA/Ghidra 解包 + AutoIt-Ripper 提取出原脚本，
   写入 32 位视图 `HKLM\SOFTWARE\Eidos\Just Cause`：`Language=0x409`、`InstallPath=游戏目录`、
   子项 `1.00.0000`。启动器启动前自动写（缺失才写，必要时 `/fixreg` 提权），
   `修复注册表.bat` 可独立执行；删除后重建实测通过（`JustCause-registry-before.reg` 为原始导出）。
 - 证据：`Games\JustCause\evidence\`（`text3-07` 加载界面、`run-06` 字幕、`run-07` 任务提示、
   `menu2-04` 主菜单、`menu-esc` HUD、`hud-06`/`hud-crop` HUD 帧数、`starter-ui` 启动器、
-  `justcause-fps-only.png`（当前交付仅 FPS 29.9）、`JustCause-registry-before.reg`、
-  `platform-noarg-test.txt`（PowerShell 无参数自动启动））。
+  `justcause-fps-only.png`（当前交付仅 FPS 29.9）、`JustCause-registry-before.reg`）。
 - 完整过程与测试矩阵：`Games\JustCause\适配过程分析.md`。
 
 ---

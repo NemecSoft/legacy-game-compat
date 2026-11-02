@@ -129,10 +129,9 @@ class Launcher : Form
         foreach (string a in args)
             if (a == "/go" || a == "-go" || a == "--go" || a == "/auto") l.autoStart = true;
         string parent = ParentProcessName();
-        if (!l.autoStart && (parent == "powershell" || parent == "pwsh")) l.autoStart = true;
         Log("启动参数：" + (args.Length == 0 ? "（无）" : string.Join(" ", args)) +
             "；父进程：" + (parent.Length == 0 ? "未知" : parent) +
-            "；自动启动：" + (l.autoStart ? "是" : "否"));
+            "；零交互：" + (l.autoStart ? "是" : "否"));
         Application.Run(l);
         return l.exitCode;
     }
