@@ -233,7 +233,8 @@ FixTips=...\n...                    ; 自绘版右栏故障说明
   `-WARNING- Using slow software rendering...`；测试时截图存 `Games\<游戏>\evidence\`。
 - DXVK 硬件渲染：`dxvk.conf` 写 `dxvk.hud = version,api,fps`，左上角显示 DXVK 版本/API/FPS；
   交付时删掉这行。
-- 交付默认配置不得带 HUD/水印；软件警告只应作为“auto 回退”的诊断信息出现。
+- DXVK 交付默认配置保留 `dxvk.hud = version,api,fps` 作为层挂载标志；cnc-ddraw 软件警告 /
+  dgVoodoo 水印只作为诊断信息，交付关闭。原生游戏没有 DXVK 层，不能用这个 HUD 判断。
 
 ## 目录布局（交付时）
 

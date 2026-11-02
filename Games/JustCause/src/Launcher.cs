@@ -50,10 +50,10 @@ class Launcher : Form
     // ---------- 选项数据（顺序与默认值即界面所见） ----------
     static readonly string[] HudNames =
     {
-        "1  正常游玩（默认）",
-        "2  显示帧数 HUD（排查用）"
+        "1  显示帧数 HUD（默认）",
+        "2  正常游玩（不显示 HUD）"
     };
-    static readonly string[] HudSubNames = { "正常游玩", "显示帧数 HUD" };
+    static readonly string[] HudSubNames = { "显示帧数 HUD", "正常游玩" };
 
     // ---------- launcher.ini 可覆盖 ----------
     string gameTitle = "正当防卫 Just Cause";
@@ -810,13 +810,13 @@ class Launcher : Form
         Icon = SystemIcons.Application;
     }
 
-    // 显示选项：0 正常（不写 HUD 行），1 写 dxvk.hud = fps
+    // 显示选项：0 显示 HUD（默认），1 正常不写 HUD
     bool ApplyHud(int index, out string message)
     {
         try
         {
             string text = "# 由 game_starter.exe 每次启动按界面选择生成；默认模板见 " + layerBackupDir + "\\" + layerIni + "\r\n";
-            if (index == 1) text += "dxvk.hud = fps\r\n";
+            if (index == 0) text += "dxvk.hud = version,api,fps\r\n";
             File.WriteAllText(Path.Combine(AppDir(), layerIni), text, new UTF8Encoding(false));
             message = HudSubNames[index];
             return true;

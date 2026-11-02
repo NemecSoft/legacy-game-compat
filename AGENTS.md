@@ -62,9 +62,11 @@
    **不放 `.cs` / `.ps1`**。bat 源码 UTF-8 + CRLF，构建时转 GBK+CRLF；exe 编译后复制过去。
 10. **启动器中国红**：bat `color 4f`；exe 背景 `#C0121E` + 金色 `#FFD85E`，不要黑底。
     exe 的具体视觉令牌（配色/字阶/三栏布局/键帽画法）见技能 `.qoder\skills\legacy-launcher-gui`。
-11. **测试时显示渲染水印，交付时关掉**：cnc-ddraw 的 GDI 软件警告 / DXVK HUD / dgVoodoo 水印，
-    用来证明层生效和硬件/软件路径；DXVK HUD 用 `version,api,fps`（临时 `DXVK_HUD=version,api,fps`
-    或 `dxvk.hud`），**`devinfo` 只显示显卡型号，不能当兼容层证据**；证据存 `Games\<游戏>\evidence\`。
+11. **DXVK 交付默认显示层挂载标志**：所有用 DXVK 的交付都在 `dxvk.conf` 写
+    `dxvk.hud = version,api,fps`，玩家看到左上角 `DXVK v... / D3D9 / FPS` 才说明兼容层已挂载；
+    **`devinfo` 只显示显卡型号，不能当兼容层证据**。cnc-ddraw 的 GDI 软件警告 / dgVoodoo 水印
+    只在测试/排障时开，证据存 `Games\<游戏>\evidence\`。原生游戏（War3、Future Soldier、CS16）
+    没有 DXVK 层，不能用这个 HUD 判断；需要 FPS 时用游戏自带选项，不能拿假 FPS 冒充层证据。
 12. **分辨率要实测并如实记录**：DirectDraw 老游戏多是固定 640×480，1080p 只是 cnc-ddraw 输出放大；
     640 与 1080 都要截图对比，不能写成原生 1080p。
 13. **允许一个游戏多个兼容启动方式**（默认 auto、纯软件、原版 640 等），但默认 `game_starter.exe`
@@ -129,7 +131,7 @@
 5. **验证**：先开水印/HUD 确认渲染路径，再跑默认/备用模式；分辨率测试全 PASS / 进一局截图正常；
    640 与 1080 对比；退出后桌面恢复。
 6. **收尾**：杀掉测试进程、确认桌面分辨率复原、把结论写进 `references/cases.md` 和
-   `Games\<游戏>\适配过程分析.md`；水印证据只留在 `evidence\`，交付配置关掉水印。
+   `Games\<游戏>\适配过程分析.md`；DXVK 交付保留 `version,api,fps`，其他水印证据只留在 `evidence\`。
 
 ## 游戏侧交付形态
 
@@ -139,7 +141,7 @@
   ddraw.ini                默认配置（分辨率/渲染器）
   ddraw-soft.ini           可选：纯软件渲染
   ddraw-640.ini            可选：原版分辨率
-  dxvk.conf                可选，交付时关闭 HUD
+  dxvk.conf                可选，DXVK 交付写 dxvk.hud = version,api,fps（层挂载标志）
   _cnc-ddraw\              留底（重装用）
   兼容修复.bat             从 _cnc-ddraw 复制上来，遇同名 dll 先备份
   恢复原版.bat             删除翻译层并还原备份
@@ -182,5 +184,6 @@
   同时在 `Games\<游戏>\适配过程分析.md` 写完整测试矩阵（原生/各层/各分辨率/水印/硬件软件对比）。
 - **新坑** → `references/pitfalls.md` 加一行：症状 → 原因 → 处理。
 - **规则变了** → 改 `SKILL.md` 决策表，别只写在聊天里。
-- **测试证据** → 截图/日志/HUD 存 `Games\<游戏>\evidence\`；交付配置不保留水印/HUD。
+- **测试证据** → 截图/日志/HUD 存 `Games\<游戏>\evidence\`；DXVK 交付保留 `version,api,fps` 作为
+  层挂载标志，其他水印（GDI 警告/dgVoodoo）只留测试证据。
 - 只写实测结论；没验证的标注"未验证"，不要写"应该/可能"。

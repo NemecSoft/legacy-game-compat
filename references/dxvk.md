@@ -29,7 +29,8 @@ devinfo drawcalls compiler`。
 玩家/审核看 HUD 要先看到 `DXVK vX.Y.Z`。
 
 **HUD 只用于测试**：它证明 DXVK 真的在用、走的是哪个 API、帧率多少；截图存 `Games\<游戏>\evidence\`。
-交付时删掉这一行（或注释），**不要让 HUD 出现在玩家画面里**。
+**本项目交付保留这一行**：`dxvk.hud = version,api,fps` 是层挂载标志，玩家看到 DXVK 版本
+才说明兼容层生效；只有确实需要纯净画面时才注释，不要用 `devinfo` 代替。
 
 ## 作为 cnc-ddraw 的后端（DirectDraw 游戏）
 
@@ -38,7 +39,7 @@ devinfo drawcalls compiler`。
 1. 游戏目录放 cnc-ddraw 的 `ddraw.dll` + `ddraw.ini`；
 2. 再放 DXVK 的 `d3d9.dll`；
 3. `ddraw.ini` 写 `renderer=direct3d9`（或 `auto`，有 DXVK 时会选 D3D9）；
-4. `dxvk.conf` 按需配置，测试时开 HUD，交付关闭。
+4. `dxvk.conf` 按需配置；本项目的 DXVK 交付默认保留 `dxvk.hud = version,api,fps`，作为层挂载标志。
 
 实测 RoadRash：`renderer=auto` 自动加载同目录 DXVK，HUD 显示 `DXVK v2.5.3 / D3D9 / 60FPS`；
 无 Vulkan 的机器回退 cnc-ddraw GDI。DXVK + 640×480 组合在该游戏开场黑屏 8~16 秒，

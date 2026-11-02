@@ -55,12 +55,12 @@ Deploy-Bat 'game_starter.bat'
 Deploy-Bat '兼容修复.bat'
 Deploy-Bat '恢复原版.bat'
 
-# 3. 启动器、配置和交付版 DXVK 配置（HUD 已注释）
+# 3. 启动器、配置和交付版 DXVK 配置（HUD=version,api,fps）
 Copy-Item $exe (Join-Path $GameDir 'game_starter.exe') -Force
 Copy-Item (Join-Path $Src 'launcher.ini') (Join-Path $GameDir 'launcher.ini') -Force
 Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $GameDir 'dxvk.conf') -Force
 
-# 4. _dxvk 留底：DLL 从游戏目录现有文件取一次，dxvk.conf 用交付版（HUD 关）
+# 4. _dxvk 留底：DLL 从游戏目录现有文件取一次，dxvk.conf 用交付版（HUD 开）
 $dxvk = Join-Path $GameDir '_dxvk'
 New-Item -ItemType Directory -Force -Path $dxvk | Out-Null
 foreach ($f in 'd3d8.dll', 'd3d9.dll') {

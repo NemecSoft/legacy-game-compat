@@ -68,13 +68,13 @@ $curIni = Join-Path $GameDir 'dxvk.conf'
 $bakIni = Join-Path $dxvk 'dxvk.conf'
 if (-not (Test-Path $bakIni) -and (Test-Path $curIni)) {
   Copy-Item $curIni $bakIni -Force
-  Write-Host '备份 dxvk.conf -> _dxvk（HUD 已关闭）'
+  Write-Host '备份 dxvk.conf -> _dxvk（HUD=version,api,fps）'
 }
 $srcIni = Join-Path $Src 'dxvk.conf'
 if (Test-Path $srcIni) {
   Copy-Item $srcIni $curIni -Force
   Copy-Item $srcIni $bakIni -Force
-  Write-Host '已写入 dxvk.conf（HUD 关闭）'
+  Write-Host '已写入 dxvk.conf（HUD=version,api,fps）'
 }
 
 $n = Join-Path $GameDir '_tools\nircmd'

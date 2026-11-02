@@ -77,7 +77,8 @@
   `launcher.ini`）。5 档分辨率（1920×1080 默认 / 1600×900 / 1280×720 / 1024×768 / 800×600）由启动器
   写我的文档 `My Games\The Saboteur™\SaveGames\config.ini` 的 `ScreenWidth/ScreenHeight`；`/setres N`
   实测 1280×720 → 1920×1080 可逆，退出码 0。游戏是启动器直接子进程，陪跑并回传退出码。
-  exe 已嵌入 `Saboteur.exe` 图标（32.5 KB）；交付 `dxvk.conf` 关闭 HUD。
+  exe 已嵌入 `Saboteur.exe` 图标（32.5 KB）；交付 `dxvk.conf` 保留
+  `dxvk.hud = version,api,fps` 作为层挂载标志。
   证据：`Games\TheSaboteur\evidence\saboteur-first.png`（`DXVK v2.5.3 / D3D9 / 59.4 FPS`）、
   `saboteur-menu.png`（中文游戏内）、`saboteur-launcher.png`。
 - **跨机器交付包**：`Games\TheSaboteur\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest）。
@@ -105,7 +106,8 @@
   游戏不是启动器的直接子进程，是外挂的子进程（平台托管限制，已记录在技能）。
   实施阶段用 DXVK HUD 取证：D3D8 / ~59.9 FPS（早期截图带 `devinfo` 只显示 RX 580；
   `devinfo` 不证明兼容层，后续统一用 `version,api,fps`）；
-  交付时 `dxvk.conf` 注释掉 HUD，最终截图无 HUD。证据：`Games\DFBHD\evidence\dfbhd-hud-1600x1200.png`、
+  交付 `dxvk.conf` 保留 HUD=version,api,fps 作为层挂载标志；旧 no-hud 截图只作历史。
+  证据：`Games\DFBHD\evidence\dfbhd-hud-1600x1200.png`、
   `dfbhd-game-1600x1200-no-hud.png`、`dfbhd-launcher.png`。
 
 ## 5. Delta Force: Black Hawk Down（1.2 单机完整版）
@@ -129,7 +131,7 @@
   - 默认 `renderer=auto`：本机有 Vulkan → cnc-ddraw 的 D3D9 渲染器加载 DXVK 2.5.3（硬件，60FPS）；
     无 Vulkan 自动回退 GDI。另留 `renderer=gdi` 的纯软件启动、640×480 原版启动。
 - 水印验证：软件 = GDI 回退警告；硬件 = `dxvk.hud = version,api,fps`（`DXVK v2.5.3 / D3D9 / 60FPS`）。
-  测试截图存 `Games\RoadRash\evidence\`，交付配置关闭 HUD/水印。
+  交付 `dxvk.conf` 保留该 HUD 作为层挂载标志；GDI 软件警告只用于测试。测试截图存 `Games\RoadRash\evidence\`。
 - 注意：DXVK + 640×480 组合在本机开场 8~16 秒黑屏（20 秒后进比赛）；1080p + DXVK 正常。
 - 启动器：`game_starter.bat` + `game_starter.exe`（中国红，同逻辑），另有 `game_starter-soft.bat` / `game_starter-640.bat`。
 - 键位：注册表 `HKLM\...\RoadRash 95\Controls`（22 字节），11 个 WORD 低字节恒 0、
@@ -309,6 +311,8 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 - 启动链：`init.exe` → `Future Soldier.exe "Future Soldier DX11.exe"`；
   实际游戏进程是 `Future Soldier DX11.exe`。启动器等待实际进程并取它的退出码，
   不是只拿包装器的 0；游戏是孙进程（游戏自身分层）。
+- 原生 DX11 没有 DXVK 层，不显示 DXVK HUD；`/DisplayFPS 1` 参数实测转发到实际游戏但画面未出现 FPS，
+  不作为层证据。其他 DXVK 交付统一保留 `version,api,fps`。
 - 修改器：LinGon v1.8 DX9/DX11 都是 Themida/WinLicense 加壳，带反虚拟机检测；本机
   `HypervisorPresent=True` / VBS 运行中，启动即报
   `Sorry, this application cannot run under a Virtual Machine.`，点确定退出。

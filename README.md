@@ -71,6 +71,8 @@ Then double-click `game_starter.bat` in the game folder.
 DXVK versions are scene-sensitive: a game that white-screens on 2.3.1 may be perfect on 2.5.3 (and vice
 versa). Keep both binaries around. On this machine dgVoodoo2's D3D11/D3D12 backends are unusable, so
 layered D3D9 games use DXVK (Vulkan); re-probe before applying that conclusion to another machine.
+DXVK deliveries keep `dxvk.hud = version,api,fps` so players can see the DXVK version/API/FPS and
+confirm the layer is active; native games do not run DXVK and do not show this HUD.
 
 ## Verified cases
 
