@@ -105,10 +105,12 @@
   **注意本目录这版外挂是陪跑到游戏退出的**（`dfbhd.dat` 的父进程），不能只按“外挂拉起就退出”处理；
   游戏不是启动器的直接子进程，是外挂的子进程（平台托管限制，已记录在技能）。
   实施阶段用 DXVK HUD 取证：D3D8 / ~59.9 FPS（早期截图带 `devinfo` 只显示 RX 580；
-  `devinfo` 不证明兼容层，后续统一用 `version,api,fps`）；
-  交付 `dxvk.conf` 保留 HUD=version,api,fps 作为层挂载标志；旧 no-hud 截图只作历史。
-  证据：`Games\DFBHD\evidence\dfbhd-hud-1600x1200.png`、
-  `dfbhd-game-1600x1200-no-hud.png`、`dfbhd-launcher.png`。
+  `devinfo` 不证明兼容层，取证阶段用 `version,api,fps`）；
+  **当前交付按玩家要求只写 `dxvk.hud = fps`**，左上角只显示帧数；旧截图只作历史。
+  排障时可临时换 `src\dxvk-hud.conf`（version,api,fps）。
+  证据：`Games\DFBHD\evidence\dfbhd-hud-1600x1200.png`（旧 version/api/fps）、
+  `dfbhd-fps-only.png`（当前交付，仅 FPS）、`dfbhd-game-1600x1200-no-hud.png`、
+  `dfbhd-launcher.png`。
 
 ## 5. Delta Force: Black Hawk Down（1.2 单机完整版）
 

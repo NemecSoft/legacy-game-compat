@@ -55,7 +55,7 @@ Deploy-Bat 'game_starter.bat'
 Deploy-Bat '兼容修复.bat'
 Deploy-Bat '恢复原版.bat'
 
-# 3. 启动器、配置和交付版 DXVK 配置（HUD=version,api,fps）
+# 3. 启动器、配置和交付版 DXVK 配置（HUD=fps）
 Copy-Item $exe (Join-Path $GameDir 'game_starter.exe') -Force
 Copy-Item (Join-Path $Src 'launcher.ini') (Join-Path $GameDir 'launcher.ini') -Force
 Copy-Item (Join-Path $Src 'dxvk.conf') (Join-Path $GameDir 'dxvk.conf') -Force

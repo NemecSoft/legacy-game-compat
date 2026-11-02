@@ -14,7 +14,7 @@ copy /y "_dxvk\d3d8.dll" "d3d8.dll" >nul
 copy /y "_dxvk\d3d9.dll" "d3d9.dll" >nul
 if exist "_dxvk\dxvk.conf" copy /y "_dxvk\dxvk.conf" "dxvk.conf" >nul
 echo.
-echo   已启用 DXVK 2.5.3（D3D8 转 Vulkan，HUD=version,api,fps）
+echo   已启用 DXVK 2.5.3（D3D8 转 Vulkan，左上角只显示帧数）
 if not exist "汉化外挂.exe" echo   警告：缺少 汉化外挂.exe
 if not exist "LG_Data\LG_DF_BHD_TS.dll" echo   警告：缺少 LG_Data\LG_DF_BHD_TS.dll
 echo.
