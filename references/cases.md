@@ -203,13 +203,16 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   `_tools\nircmd` 负责控制台窗口居中）+ `launcher.ini`。
   汉化补丁本体（Archives / dinput8.dll / 其它 asi）不动。托管契约：假游戏 5/5 PASS，
   真游戏 `/go` 正常退出回传 `0x00000000`、强杀回传 `0xFFFFFFFF`；bat 菜单 6/6 PASS。
+- 平台入口：`PowerShell Start-Process` 无参数启动时，启动器识别 `powershell` 父进程自动按默认项
+  进游戏（实测 `game_running=True`）；普通双击仍显示菜单。所有 GUI 启动器都加了这一兜底。
 - 注册表：`reg.fix.exe` 是 UPX + AutoIt3；REA/Ghidra 解包 + AutoIt-Ripper 提取出原脚本，
   写入 32 位视图 `HKLM\SOFTWARE\Eidos\Just Cause`：`Language=0x409`、`InstallPath=游戏目录`、
   子项 `1.00.0000`。启动器启动前自动写（缺失才写，必要时 `/fixreg` 提权），
   `修复注册表.bat` 可独立执行；删除后重建实测通过（`JustCause-registry-before.reg` 为原始导出）。
 - 证据：`Games\JustCause\evidence\`（`text3-07` 加载界面、`run-06` 字幕、`run-07` 任务提示、
   `menu2-04` 主菜单、`menu-esc` HUD、`hud-06`/`hud-crop` HUD 帧数、`starter-ui` 启动器、
-  `justcause-fps-only.png`（当前交付仅 FPS 29.9）、`JustCause-registry-before.reg`）。
+  `justcause-fps-only.png`（当前交付仅 FPS 29.9）、`JustCause-registry-before.reg`、
+  `platform-noarg-test.txt`（PowerShell 无参数自动启动））。
 - 完整过程与测试矩阵：`Games\JustCause\适配过程分析.md`。
 
 ---

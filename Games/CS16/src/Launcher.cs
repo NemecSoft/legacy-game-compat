@@ -174,6 +174,11 @@ class Launcher : Form
                 if (i + 1 < args.Length && int.TryParse(args[i + 1], out n) && n >= 1 && n <= ServerPresets.Length)
                     l.serverPreset = n - 1;
             }
+        string parentName = ParentProcessName();
+        if (!l.autoStart && (parentName == "powershell" || parentName == "pwsh")) l.autoStart = true;
+        Log("启动参数：" + (args.Length == 0 ? "（无）" : string.Join(" ", args)) +
+            "；父进程：" + (parentName.Length == 0 ? "未知" : parentName) +
+            "；自动启动：" + (l.autoStart ? "是" : "否"));
         Application.Run(l);
         return l.exitCode;
     }
@@ -227,6 +232,17 @@ class Launcher : Form
         }
         CloseHandle(snap);
         return (int)parent;
+    }
+
+    static string ParentProcessName()
+    {
+        try
+        {
+            int pid = ParentPid(Process.GetCurrentProcess().Id);
+            if (pid == 0) return "";
+            using (Process p = Process.GetProcessById(pid)) return p.ProcessName.ToLowerInvariant();
+        }
+        catch { return ""; }
     }
 
     static void HideParentConsole()

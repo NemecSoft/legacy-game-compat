@@ -43,6 +43,8 @@
    `0xC0000xxx` 判崩溃）、玩家关启动器窗口**不杀游戏**（进程树里游戏仍挂 `game_starter.exe` 的 pid，
    平台照监控）、`game_starter.exe /go` 当零交互启动命令用。平台入口优先 `game_starter.exe /go`，
    平台只认脚本时用 `game_starter.bat /go`（bat 阻塞等待游戏，退出码天然回传）。
+   平台若只能用 PowerShell `Start-Process` 且不能传 `/go`，GUI 会识别 `powershell` / `pwsh`
+   父进程并按默认项自动启动；普通双击（`explorer`）仍显示菜单。运行日志记录参数/父进程/是否自动启动。
    若有人把 exe 挂到 bat 后面启动，可用 `game_starter.exe /go /hideparent` 藏掉父控制台（藏窗口不要依赖 nircmd/PowerShell）。
    菜单版 bat 本身就是控制台窗口，居中用 `_tools\nircmd\nircmdc.exe`（`if exist` 保护，缺了照样能启动）。
    界面与契约细节见技能
