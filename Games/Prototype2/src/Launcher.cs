@@ -465,6 +465,9 @@ class Launcher : Form
         Size sz = TextRenderer.MeasureText(g, hint, fMono);
         TextRenderer.DrawText(g, hint, fMono,
             new Point(ClientSize.Width - S(20) - sz.Width, y), InkDim, Color.Transparent);
+        Size brand = TextRenderer.MeasureText(g, "YUNGAME", fMono);
+        TextRenderer.DrawText(g, "YUNGAME", fMono,
+            new Point((ClientSize.Width - brand.Width) / 2, y), GoldDim, Color.Transparent);
     }
 
     void Card(Graphics g, Rectangle r)
