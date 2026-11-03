@@ -1,0 +1,1 @@
+prompt=enter same string as screen; input=测试

@@ -1,0 +1,30 @@
+===== APPLY =====
+
+  应用完成。
+  记录与备份："D:\AI\legacy-game-compat\Games\OnimushaWotS\test-delivery\_legacy_compat_backup\OnimushaWotS"
+  现在可双击目标目录里的 game_starter.exe 启动游戏。
+请按任意键继续. . . 
+
+EXIT=0
+PASS game_starter.exe copied
+PASS game_starter.exe is real launcher
+PASS config.ini deleted
+PASS config.ini backed up
+PASS backup keeps original config
+PASS launcher.ini backed up
+PASS delivery record written
+PASS nircmd delivered
+===== ROLLBACK =====
+
+  撤回完成。
+  记录："D:\AI\legacy-game-compat\Games\OnimushaWotS\test-delivery\_legacy_compat_backup\OnimushaWotS\交付记录.txt"
+请按任意键继续. . . 
+
+EXIT=0
+PASS config.ini restored
+PASS launcher.ini restored
+PASS old game_starter.exe restored
+PASS delivered game_starter.bat removed
+PASS delivered sha256 removed
+PASS delivered nircmd removed
+FAILURES=0

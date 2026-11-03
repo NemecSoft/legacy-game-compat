@@ -399,3 +399,35 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 - 证据：`Games\FiveStar\evidence\fivestar-launcher.png`、`fivestar-60fps.png`、
   `fivestar-game-1024.png`、`original-tools.png`、`registry-before.reg`、`Options-before.ini`。
   完整分析：`Games\FiveStar\适配过程分析.md`。
+
+## 14. 鬼武者：剑之道 —— RE Engine 分辨率分发（不随包发 config.ini）
+
+- 路径：`D:\YunGame\F\OnimushaWotS`；RE Engine / DirectX 12，本机原生可跑，不需要兼容层。
+- 需求：接收方有宽屏和 2K 显示器，必须至少按各自桌面分辨率输出。上一款《生化危机 8》
+  出现过分发后只有 240p、游戏内改不回来。
+- 根因：RE Engine `config.ini` 的 `FullScreenDisplayModeIndex` / `FullScreenDisplayMode` 是
+  机器相关的显示模式序号，`NormalWindowResolution` 是开发机分辨率；复制到别的显示器会失效，
+  游戏回退到 240p 或锁死低分辨率。**这类配置不能随包发。**
+- 实测：`WindowMode=Borderless` 时，`FullScreenDisplayModeIndex=999`、
+  `NormalWindowResolution=(1280,720)` 都被忽略，窗口仍按桌面 1920×1080 输出。
+  最小显示配置（只写 DisplayType / NormalWindowResolution / WindowMode / FullScreenMode）
+  可以被游戏正常补齐，补齐结果与“完全无配置”逐字节一致。
+- 方案：启动器每次启动用 `EnumDisplaySettings` 取物理桌面（先开
+  `SetProcessDpiAwarenessContext(PER_MONITOR_AWARE_V2)`），首启写最小显示配置；
+  已有配置只改 `[Graphics]` / `[RenderConfig]` 的 `WindowMode=Borderless`、
+  `FullScreenMode=false`、`NormalWindowResolution=当前桌面`，画质键一律不动；
+  原配置备份到 `_legacy_compat_backup\OnimushaWotS\`。另留下拉框“直接启动（不改设置）”
+  （`/raw`）作为退路，完全跳过预设。
+- 交付包 `Games\OnimushaWotS\release\` 的 `一键应用.bat` 会备份并删除目标机的 `config.ini`，
+  让每台电脑首次启动按本机重新生成；撤回时若游戏已重新生成则保留并提示，否则恢复备份。
+- 验证：启动器 `/go` 下游戏是直接子进程、陪跑、退出码回传；`/selftest` 回传 7，
+  强杀回传 `0xFFFFFFFF`，游戏异常回传 `0xC0000005`；关启动器窗口游戏继续运行。
+  交付包应用/撤回 14 项断言 PASS。
+- 证据：`Games\OnimushaWotS\evidence\`（`no-config-45s.png`、`bad-index-borderless-40s.png`、
+  `launcher-final.png`、`launcher-final-direct.png`、`launcher-final-autodetect.png`、`delivery-test.txt`、
+  `verification.txt`）。完整分析：`Games\OnimushaWotS\适配过程分析.md`。
+- 现场补充（2026-11-03，用户提供，非本机复现）：此前分发《生化危机 8》时，网吧 PnP 装机的电脑上
+  出现 GUI 只有小方块（240p 级别），开发机完全正常。推测网吧按 PnP 批量装驱动，游戏识别不到显卡/驱动，
+  回退最低画质和最小分辨率。因此本作默认项必须锁桌面分辨率；启动器下拉框第 3 项
+  “让游戏自动检测（重置画面设置）”只作为可选退路，并提示“检测不到显卡时可能回到最低画面”。
+- 未验证：2K / 超宽屏 / 150% DPI 真机；机制上跟随物理桌面，本机只实测 1920×1080。

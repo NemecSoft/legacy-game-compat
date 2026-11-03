@@ -1,0 +1,7 @@
+h=23530896 vis=True class=#32770 text=[Dialog]
+h=7079314 vis=True class=#32770 text=[.\PrinceOfPersia.EXE]
+h=3804806 vis=True class=DX Project text=[通用汉化器]
+h=23924390 vis=False class=DIEmWin text=[DIEmWin]
+h=12781842 vis=False class=IME text=[Default IME]
+h=5442292 vis=False class=MSCTFIME UI text=[MSCTFIME UI]
+h=5246728 vis=False class=IME text=[Default IME]

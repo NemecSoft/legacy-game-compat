@@ -1,0 +1,61 @@
+鬼武者：剑之道 —— 显示守卫验证记录
+日期：2026-11-03
+机器：Windows 11 x64，AMD RX 580 2048SP，桌面 1920×1080，DPI 100%
+
+1. 无 config.ini 首次启动
+   - GetWindowRect / GetClientRect = 1920×1080
+   - 游戏自动生成 config.ini 3616 字节：WindowMode=Borderless、FullScreenDisplayModeIndex=49
+   - 证据：no-config-45s.png
+
+2. Borderless 下分辨率字段是否生效
+   - 配置改为 FullScreenDisplayModeIndex=999、NormalWindowResolution=(1280,720)
+   - 启动后窗口仍为 1920×1080（Borderless 忽略这两个字段）
+   - 证据：bad-index-borderless-40s.png
+   - 结论：只要 WindowMode=Borderless，输出跟随桌面；2K/宽屏同理
+
+3. 分辨率修复 /fixres（兼容旧 /fixdisplay）
+   - 输入：WindowMode=FullScreen、FullScreenMode=true、DisplayType=Test、1280×720、索引 999
+   - 输出：WindowMode=Borderless（两段）、FullScreenMode=false、DisplayType=Auto
+   - 只改显示键，画质键不变；原文件备份到 _legacy_compat_backup\OnimushaWotS\config.ini
+   - 证据：config-fullscreen-test.ini、config-before-fix.ini
+
+4. 首启最小配置
+   - 只写 [Graphics] / [RenderConfig] 的 DisplayType、NormalWindowResolution、WindowMode、FullScreenMode
+   - 游戏正常启动 1920×1080；补齐后的 config.ini 与“完全无配置”逐字节一致（diff 无输出）
+   - 证据：config-minimal.ini、config-firstrun-auto.ini、config-expanded-from-minimal.ini
+
+5. 启动器托管契约
+   - /go：游戏 PID 15016，父 PID 13668（game_starter.exe）
+   - 游戏运行期间启动器存活；关启动器窗口后启动器隐藏、游戏仍运行
+   - /selftest cmd /c exit 7 → 7
+   - 强杀游戏 → 0xFFFFFFFF；游戏自身异常退出 → 0xC0000005（均原样回传）
+   - 证据：starter-go-visible.png、launcher-final.png
+
+6. 直接启动模式（/raw，下拉框第 2 项）
+   - 隔离目录 config.ini 为 FullScreen/1280×720；/raw /go 后 md5 前后一致（完全没改）
+   - 默认模式 /go 后同一文件被改为 Borderless/1920×1080/Auto/false
+   - 日志：“直接启动：跳过所有画面预设” / “已按桌面 1920×1080 调整分辨率”
+   - 证据：launcher-final-direct.png
+
+7. 让游戏自动检测（/autodetect，下拉框第 3 项）
+   - 0 字节 config.ini 实测：游戏正常启动 1920×1080，并自动补齐 3616 字节
+   - 隔离目录：/autodetect /go 先备份原 config.ini，再写 0 字节；cmd 退出 0
+   - 入口：/autodetect /go（兼容 /reset）
+   - 证据：launcher-final-autodetect.png
+
+8. 交付包
+   - payload 不含 config.ini
+   - 应用：备份并删除目标 config.ini，复制启动器文件
+   - 撤回：目标已重新生成 config.ini 时保留并提示，否则恢复备份；被玩家改过的文件跳过
+   - 应用/撤回 14 项断言全部 PASS
+   - 证据：delivery-test.txt
+
+9. 现场备注（用户提供，非本机实测）
+   - 《生化危机 8》在网吧 PnP 装机的电脑上 GUI 只有小方块（240p），开发机无法复现；
+     推测游戏识别不到显卡/驱动，回退到最低分辨率。因此默认项必须锁桌面，
+     “让游戏自动检测（重置）”只作可选退路，并提示可能回到最低画面。
+
+10. 未实测
+   - 2K（2560×1440）、超宽屏（3440×1440）、150% DPI 真机
+   - 机制：SetProcessDpiAwarenessContext(PER_MONITOR_AWARE_V2) + EnumDisplaySettings 取物理桌面；
+     Borderless 充满桌面。本机 1920×1080 实测，2K/宽屏按同一机制推断，未在真机验证。

@@ -1,0 +1,3 @@
+h=23530896 class=#32770 text=[Dialog]
+h=7079314 class=#32770 text=[.\PrinceOfPersia.EXE]
+h=3804806 class=DX Project text=[通用汉化器]

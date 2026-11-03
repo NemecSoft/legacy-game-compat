@@ -1,0 +1,2 @@
+h=1970014 class=Button text=[确定]
+h=2755594 class=Static text=[00000000]

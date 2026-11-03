@@ -1,0 +1,3 @@
+h=13176332 text=[是(&Y)]
+h=8523410 text=[否(&N)]
+h=3673696 text=[Use safe mode settings?]

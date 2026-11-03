@@ -1,0 +1,8 @@
+PASS auto exit code 0
+PASS auto leaves config.ini untouched
+PASS desktop exit code 0
+PASS desktop sets Borderless
+PASS desktop clears FullScreenMode
+PASS desktop sets desktop resolution
+PASS desktop sets DisplayType Auto
+FAILURES=0

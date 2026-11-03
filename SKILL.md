@@ -207,10 +207,17 @@ FixGame.exe D:\Games\某游戏 /undo       :: 回滚
   640×480 → 1440×1080（2.25 倍）。GDI 双线性偏柔和；`renderer=direct3d9` + DXVK 的 bicubic 更锐利。
   要如实记录“输出 1080p / 内部 640×480”，不要写成原生 1080p。
 - 启动器可以在每次启动前自动改写游戏配置文件，实现"自动按最高档全屏跑"。
+- **RE Engine（生化危机 8 / 鬼武者等）不要分发开发机的 `config.ini`**：
+  `FullScreenDisplayModeIndex` / `FullScreenDisplayMode` / `NormalWindowResolution` 都是机器相关值，
+  换显示器会掉到 240p 或被锁死。做法：启动器首启写最小显示配置，之后每次启动只把
+  `[Graphics]` / `[RenderConfig]` 的 `WindowMode` 固定为 `Borderless`、`FullScreenMode=false`、
+  `NormalWindowResolution` 写当前物理桌面（先开 `SetProcessDpiAwarenessContext(PER_MONITOR_AWARE_V2)`）；
+  Borderless 实测忽略分辨率字段和无效索引，2K/宽屏跟随桌面。另留 `/raw`（不改任何设置直接启动）
+  作为退路。案例：`Games\OnimushaWotS`。
 - **DXVK + 640×480 组合**在 RoadRash 实测开场 8~16 秒黑屏；同一游戏 1080p + DXVK 正常。
   遇到开场黑屏先换分辨率/换 GDI，再怀疑层。
 
-## 常见坑（摘要，完整 41 条见 `references/pitfalls.md`）
+## 常见坑（摘要，完整 65 条见 `references/pitfalls.md`）
 
 - **探针必须 32 位编译**，否则同目录的 32 位包装 DLL 根本不会被加载。
 - **D3D9 全挂先清 `Direct3D\Drivers\SoftwareOnly` / `DirectDraw\EmulationOnly`（64 位 + WOW6432Node 两个视图）**；这是 DirectX 修复工具写的，重装驱动无效。
