@@ -14,8 +14,8 @@ $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe' }
 if (-not (Test-Path $csc)) { throw '找不到 csc.exe' }
 $exe = Join-Path $Out 'game_starter.exe'
-$icon = 'D:\ico.ico'
-if (-not (Test-Path $icon)) { throw "缺少统一启动器图标：$icon（所有 game_starter.exe 固定使用它）" }
+$icon = Join-Path $Repo 'assets\ico.ico'
+if (-not (Test-Path $icon)) { throw "缺少统一启动器图标：$icon（仓库资源，所有 game_starter.exe 固定使用它）" }
 $oldIco = Join-Path $Out 'game_starter.ico'
 if (Test-Path $oldIco) { Remove-Item $oldIco -Force }
 
@@ -57,7 +57,7 @@ Deploy-Bat 'game_starter.bat'
 $n = Join-Path $GameDir '_tools\nircmd'
 New-Item -ItemType Directory -Force -Path $n | Out-Null
 $nircmd = Join-Path $Repo 'tools\nircmd\nircmdc.exe'
-if (Test-Path $nircmd) { Copy-Item $nircmd (Join-Path $n 'ircmdc.exe') -Force }
+if (Test-Path $nircmd) { Copy-Item $nircmd (Join-Path $n 'nircmdc.exe') -Force }
 
 Backup-File 'game_starter.exe'
 Backup-File 'launcher.ini'

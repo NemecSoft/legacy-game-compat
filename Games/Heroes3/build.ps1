@@ -15,18 +15,13 @@ $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe' }
 if (-not (Test-Path $csc)) { throw '找不到 csc.exe' }
 $exe = Join-Path $Out 'game_starter.exe'
-$ico = Join-Path $Out 'game_starter.ico'
-$iconExe = Join-Path $GameDir 'Heroes3.exe'
-try {
-  Add-Type -AssemblyName System.Drawing
-  if (Test-Path $iconExe) {
-    $ic = [System.Drawing.Icon]::ExtractAssociatedIcon($iconExe)
-    if ($ic) { $fs = [IO.File]::Create($ico); $ic.Save($fs); $fs.Close(); $ic.Dispose() }
-  }
-} catch { Write-Host "图标提取失败，继续无图标：$($_.Exception.Message)" }
+$icon = Join-Path $Repo 'assets\ico.ico'
+if (-not (Test-Path $icon)) { throw "缺少统一启动器图标：$icon（仓库资源，所有 game_starter.exe 固定使用它）" }
+$oldIco = Join-Path $Out 'game_starter.ico'
+if (Test-Path $oldIco) { Remove-Item $oldIco -Force }
 $cscArgs = @('-nologo', '-target:winexe', '-optimize+', '-platform:anycpu', '-codepage:65001',
   '-r:System.Windows.Forms.dll', '-r:System.Drawing.dll', ('-out:' + $exe))
-if (Test-Path $ico) { $cscArgs += ('-win32icon:' + $ico) }
+$cscArgs += ('-win32icon:' + $icon)
 $cscArgs += (Join-Path $Src 'Launcher.cs')
 & $csc @cscArgs
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path $exe)) { throw '编译失败' }
@@ -53,7 +48,8 @@ function Deploy-Bat([string]$name) {
   Write-Host "已部署 $name (GBK+CRLF)"
 }
 
-$presets = @('ddraw.ini', 'ddraw-43.ini', 'ddraw-window.ini', 'ddraw-640.ini')
+$presets = @('ddraw.ini', 'ddraw-43.ini', 'ddraw-window.ini', 'ddraw-640.ini',
+           'ddraw-d3d9.ini', 'dgVoodoo-window.conf')
 $presetDir = Join-Path $GameDir '_presets'
 New-Item -ItemType Directory -Force -Path $presetDir | Out-Null
 foreach ($p in $presets) { Copy-Item (Join-Path $Src $p) (Join-Path $presetDir $p) -Force }
@@ -66,6 +62,13 @@ if (-not (Test-Path $bakDll) -and (Test-Path $curDll)) { Copy-Item $curDll $bakD
 Copy-Item (Join-Path $Src 'ddraw.ini') (Join-Path $GameDir 'ddraw.ini') -Force
 Copy-Item (Join-Path $Src 'ddraw.ini') (Join-Path $layer 'ddraw.ini') -Force
 
+# dgVoodoo2 层：仓库自带的 32 位 DDraw.dll（游戏是 32 位），落成 _dgvoodoo2\ddraw.dll
+$vd = Join-Path $GameDir '_dgvoodoo2'
+New-Item -ItemType Directory -Force -Path $vd | Out-Null
+$vdSrc = Join-Path $Repo 'tools\dgvoodoo\x86\DDraw.dll'
+if (-not (Test-Path $vdSrc)) { throw ('缺少 dgVoodoo2 层：' + $vdSrc) }
+Copy-Item $vdSrc (Join-Path $vd 'ddraw.dll') -Force
+
 Deploy-Bat 'game_starter.bat'
 Deploy-Bat '兼容修复.bat'
 Backup-File 'game_starter.exe'
@@ -76,7 +79,9 @@ Copy-Item (Join-Path $Src 'launcher.ini') (Join-Path $GameDir 'launcher.ini') -F
 $n = Join-Path $GameDir '_tools\nircmd'
 New-Item -ItemType Directory -Force -Path $n | Out-Null
 $nircmd = Join-Path $Repo 'tools\nircmd\nircmdc.exe'
-if (Test-Path $nircmd) { Copy-Item $nircmd (Join-Path $n 'ircmdc.exe') -Force }
+if (Test-Path $nircmd) { Copy-Item $nircmd (Join-Path $n 'nircmdc.exe') -Force }
+$stale = Join-Path $n 'ircmdc.exe'
+if (Test-Path $stale) { Remove-Item $stale -Force }   # 2026-11-04 修正：文件名必须和 bat 里逐字一致
 
 $bad = Get-ChildItem $GameDir -Include *.cs,*.ps1 -Recurse -ErrorAction SilentlyContinue
 if ($bad) { throw ("目标目录出现源码文件：" + ($bad.FullName -join ', ')) }

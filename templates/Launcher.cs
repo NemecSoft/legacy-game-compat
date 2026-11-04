@@ -36,21 +36,21 @@ class Launcher : Form
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = true;
-        BackColor = Color.FromArgb(22, 24, 30);
-        ForeColor = Color.White;
+        BackColor = Color.FromArgb(0x2C, 0x18, 0x10);   // 皮革深棕（拟物皮革主题）
+        ForeColor = Color.FromArgb(0xF4, 0xE3, 0xC6);    // 米黄正文
         Font = new Font("Microsoft YaHei", 9f);
 
         lblTitle = new Label();
         lblTitle.Text = gameTitle;
         lblTitle.Font = new Font("Microsoft YaHei", 16f, FontStyle.Bold);
-        lblTitle.ForeColor = Color.White;
+        lblTitle.ForeColor = Color.FromArgb(0xF0, 0xD5, 0x96); // 烫金标题
         lblTitle.AutoSize = false;
         lblTitle.Location = new Point(24, 20);
         lblTitle.Size = new Size(532, 40);
 
         lblNotes = new Label();
         lblNotes.Text = notes;
-        lblNotes.ForeColor = Color.FromArgb(168, 174, 186);
+        lblNotes.ForeColor = Color.FromArgb(0xD8, 0xBD, 0x96);
         lblNotes.Location = new Point(26, 68);
         lblNotes.Size = new Size(530, 150);
 
@@ -65,7 +65,7 @@ class Launcher : Form
 
         lblStatus = new Label();
         lblStatus.Text = "就绪";
-        lblStatus.ForeColor = Color.FromArgb(120, 200, 140);
+        lblStatus.ForeColor = Color.FromArgb(0xD9, 0xA4, 0x41);
         lblStatus.Location = new Point(26, 290);
         lblStatus.AutoSize = true;
 
@@ -79,9 +79,9 @@ class Launcher : Form
         b.Location = new Point(x, y);
         b.Size = new Size(w, 38);
         b.FlatStyle = FlatStyle.Flat;
-        b.FlatAppearance.BorderColor = Color.FromArgb(80, 86, 100);
-        b.BackColor = Color.FromArgb(36, 40, 50);
-        b.ForeColor = Color.White;
+        b.FlatAppearance.BorderColor = Color.FromArgb(0xB9, 0x8A, 0x55);
+        b.BackColor = Color.FromArgb(0x5A, 0x34, 0x21);
+        b.ForeColor = Color.FromArgb(0xF4, 0xE3, 0xC6);
         return b;
     }
 

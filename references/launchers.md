@@ -34,7 +34,7 @@ bat 用 `echo` 自己生成菜单，菜单项、顺序、默认值与 exe 完全
 | 适合 | 控制台玩家；不想编译；平台只认脚本时用 `/go`；同一套选项做双入口 | 默认交付；键帽操作表；被平台托管 |
 | 依赖 | 系统 `cmd` | .NET Framework 4.x（Win10/11 自带） |
 | 体积 | 1 个文本文件 | 约 10–30 KB（自绘版实测 27.5 KB，红线 60 KB） |
-| 主题 | 红底白字 `color 4f` + 菜单 | 中国红渐变 `#800020→#4A0012` + 金色 `#FFD85E` |
+| 主题 | 红底白字 `color 4f` + 菜单 | 拟物皮革：`#3A2015→#1C0F0A` + 黄铜金 `#E3C07A` / 烫金 `#F0D596` |
 
 ## 共同硬要求
 
@@ -47,7 +47,9 @@ bat 用 `echo` 自己生成菜单，菜单项、顺序、默认值与 exe 完全
 6. **导入游戏设置**：如果游戏需要自己的 `.reg`（如 RoadRash 的 `road64.reg`），按系统位数导入；
    只写游戏自己的键，能回滚，不碰系统全局。
 7. **退出即结束**：游戏退出后启动器窗口自动关（bat）或状态回到"已退出"（exe）。
-8. **中国红，不要黑底**：bat `@echo off&color 4f`；exe 背景 `#C0121E`、标题/边框金色、正文白/米色。
+8. **配色**：bat `@echo off&color 4f`（cmd 只有 16 色，保持中国红）；exe 自 2026-11-03 起统一
+   **拟物皮革**（背景深棕渐变 + 皮纹 + 暗角，卡片黄铜缝线，标题/页脚烫金，正文米黄），不要纯黑底。
+   已交付的中国红 exe 不返工。令牌见技能 `.qoder\skills\legacy-launcher-gui\SKILL.md`。
 9. **源文件隔离**：`Launcher.cs`、bat 源码放仓库 `Games\<游戏>\src`；游戏目录只放编译/转码后的成品，
    **不放 `.cs` / `.ps1`**。bat 源码 UTF-8 + **CRLF**，落地转 **GBK + CRLF**。
 10. **反作弊网游不做。**
@@ -167,18 +169,22 @@ csc -nologo -target:winexe -optimize+ -platform:anycpu -codepage:65001 ^
     -r:System.Windows.Forms.dll -r:System.Drawing.dll -out:game_starter.exe Launcher.cs
 ```
 
-源码放 `Games\<游戏>\src\Launcher.cs`，配置 `launcher.ini`。中国红主题：
+源码放 `Games\<游戏>\src\Launcher.cs`，配置 `launcher.ini`。拟物皮革主题（简单模板版）：
 
 ```csharp
-BackColor = Color.FromArgb(192, 18, 30);      // 中国红
-lblTitle.ForeColor = Color.FromArgb(255, 216, 94);  // 金色
-lblNotes.ForeColor = Color.FromArgb(255, 233, 200); // 米色
-btn.BackColor = Color.FromArgb(150, 12, 22);
-btn.FlatAppearance.BorderColor = Color.FromArgb(255, 216, 94);
+BackColor = Color.FromArgb(0x2C, 0x18, 0x10);        // 皮革深棕
+ForeColor = Color.FromArgb(0xF4, 0xE3, 0xC6);        // 米黄正文
+lblTitle.ForeColor = Color.FromArgb(0xF0, 0xD5, 0x96); // 烫金标题
+lblNotes.ForeColor = Color.FromArgb(0xD8, 0xBD, 0x96); // 次要说明
+btn.BackColor = Color.FromArgb(0x5A, 0x34, 0x21);      // 皮革按钮
+btn.FlatAppearance.BorderColor = Color.FromArgb(0xB9, 0x8A, 0x55); // 黄铜描边
 ```
 
-统一启动器图标固定用 `D:\ico.ico`（构建时 `-win32icon:` 嵌入，运行时取 exe 自身图标），
-不要从游戏 exe 抽图标；游戏目录与 src 仍不允许出现 ico。
+自绘版（900×620 三栏）不用控件底色，全部在 `OnPaint` 里现画：皮纹斜线 + `PathGradientBrush` 暗角 +
+卡片缝线，令牌表同一技能文档。
+
+统一启动器图标固定用**仓库资源 `assets\ico.ico`**（构建时 `-win32icon:` 嵌入，运行时取 exe 自身图标），
+不要写 `D:\ico.ico` 这种构建机路径，也不要从游戏 exe 抽图标；游戏目录与 src 仍不允许出现 ico。
 
 构建后跑一次体积/资源检查（红线 60 KB，游戏目录与 src 不许出现图片/图标/resx）：
 
@@ -216,18 +222,24 @@ FixTips=...\n...                    ; 自绘版右栏故障说明
 - 启动优先 `LoaderExe`，否则 `GameExe`；工作目录固定为 exe 所在目录。
 - 运行期间"启动游戏"按钮禁用并显示"游戏运行中…"；游戏一退出，启动器跟着退出并回传游戏退出码。
 - **交付只一个 exe**：自检补层、按键落地、提权都在 `game_starter.exe` 的命令行开关里
-  （`/go`、`/keymap N`、`/selftest`），不留 `keymap.exe` / `nircmdc.exe` 这类伴生文件，不引第三方 DLL。
+  （`/go`、`/keymap N`、`/selftest`），不留 `keymap.exe` 这类伴生文件，不引第三方 DLL。
+  唯一例外：随控制台菜单版 bat 一起带的 `_tools\nircmd\nircmdc.exe`（只服务 bat 居中）；
+  **落地文件名要和 bat 里写的逐字一致**，写成 `ircmdc.exe` 会让 `if exist` 静默跳过。
 - **窗口永不置顶**（`TopMost=false`）；玩家关窗 = 隐藏陪跑，不是退出游戏。
 - 按钮：**启动游戏** + 必要的修复按钮（如 `修复分辨率`）+ **打开运行日志** + **退出**，不要「打开游戏目录」。
   技术细节（层、rc、注册表、退出码）全写进 `运行日志.txt`，界面只说人话，状态默认「已就绪」；
   左栏只讲游戏本身，右栏只放操作说明，不写兼容层/分辨率/回滚这类说明。
-- 自绘版基准尺寸 900×620（三栏），模板版约 600×380；都是中国红底 + 金色标题。
+- 自绘版基准尺寸 900×620（三栏），模板版约 600×380；统一拟物皮革（深棕皮革底 + 黄铜金 / 烫金标题）。
 - 启动方式下拉只给两个玩家能懂的结果：`游戏自动检测（推荐）` / `画面异常时（固定桌面分辨率）`；
   不要写「备份 / 直接启动 / 自动检测（重置）/ config」。默认游戏自动检测，画面不对再选固定桌面分辨率。
 - 确实需要下拉框时：不要半自绘原生 ComboBox（`OwnerDrawFixed` + `FlatStyle.Flat` 容易闪）；
   用自绘双缓冲 `Panel` + `ContextMenuStrip`，或接受系统外观的原生 ComboBox；
   父窗体 hover/选中只刷按钮区，不整窗 `Invalidate()`。
-- 页脚中间固定显示 `YunGame` 品牌字样（`fBrand` 12pt 粗体 + `Gold` 亮金，居中），与左状态/右提示同一行，
+  **自绘 `Panel` 默认不可聚焦**，键盘要走就得在窗体 `ProcessCmdKey` 里把它接进 Tab 链：
+  焦点在框上时 `↑↓` 直接换项、`Enter` 展开菜单，并给它画和按钮一样的焦点环
+  （重绘要连它的区域一起失效，不然环被裁掉看不见）。
+- 页脚中间固定显示 `YunGame` 品牌字样（`fBrand` 12pt 粗体，先画 1px 偏移深棕再画烫金 `#F0D596`，居中），
+  与左状态/右提示同一行，
   不遮挡；这是统一交付标识，不要换成游戏名或技术名。
 - 品牌防改：exe 不存明文，运行时解码并 SHA-256 校验，失败提示退出；构建后运行
   `scripts/write-launcher-hashes.ps1` 生成 `game_starter.sha256`，平台可复核。签名/哈希
@@ -248,7 +260,7 @@ FixTips=...\n...                    ; 自绘版右栏故障说明
 - DXVK 交付配置只写 `dxvk.hud = fps` 作为层挂载标志；cnc-ddraw 软件警告 /
   dgVoodoo 水印只作为诊断信息，交付关闭。原生游戏没有 DXVK 层，不能用这个 HUD 判断。
 - **玩家界面说人话**：启动方式只给玩家能懂的结果——`DX11（画质最好）`、`DX9（老机器）`、
-  `GDI（最兼容，推荐）`；界面不写 DXVK/dgVoodoo/cnc-ddraw/Mesa/兼容层/HUD/注册表/亲和性/DLL
+  `GDI（软件画面）`；不写「最稳」「最兼容」这类保证词；界面不写 DXVK/dgVoodoo/cnc-ddraw/Mesa/兼容层/HUD/注册表/亲和性/DLL
   文件名，技术细节只进日志和仓库文档。左栏只讲游戏本身。
 - **启动选项只用一个下拉框**，选项文字直接描述（`桌面分辨率（推荐）`、`直接启动（不改设置）`）；
   不单独显示「画面/分辨率」信息块；修复按钮写明修复对象（`修复分辨率`），不要用「修复画面」；

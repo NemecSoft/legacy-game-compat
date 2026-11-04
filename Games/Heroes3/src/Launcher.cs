@@ -12,32 +12,38 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 
 // 英雄无敌3：死亡阴影启动器（game_starter.exe），界面规范见仓库
-// .qoder/skills/legacy-launcher-gui/SKILL.md：纯 GDI+ 自绘、三栏 900×620、红渐变、正常 TextRenderer。
+// .qoder/skills/legacy-launcher-gui/SKILL.md：纯 GDI+ 自绘、三栏 900×620、拟物皮革、正常 TextRenderer。
 //
-// 兼容层是 cnc-ddraw 7.1（ddraw.dll），只提供 GDI 软件渲染的几种显示方式：
-// 稳定全屏 / 保持 4:3 / 窗口 / 原版 640×480；auto/direct3d9/DXVK 在本游戏实测易崩，不提供。
-// 启动器直接启动 Heroes3.exe，按所选模式切换 _presets\ddraw*.ini，退出后恢复默认。
+// 两条通道六个档位（名字是用户选的 B 套：大白话 + 技术名）：
+// cnc-ddraw 7.1 的 GDI 软件画面（全屏 / 4:3黑边 / 窗口 / 原版640）与 DX9硬件加速，
+// dgVoodoo2 转译（窗口）；auto 与 DXVK 在本游戏实测易崩，不提供。
+// 启动器直接启动 Heroes3.exe，按所选模式切换 _presets\ 里的配置，退出后恢复默认。
 
 class Launcher : Form
 {
-    // ---------- 设计令牌 ----------
-    static readonly Color BgTop = Color.FromArgb(0x80, 0x00, 0x20);
-    static readonly Color BgBottom = Color.FromArgb(0x4A, 0x00, 0x12);
-    static readonly Color CardTop = Color.FromArgb(0x9B, 0x1B, 0x30);
-    static readonly Color CardBottom = Color.FromArgb(0x6E, 0x0F, 0x22);
-    static readonly Color BandTop = Color.FromArgb(0x2A, 0x0A, 0x0F);
-    static readonly Color BandBottom = Color.FromArgb(0x4A, 0x0E, 0x1A);
-    static readonly Color PanelEdge = Color.FromArgb(0xE0, 0x57, 0x4F);
-    static readonly Color Gold = Color.FromArgb(0xFF, 0xD8, 0x5E);
-    static readonly Color GoldDim = Color.FromArgb(0xC9, 0xA2, 0x27);
-    static readonly Color Ink = Color.FromArgb(0xFF, 0xF3, 0xE6);
-    static readonly Color InkDim = Color.FromArgb(0xF0, 0xC3, 0xA8);
-    static readonly Color OnGold = Color.FromArgb(0x5C, 0x08, 0x10);
-    static readonly Color CapFace = Color.FromArgb(0x2E, 0x2E, 0x34);
-    static readonly Color CapTopHi = Color.FromArgb(0x54, 0x54, 0x5E);
-    static readonly Color CapSide = Color.FromArgb(0x17, 0x17, 0x1B);
-    static readonly Color Ok = Color.FromArgb(0x7B, 0xD8, 0x8F);
-    static readonly Color Warn = Color.FromArgb(0xFF, 0xB4, 0x54);
+    // ---------- 设计令牌（拟物皮革，见 .qoder/skills/legacy-launcher-gui/SKILL.md） ----------
+    static readonly Color BgTop = Color.FromArgb(0x3A, 0x20, 0x15);
+    static readonly Color BgMid = Color.FromArgb(0x2C, 0x18, 0x10);
+    static readonly Color BgBottom = Color.FromArgb(0x1C, 0x0F, 0x0A);
+    static readonly Color CardTop = Color.FromArgb(0x5A, 0x34, 0x21);
+    static readonly Color CardBottom = Color.FromArgb(0x3B, 0x21, 0x16);
+    static readonly Color BandTop = Color.FromArgb(0x24, 0x13, 0x0D);
+    static readonly Color BandBottom = Color.FromArgb(0x3A, 0x20, 0x15);
+    static readonly Color PanelEdge = Color.FromArgb(0xB9, 0x8A, 0x55);
+    static readonly Color Gold = Color.FromArgb(0xE3, 0xC0, 0x7A);
+    static readonly Color GoldBright = Color.FromArgb(0xF0, 0xD5, 0x96);
+    static readonly Color GoldDim = Color.FromArgb(0x9A, 0x6A, 0x2A);
+    static readonly Color Ink = Color.FromArgb(0xF4, 0xE3, 0xC6);
+    static readonly Color InkDim = Color.FromArgb(0xD8, 0xBD, 0x96);
+    static readonly Color OnGold = Color.FromArgb(0x2A, 0x16, 0x0D);
+    static readonly Color CapFace = Color.FromArgb(0x4A, 0x2A, 0x1B);
+    static readonly Color CapTopHi = Color.FromArgb(0x9C, 0x6A, 0x3B);
+    static readonly Color CapSide = Color.FromArgb(0x1C, 0x0F, 0x0A);
+    static readonly Color LeatherDark = Color.FromArgb(0x1C, 0x0F, 0x0A);
+    static readonly Color LeatherLight = Color.FromArgb(0x6F, 0x4A, 0x2C);
+    static readonly Color Stitch = Color.FromArgb(0xB9, 0x8A, 0x55);
+    static readonly Color Ok = Color.FromArgb(0xD9, 0xA4, 0x41);
+    static readonly Color Warn = Color.FromArgb(0xE0, 0x7A, 0x5F);
 
     // ---------- launcher.ini 可覆盖 ----------
     string gameTitle = "英雄无敌3：死亡阴影";
@@ -65,45 +71,63 @@ class Launcher : Form
         "把内容发给管理员";
     string entryGuide =
         "启动后先等加载（第一次较慢）\n" +
-        "想换窗口用启动器的「窗口模式」\n" +
-        "画面异常换「保持 4:3」或「窗口」\n" +
+        "想切窗口选第 3 档\n" +
+        "画面异常先回第 1 档\n" +
         "多人：游戏内选 IPX 或 TCP/IP\n" +
         "联机组件已带好，不用另装";
     string tips =
         "# 提示\n" +
-        "默认 GDI（最兼容），画面最稳\n" +
-        "黑屏/花屏时优先选 GDI 稳定全屏或窗口\n" +
-        "其他画面方式在本游戏容易出问题，别手动改\n" +
+        "默认第 1 档：软件画面 GDI\n" +
+        "黑屏/花屏先回第 1 档，再试窗口档\n" +
+        "备选：DX9硬件加速、\n" +
+        "dgVoodoo2转换（无边框全屏），能用就别常换\n" +
         "花屏/黑屏先关远程软件、HDR、覆盖层\n" +
         "高刷屏已经处理过，不用再调";
     string centerNote =
-        "默认「稳定全屏（GDI）」最兼容；\n" +
-        "人物被拉胖选「保持 4:3」，\n" +
-        "黑屏/切屏问题选「窗口模式」，\n" +
-        "老机器想原汁原味\n" +
-        "选「原版 640×480（窗口）」。\n" +
+        "共 6 档，默认第 1 档软件画面 GDI。\n" +
+        "人物拉胖选 2，切窗口选 3 或 4，\n" +
+        "都不行再试：5 DX9硬件加速、\n" +
+        "6 dgVoodoo2转换（无边框全屏）。\n" +
         "\n" +
         "启动器只切换显示方式，不改存档。";
 
     // ---------- 启动方式 ----------
     static readonly string[] ModeNames =
     {
-        "1  稳定全屏（GDI，最兼容）",
-        "2  保持 4:3（左右黑边）",
-        "3  窗口模式（1280×720）",
-        "4  原版 640×480（窗口）"
+        "1  软件画面 GDI（全屏）",
+        "2  软件画面 GDI（4:3黑边）",
+        "3  软件画面 GDI（窗口1280×720）",
+        "4  原版640×480（窗口）",
+        "5  DX9硬件加速（全屏）",
+        "6  dgVoodoo2转换（无边框全屏）"
     };
     static readonly string[] ModePresets =
     {
         "ddraw.ini",
         "ddraw-43.ini",
         "ddraw-window.ini",
-        "ddraw-640.ini"
+        "ddraw-640.ini",
+        "ddraw-d3d9.ini",
+        "dgVoodoo-window.conf"
     };
+    // 每个模式顶在 ddraw.dll 位置上的层：cnc = cnc-ddraw，voodoo = dgVoodoo2
+    static readonly string[] ModeLayer =
+    {
+        // dgVoodoo2 全屏这条路实测会让游戏报 DDERR_INVALIDRECT（WINGRAPH.CPP:456），已撤下，只留窗口
+        "cnc", "cnc", "cnc", "cnc", "cnc", "voodoo"
+    };
+    static readonly string[] LayerDirs =
+    {
+        "cnc", "_cnc-ddraw",
+        "voodoo", "_dgvoodoo2"
+    };
+
+    // 窗口模式（1280×720）：除零类闪退的兜底方式
+    const int WINDOW_MODE = 2;
 
     // ---------- 运行状态 ----------
     const int NoFocus = -99;
-    int mode;
+    int mode = 5;                    // 默认第 6 档：dgVoodoo2转换（无边框全屏）
     int hover = -1, focus = NoFocus;
     int rightScroll, rightScrollMax;
     bool busy, layerOk;
@@ -120,7 +144,8 @@ class Launcher : Form
     float dpi = 1f;
     Rectangle colLeft, colCenter, colRight;
     Rectangle rcLabelMode, rcComboMode, rcStart, rcFolder, rcExit;
-    ComboBox cbMode;
+    SelectPanel selMode;
+    ContextMenuStrip modeMenu;
 
     class LegendItem { public string Caption; public string[] Caps; public string Note; }
 
@@ -133,10 +158,15 @@ class Launcher : Form
             if (a == "/hideparent" || a == "-hideparent") HideParentConsole();
         Application.EnableVisualStyles();
         Launcher l = new Launcher();
+        int remembered = ReadModeMemory();
+        if (remembered >= 0 && remembered < ModeNames.Length) l.mode = remembered;
         foreach (string a in args)
         {
             if (a == "/go" || a == "-go" || a == "--go" || a == "/auto") l.autoStart = true;
-            if (a == "/dx9" || a == "-dx9" || a == "--dx9") l.mode = 1;
+            int picked;
+            if (a.StartsWith("/mode") && a.IndexOf('=') > 0 &&
+                int.TryParse(a.Substring(a.IndexOf('=') + 1), out picked) &&
+                picked >= 1 && picked <= ModeNames.Length) l.mode = picked - 1;
         }
         string parentName = ParentProcessName();
         Log("启动参数：" + (args.Length == 0 ? "（无）" : string.Join(" ", args)) +
@@ -259,11 +289,7 @@ class Launcher : Form
         MakeFonts();
         ClientSize = new Size(S(900), S(620));
         RebuildLegend();
-        if (cbMode == null)
-        {
-            cbMode = MakeCombo(ModeNames, mode, delegate { mode = cbMode.SelectedIndex; });
-            cbMode.TabIndex = 0;
-        }
+        if (selMode == null) selMode = MakeModeSelect();
         LayoutRects();
         string msg;
         layerOk = EnsureLayer(out msg);
@@ -324,7 +350,7 @@ class Launcher : Form
         rcStart = new Rectangle(inner, btnY, innerW, S(44));
         rcFolder = new Rectangle(inner, btnY + S(44) + S(10), (innerW - S(8)) * 9 / 16, S(34));
         rcExit = new Rectangle(rcFolder.Right + S(8), rcFolder.Y, innerW - (rcFolder.Right + S(8) - inner), S(34));
-        PlaceCombo(cbMode, rcComboMode);
+        PlaceSelector(selMode, rcComboMode);
     }
 
     // ---------- 绘制 ----------
@@ -334,15 +360,10 @@ class Launcher : Form
         g.SmoothingMode = SmoothingMode.AntiAlias;
         g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
         Rectangle all = new Rectangle(0, 0, ClientSize.Width, ClientSize.Height);
-        using (LinearGradientBrush bg = new LinearGradientBrush(all, BgTop, BgBottom, LinearGradientMode.Vertical))
-            g.FillRectangle(bg, all);
-        Rectangle head = new Rectangle(0, 0, ClientSize.Width, S(76));
-        using (LinearGradientBrush hb = new LinearGradientBrush(head, BandTop, BandBottom, LinearGradientMode.Horizontal))
-            g.FillRectangle(hb, head);
+        DrawLeatherBg(g, all);
+        DrawBand(g, new Rectangle(0, 0, ClientSize.Width, S(76)));
         int footY = S(560);
-        Rectangle foot = new Rectangle(0, footY, ClientSize.Width, ClientSize.Height - footY);
-        using (LinearGradientBrush fb = new LinearGradientBrush(foot, BandTop, BandBottom, LinearGradientMode.Horizontal))
-            g.FillRectangle(fb, foot);
+        DrawBand(g, new Rectangle(0, footY, ClientSize.Width, ClientSize.Height - footY));
 
         DrawHeader(g);
         DrawLeft(g);
@@ -351,13 +372,51 @@ class Launcher : Form
         DrawFooter(g);
     }
 
+    // 背景：竖直渐变 + 两组反向 1px 斜线当皮纹 + PathGradientBrush 压暗四角（不引图片）
+    void DrawLeatherBg(Graphics g, Rectangle r)
+    {
+        using (LinearGradientBrush b = new LinearGradientBrush(r, BgTop, BgBottom, LinearGradientMode.Vertical))
+            g.FillRectangle(b, r);
+        using (Pen dark = new Pen(Color.FromArgb(12, 0, 0, 0), 1f))
+            for (int x = -r.Height; x < r.Width; x += 9)
+                g.DrawLine(dark, x, 0, x + r.Height, r.Height);
+        using (Pen light = new Pen(Color.FromArgb(8, 255, 220, 160), 1f))
+            for (int x = 0; x < r.Width + r.Height; x += 13)
+                g.DrawLine(light, x, 0, x - r.Height, r.Height);
+        using (GraphicsPath path = new GraphicsPath())
+        {
+            path.AddRectangle(r);
+            using (PathGradientBrush pb = new PathGradientBrush(path))
+            {
+                pb.CenterColor = Color.FromArgb(0, 0, 0, 0);
+                pb.SurroundColors = new Color[] { Color.FromArgb(120, 10, 4, 2) };
+                g.FillPath(pb, path);
+            }
+        }
+    }
+
+    void DrawBand(Graphics g, Rectangle r)
+    {
+        using (LinearGradientBrush b = new LinearGradientBrush(r, BandTop, BandBottom, LinearGradientMode.Horizontal))
+            g.FillRectangle(b, r);
+        using (Pen p = new Pen(Color.FromArgb(14, 0, 0, 0), 1f))
+            for (int x = r.X; x < r.Right; x += 7)
+                g.DrawLine(p, x, r.Y, x, r.Bottom);
+        using (Pen hi = new Pen(Color.FromArgb(45, 255, 220, 160), 1f))
+            g.DrawLine(hi, r.X, r.Y, r.Right, r.Y);
+    }
+
     void DrawHeader(Graphics g)
     {
-        TextRenderer.DrawText(g, gameTitle, fTitle, new Point(colLeft.X, S(16)), Gold, Color.Transparent);
+        TextRenderer.DrawText(g, gameTitle, fTitle,
+            new Point(colLeft.X + S(1), S(17)), Color.FromArgb(150, 0, 0, 0), Color.Transparent);
+        TextRenderer.DrawText(g, gameTitle, fTitle, new Point(colLeft.X, S(16)), GoldBright, Color.Transparent);
         TextRenderer.DrawText(g, "Heroes of Might and Magic III · v3.1",
             fMono, new Point(colLeft.X, S(48)), InkDim, Color.Transparent);
         using (Pen p = new Pen(GoldDim, 1f))
             g.DrawLine(p, colLeft.X, S(76), ClientSize.Width - S(20), S(76));
+        using (Pen sh = new Pen(Color.FromArgb(90, 0, 0, 0), 1f))
+            g.DrawLine(sh, colLeft.X, S(77), ClientSize.Width - S(20), S(77));
     }
 
     void DrawLeft(Graphics g)
@@ -384,6 +443,7 @@ class Launcher : Form
             hover == 0 || focus == 0, focus == 0);
         DrawButton(g, rcFolder, "打开运行日志", false, true, hover == 1 || focus == 1, focus == 1);
         DrawButton(g, rcExit, "退出", false, true, hover == 2 || focus == 2, focus == 2);
+        if (focus == 3 && selMode != null) FocusRing(g, selMode.Bounds);
     }
 
     static bool InViewport(int y, int h, int top, int bottom) { return y >= top && y + h <= bottom; }
@@ -536,42 +596,82 @@ class Launcher : Form
         int y = S(578);
         using (Pen p = new Pen(GoldDim, 1f))
             g.DrawLine(p, colLeft.X, S(566), ClientSize.Width - S(20), S(566));
+        using (Pen sh = new Pen(Color.FromArgb(90, 0, 0, 0), 1f))
+            g.DrawLine(sh, colLeft.X, S(567), ClientSize.Width - S(20), S(567));
         StatusDot(g, status, statusColor, colLeft.X, y);
         string hint = busy ? "关窗只是隐藏，游戏继续跑" : "游戏退出后本窗口自动关闭";
         Size sz = TextRenderer.MeasureText(g, hint, fMono);
         TextRenderer.DrawText(g, hint, fMono,
             new Point(ClientSize.Width - S(20) - sz.Width, y), InkDim, Color.Transparent);
         Size brand = TextRenderer.MeasureText(g, BrandGuard.Text, fBrand);
+        Point bp = new Point((ClientSize.Width - brand.Width) / 2, y);
         TextRenderer.DrawText(g, BrandGuard.Text, fBrand,
-            new Point((ClientSize.Width - brand.Width) / 2, y), Gold, Color.Transparent);
+            new Point(bp.X + S(1), bp.Y + S(1)), Color.FromArgb(150, 0, 0, 0), Color.Transparent);
+        TextRenderer.DrawText(g, BrandGuard.Text, fBrand, bp, GoldBright, Color.Transparent);
     }
 
     void Card(Graphics g, Rectangle r)
     {
-        using (GraphicsPath p = Round(r, S(10)))
-        using (LinearGradientBrush b = new LinearGradientBrush(
-                   new Rectangle(r.X, r.Y, Math.Max(1, r.Width), Math.Max(1, r.Height)),
-                   CardTop, CardBottom, LinearGradientMode.Vertical))
+        Rectangle box = new Rectangle(r.X, r.Y, Math.Max(1, r.Width), Math.Max(1, r.Height));
+        using (GraphicsPath p = Round(r, S(12)))
+        using (LinearGradientBrush b = new LinearGradientBrush(box, CardTop, CardBottom, LinearGradientMode.Vertical))
             g.FillPath(b, p);
-        using (GraphicsPath p = Round(Rectangle.Inflate(r, -1, -1), S(10)))
-        using (Pen pen = new Pen(PanelEdge, 1f)) g.DrawPath(pen, p);
-        using (Pen hi = new Pen(Color.FromArgb(46, Gold), 1f))
+        Rectangle inner = Rectangle.Inflate(r, -S(8), -S(8));
+        using (Pen grain = new Pen(Color.FromArgb(10, 0, 0, 0), 1f))
+            for (int x = inner.Left - inner.Height; x < inner.Right; x += 8)
+                g.DrawLine(grain, x, inner.Top, x + inner.Height, inner.Bottom);
+        using (GraphicsPath p = Round(r, S(12)))
+        {
+            using (Pen edge = new Pen(LeatherDark, 1.5f)) g.DrawPath(edge, p);
+            using (GraphicsPath st = Round(Rectangle.Inflate(r, -S(6), -S(6)), S(9)))
+            using (Pen stitch = new Pen(Color.FromArgb(155, Stitch), 1f))
+            {
+                stitch.DashStyle = DashStyle.Dash;
+                stitch.DashPattern = new float[] { 2.5f, 2.2f };
+                g.DrawPath(stitch, st);
+            }
+        }
+        using (Pen hi = new Pen(Color.FromArgb(55, 255, 230, 180), 1f))
             g.DrawLine(hi, r.X + S(14), r.Y + 1, r.Right - S(14), r.Y + 1);
+        using (Pen sh = new Pen(Color.FromArgb(80, 0, 0, 0), 1f))
+            g.DrawLine(sh, r.X + S(14), r.Bottom - 2, r.Right - S(14), r.Bottom - 2);
     }
 
     void DrawButton(Graphics g, Rectangle r, string text, bool primary, bool enabled, bool hot, bool focused)
     {
-        Color back = !enabled ? Color.FromArgb(0x6E, 0x6E, 0x6E)
-                   : primary ? (hot ? Color.FromArgb(0xFF, 0xE6, 0x8C) : Gold)
-                   : (hot ? Color.FromArgb(70, Gold) : Color.Transparent);
-        using (GraphicsPath p = Round(r, S(6)))
+        Color top, bottom, edge, fore;
+        if (!enabled)
         {
-            if (back != Color.Transparent)
-                using (SolidBrush b = new SolidBrush(back)) g.FillPath(b, p);
-            if (!primary || !enabled)
-                using (Pen pen = new Pen(GoldDim, 1f)) g.DrawPath(pen, p);
+            top = Color.FromArgb(0x4A, 0x3A, 0x2E);
+            bottom = Color.FromArgb(0x2E, 0x21, 0x19);
+            edge = Color.FromArgb(0x5A, 0x4A, 0x3A);
+            fore = Color.FromArgb(0xB8, 0xA5, 0x8E);
         }
-        Color fore = !enabled ? Color.FromArgb(0xC8, 0xC8, 0xC8) : primary ? OnGold : Ink;
+        else if (primary)
+        {
+            top = hot ? GoldBright : Gold;
+            bottom = hot ? Color.FromArgb(0xD8, 0xB2, 0x5F) : GoldDim;
+            edge = LeatherLight;
+            fore = OnGold;
+        }
+        else
+        {
+            top = hot ? Color.FromArgb(0x6B, 0x42, 0x28) : CardTop;
+            bottom = hot ? CapFace : CardBottom;
+            edge = PanelEdge;
+            fore = Ink;
+        }
+        Rectangle box = new Rectangle(r.X, r.Y, Math.Max(1, r.Width), Math.Max(1, r.Height));
+        using (GraphicsPath p = Round(r, S(8)))
+        {
+            using (LinearGradientBrush b = new LinearGradientBrush(box, top, bottom, LinearGradientMode.Vertical))
+                g.FillPath(b, p);
+            using (Pen pen = new Pen(edge, 1f)) g.DrawPath(pen, p);
+        }
+        using (Pen hi = new Pen(Color.FromArgb(primary ? 95 : 45, 255, 230, 180), 1f))
+            g.DrawLine(hi, r.X + S(10), r.Y + S(2), r.Right - S(10), r.Y + S(2));
+        using (Pen sh = new Pen(Color.FromArgb(80, 0, 0, 0), 1f))
+            g.DrawLine(sh, r.X + S(10), r.Bottom - S(3), r.Right - S(10), r.Bottom - S(3));
         TextRenderer.DrawText(g, text, primary ? fRowSel : fRow, r, fore, Color.Transparent,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         if (focused) FocusRing(g, r);
@@ -580,15 +680,19 @@ class Launcher : Form
     void Keycap(Graphics g, string label, int x, int y, int w, int h)
     {
         Rectangle r = new Rectangle(x, y, w, h);
-        using (GraphicsPath p = Round(r, S(4)))
-        using (SolidBrush b = new SolidBrush(CapFace)) g.FillPath(b, p);
-        using (GraphicsPath hi = Round(new Rectangle(r.X + S(2), r.Y + S(1), r.Width - S(4), S(3)), S(2)))
-        using (SolidBrush tb = new SolidBrush(CapTopHi)) g.FillPath(tb, hi);
-        using (SolidBrush sb = new SolidBrush(CapSide))
-            g.FillRectangle(sb, r.X + S(3), r.Bottom - S(3), r.Width - S(6), S(2));
+        using (GraphicsPath p = Round(r, S(5)))
+        {
+            using (LinearGradientBrush b = new LinearGradientBrush(r, CapFace, CapSide, LinearGradientMode.Vertical))
+                g.FillPath(b, p);
+            using (Pen edge = new Pen(PanelEdge, 1f)) g.DrawPath(edge, p);
+        }
+        using (Pen hi = new Pen(Color.FromArgb(95, CapTopHi), 1f))
+            g.DrawLine(hi, r.X + S(3), r.Y + S(2), r.Right - S(3), r.Y + S(2));
+        using (Pen sh = new Pen(Color.FromArgb(90, 0, 0, 0), 1f))
+            g.DrawLine(sh, r.X + S(3), r.Bottom - S(2), r.Right - S(3), r.Bottom - S(2));
         Font f = CapFont(label);
         TextRenderer.DrawText(g, label, f,
-            new Rectangle(r.X, r.Y - S(1), r.Width, r.Height), Color.White, Color.Transparent,
+            new Rectangle(r.X, r.Y - S(1), r.Width, r.Height), Ink, Color.Transparent,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
     }
 
@@ -688,34 +792,187 @@ class Launcher : Form
         if (!busy && rcStart.Contains(pt)) return 0;
         if (rcFolder.Contains(pt)) return 1;
         if (rcExit.Contains(pt)) return 2;
+        if (!busy && selMode != null && selMode.Bounds.Contains(pt)) return 3;
         return -1;
     }
 
     Rectangle ButtonsRect
     {
-        get { return Rectangle.Union(Rectangle.Union(rcStart, rcFolder), rcExit); }
+        get
+        {
+            Rectangle r = Rectangle.Union(rcStart, rcFolder);
+            r = Rectangle.Union(r, rcExit);
+            if (selMode != null) r = Rectangle.Union(r, selMode.Bounds);
+            return r;
+        }
     }
 
     void RepaintControls() { Invalidate(ButtonsRect); }
 
-    static void PlaceCombo(ComboBox cb, Rectangle slot)
+    static void PlaceSelector(SelectPanel p, Rectangle slot)
     {
-        if (cb == null) return;
-        cb.SetBounds(slot.X, slot.Y + (slot.Height - cb.Height) / 2, slot.Width, 0);
+        if (p == null) return;
+        p.SetBounds(slot.X, slot.Y, slot.Width, slot.Height);
     }
 
-    ComboBox MakeCombo(string[] items, int selected, EventHandler changed)
+    SelectPanel MakeModeSelect()
     {
-        ComboBox cb = new ComboBox();
-        cb.DropDownStyle = ComboBoxStyle.DropDownList;
-        cb.BackColor = Color.FromArgb(0x4A, 0x00, 0x12);
-        cb.ForeColor = Ink;
-        cb.Font = fRowSel;
-        cb.Items.AddRange(items);
-        cb.SelectedIndex = selected;
-        cb.SelectedIndexChanged += changed;
-        Controls.Add(cb);
-        return cb;
+        SelectPanel p = new SelectPanel();
+        p.BackColor = Color.Transparent;
+        p.ForeColor = Ink;
+        p.Font = fRowSel;
+        p.Text = ModeNames[mode];
+        p.Cursor = Cursors.Hand;
+        p.Paint += PaintModeSelect;
+        p.Click += delegate { ShowModeMenu(); };
+        Controls.Add(p);
+        return p;
+    }
+
+    void PaintModeSelect(object sender, PaintEventArgs e)
+    {
+        Control p = (Control)sender;
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        Rectangle box = new Rectangle(0, 0, Math.Max(1, p.Width), Math.Max(1, p.Height));
+        Color top = p.Enabled ? CardTop : Color.FromArgb(0x4A, 0x3A, 0x2E);
+        Color bottom = p.Enabled ? Color.FromArgb(0x2A, 0x16, 0x0D) : Color.FromArgb(0x2E, 0x21, 0x19);
+        using (GraphicsPath path = Round(box, S(8)))
+        {
+            using (LinearGradientBrush b = new LinearGradientBrush(box, top, bottom, LinearGradientMode.Vertical))
+                e.Graphics.FillPath(b, path);
+            using (Pen pen = new Pen(p.Enabled ? PanelEdge : Color.FromArgb(0x5A, 0x4A, 0x3A), 1f))
+                e.Graphics.DrawPath(pen, path);
+        }
+        using (Pen hi = new Pen(Color.FromArgb(45, 255, 230, 180), 1f))
+            e.Graphics.DrawLine(hi, S(10), S(2), p.Width - S(10), S(2));
+        Rectangle tr = new Rectangle(S(12), 0, p.Width - S(36), p.Height);
+        TextRenderer.DrawText(e.Graphics, p.Text, fRowSel, tr,
+            p.Enabled ? Ink : Color.FromArgb(0xB8, 0xA5, 0x8E), Color.Transparent,
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+        using (Pen pen = new Pen(p.Enabled ? Gold : GoldDim, 1.6f))
+        {
+            int cx = p.Width - S(15), cy = p.Height / 2;
+            e.Graphics.DrawLine(pen, cx - S(4), cy - S(2), cx, cy + S(2));
+            e.Graphics.DrawLine(pen, cx, cy + S(2), cx + S(4), cy - S(2));
+        }
+    }
+
+    void ShowModeMenu()
+    {
+        if (busy) return;
+        if (modeMenu == null) BuildModeMenu();
+        for (int i = 0; i < modeMenu.Items.Count; i++)
+            modeMenu.Items[i].Text = (i == mode ? "\u2713  " : "    ") + ModeNames[i];
+        FitMenuSize(modeMenu, ModeNames);
+        modeMenu.Show(selMode, new Point(0, selMode.Height + S(2)));
+        Log("下拉高度自检：项数=" + ModeNames.Length + "，弹层高=" + modeMenu.Height +
+            "，能装下=" + (modeMenu.Height >= ModeNames.Length * modeMenu.Items[0].Height));
+    }
+
+    void StepMode(int delta)
+    {
+        int n = ModeNames.Length;
+        mode = ((mode + delta) % n + n) % n;
+        selMode.Text = ModeNames[mode];
+        selMode.Invalidate();
+        Log("选择显示方式：" + ModeNames[mode]);
+    }
+
+    void BuildModeMenu()
+    {
+        modeMenu = new ContextMenuStrip();
+        modeMenu.ShowImageMargin = false;
+        modeMenu.ShowCheckMargin = false;
+        modeMenu.BackColor = LeatherMenuRenderer.MenuBack;
+        modeMenu.ForeColor = Ink;
+        modeMenu.Font = fRowSel;
+        modeMenu.Padding = new Padding(S(4));
+        modeMenu.Renderer = new LeatherMenuRenderer();
+        for (int i = 0; i < ModeNames.Length; i++)
+        {
+            int idx = i;
+            ToolStripMenuItem item = new ToolStripMenuItem(ModeNames[i]);
+            item.ForeColor = Ink;
+            item.Padding = new Padding(S(10), S(4), S(10), S(4));
+            item.Click += delegate
+            {
+                mode = idx;
+                selMode.Text = ModeNames[idx];
+                selMode.Invalidate();
+                Log("选择显示方式：" + ModeNames[idx]);
+            };
+            modeMenu.Items.Add(item);
+        }
+    }
+
+    // 框本身宽度不动（布局照旧），只把弹层加宽到装得下最长的一项
+    void FitMenuSize(ContextMenuStrip menu, string[] items)
+    {
+        int widest = 0;
+        try
+        {
+            using (Graphics g = CreateGraphics())
+                for (int i = 0; i < items.Length; i++)
+                {
+                    int w = TextRenderer.MeasureText(g, items[i], menu.Font).Width;
+                    if (w > widest) widest = w;
+                }
+        }
+        catch (Exception ex) { Log("量下拉宽度失败：" + ex.Message); return; }
+        if (widest <= 0) return;
+        int want = widest + S(46);
+        int cap = Screen.FromControl(selMode).WorkingArea.Width - S(24);
+        menu.MinimumSize = new Size(Math.Max(selMode.Width, Math.Min(want, cap)), 0);
+        Log("下拉宽度自检：框宽=" + selMode.Width + "，最长项文字宽=" + widest +
+            "，弹层宽=" + menu.MinimumSize.Width +
+            "，能装下=" + (menu.MinimumSize.Width >= widest + S(24)));
+    }
+
+    class SelectPanel : Panel
+    {
+        public SelectPanel()
+        {
+            DoubleBuffered = true;
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint
+                   | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
+        }
+    }
+
+    class LeatherMenuRenderer : ToolStripProfessionalRenderer
+    {
+        public static readonly Color MenuBack = Color.FromArgb(0x2A, 0x16, 0x0D);
+        static readonly Color MenuHot = Color.FromArgb(0x6B, 0x42, 0x28);
+        static readonly Color MenuEdge = Color.FromArgb(0xB9, 0x8A, 0x55);
+
+        protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
+        {
+            using (SolidBrush b = new SolidBrush(MenuBack))
+                e.Graphics.FillRectangle(b, e.AffectedBounds);
+            using (Pen hi = new Pen(Color.FromArgb(40, 255, 220, 160), 1f))
+                e.Graphics.DrawLine(hi, 1, 1, e.ToolStrip.Width - 2, 1);
+        }
+
+        protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
+        {
+            Rectangle r = new Rectangle(Point.Empty, e.Item.Size);
+            using (SolidBrush b = new SolidBrush(e.Item.Selected ? MenuHot : MenuBack))
+                e.Graphics.FillRectangle(b, r);
+            if (e.Item.Selected)
+                using (SolidBrush bar = new SolidBrush(Gold))
+                    e.Graphics.FillRectangle(bar, new Rectangle(r.X + 2, r.Y + 3, 2, Math.Max(1, r.Height - 6)));
+        }
+
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
+        {
+            e.TextColor = e.Item.Selected ? GoldBright : Ink;
+            base.OnRenderItemText(e);
+        }
+
+        protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+        {
+            using (Pen p = new Pen(MenuEdge, 1f))
+                e.Graphics.DrawRectangle(p, 0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1);
+        }
     }
 
     protected override void OnMouseMove(MouseEventArgs e)
@@ -758,6 +1015,12 @@ class Launcher : Form
         {
             case Keys.Tab: CycleFocus(1); return true;
             case Keys.Shift | Keys.Tab: CycleFocus(-1); return true;
+            case Keys.Down:
+                if (!busy && focus == 3) { StepMode(1); return true; }
+                break;
+            case Keys.Up:
+                if (!busy && focus == 3) { StepMode(-1); return true; }
+                break;
             case Keys.Escape: Close(); return true;
             case Keys.Enter:
                 if (busy) { Close(); return true; }
@@ -772,7 +1035,7 @@ class Launcher : Form
 
     void CycleFocus(int delta)
     {
-        int[] order = busy ? new int[] { 1, 2 } : new int[] { 0, 1, 2 };
+        int[] order = busy ? new int[] { 1, 2 } : new int[] { 3, 0, 1, 2 };
         int idx = Array.IndexOf(order, focus);
         if (idx < 0) idx = delta > 0 ? order.Length - 1 : 0;
         focus = order[((idx + delta) % order.Length + order.Length) % order.Length];
@@ -781,9 +1044,177 @@ class Launcher : Form
 
     void Activate(int i)
     {
+        if (i == 3) { ShowModeMenu(); return; }
         if (i == 0) { StartGame(); return; }
         if (i == 1) { OpenLog(); return; }
         if (i == 2) { Close(); }
+    }
+
+    // ---------- 现场快照 ----------
+    // 0xC0000094 是整数除零。这游戏是 1999 年的代码，导入表里就有 GetDeviceCaps 和 GetDiskFreeSpaceA：
+    // 系统把刷新率报成 0、或某个盘的扇区/簇大小报成 0，它拿去当除数就直接炸。
+    // 这里把这两个来源原样记进 运行日志.txt，并据此决定要不要改用窗口模式。
+    bool SnapshotEnvironment(out string reason)
+    {
+        reason = "";
+        int refresh = 0, cx = 0, cy = 0, dpiX = 0, dpiY = 0;
+        try
+        {
+            IntPtr hdc = GetDC(IntPtr.Zero);
+            try
+            {
+                refresh = GetDeviceCaps(hdc, VREFRESH);
+                cx = GetDeviceCaps(hdc, HORZRES);
+                cy = GetDeviceCaps(hdc, VERTRES);
+                dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
+                dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+            }
+            finally { ReleaseDC(IntPtr.Zero, hdc); }
+        }
+        catch (Exception ex) { Log("取显示参数失败：" + ex.Message); }
+        int screens = 1;
+        try { screens = Screen.AllScreens.Length; } catch { }
+
+        string root = "";
+        try { root = Path.GetPathRoot(AppDir()); } catch { }
+        uint bps = 0, spc = 0, freeC = 0, totalC = 0;
+        bool diskOk = false;
+        if (root.Length > 0)
+        {
+            try { diskOk = GetDiskFreeSpaceA(root, out spc, out bps, out freeC, out totalC); }
+            catch (Exception ex) { Log("取磁盘参数失败：" + ex.Message); }
+        }
+        string floppy = "";
+        try
+        {
+            foreach (DriveInfo d in DriveInfo.GetDrives())
+            {
+                string n = d.Name;
+                if (n != "A:\\" && n != "B:\\") continue;
+                uint a, b, c, e;
+                bool ok = GetDiskFreeSpaceA(n, out a, out b, out c, out e);
+                floppy += " " + n + (ok ? ("(每簇扇数" + a + " 每扇区字节" + b + ")") : "(读不到)");
+            }
+        }
+        catch { }
+
+        Log("现场快照：显示 " + cx + "×" + cy + " 刷新率=" + refresh + " DPI=" + dpiX + "/" + dpiY +
+            " 屏幕数=" + screens + "；游戏盘 " + root + " 每扇区字节=" + bps + " 每簇扇区=" + spc +
+            " 簇 总" + totalC + "/可用" + freeC + (diskOk ? "" : "（GetDiskFreeSpace 失败）") +
+            (floppy.Length == 0 ? "" : "；软驱" + floppy) +
+            "；AppPath=" + RegValue("AppPath") + " CDDrive=" + RegValue("CDDrive"));
+
+        List<string> zero = new List<string>();
+        if (refresh <= 0) zero.Add("刷新率=" + refresh);
+        if (bps == 0 || spc == 0) zero.Add("游戏盘每扇区字节/每簇扇区=" + bps + "/" + spc);
+        if (cx <= 0 || cy <= 0) zero.Add("桌面尺寸=" + cx + "×" + cy);
+        if (zero.Count == 0) return false;
+        reason = string.Join("、", zero.ToArray());
+        return true;
+    }
+
+    static string RegValue(string name)
+    {
+        try
+        {
+            using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+            using (RegistryKey k = baseKey.OpenSubKey(
+                @"SOFTWARE\New World Computing\Heroes of Might and Magic?III\1.0"))
+            {
+                if (k == null) return "（键不存在）";
+                object v = k.GetValue(name);
+                return v == null ? "（无此值）" : Convert.ToString(v);
+            }
+        }
+        catch (Exception ex) { return "（读失败:" + ex.Message + "）"; }
+    }
+
+    // ---------- 换层：把所选模式要用的 ddraw.dll 顶上去，并铺好它的配置 ----------
+    static string LayerDirOf(string tag)
+    {
+        for (int i = 0; i < LayerDirs.Length; i += 2)
+            if (LayerDirs[i] == tag) return LayerDirs[i + 1];
+        return "_cnc-ddraw";
+    }
+
+    // 返回 false 表示这个模式的层或配置不在，调用方要退回默认模式
+    bool ApplyLayer(int which, out string fail)
+    {
+        fail = "";
+        string tag = ModeLayer[which];
+        string dir = LayerDirOf(tag);
+        string dllSrc = Path.Combine(AppDir(), dir, "ddraw.dll");
+        string confSrc = Path.Combine(AppDir(), "_presets", ModePresets[which]);
+        if (!File.Exists(dllSrc)) { fail = dir + "\\ddraw.dll 缺失"; return false; }
+        if (!File.Exists(confSrc)) { fail = "_presets\\" + ModePresets[which] + " 缺失"; return false; }
+        try
+        {
+            File.Copy(dllSrc, Path.Combine(AppDir(), "ddraw.dll"), true);
+            if (tag == "voodoo")
+            {
+                File.Copy(confSrc, Path.Combine(AppDir(), "dgVoodoo.conf"), true);
+                // dgVoodoo2 和 cnc-ddraw 都靠 ddraw.ini / dgVoodoo.conf 读配置，
+                // 用哪一层就只留哪一份，免得上一份的残留把这一层带歪
+                try { if (File.Exists(Path.Combine(AppDir(), "ddraw.ini"))) File.Delete(Path.Combine(AppDir(), "ddraw.ini")); } catch { }
+            }
+            else
+            {
+                File.Copy(confSrc, Path.Combine(AppDir(), "ddraw.ini"), true);
+                try { if (File.Exists(Path.Combine(AppDir(), "dgVoodoo.conf"))) File.Delete(Path.Combine(AppDir(), "dgVoodoo.conf")); } catch { }
+            }
+            Log("已挂载 " + (tag == "voodoo" ? "dgVoodoo2" : "cnc-ddraw") + " + " + ModePresets[which]);
+            return true;
+        }
+        catch (Exception ex) { fail = ex.Message; return false; }
+    }
+
+    // 收尾回到默认档（第 6 档 dgVoodoo2）；缺 dgVoodoo2 文件时退回 cnc-ddraw GDI，
+    // 总之只留一份配置在位，不在机器上留两层叠着的现场
+    void RestoreDefaultLayer()
+    {
+        try
+        {
+            string vDll = Path.Combine(AppDir(), "_dgvoodoo2", "ddraw.dll");
+            string vConf = Path.Combine(AppDir(), "_presets", "dgVoodoo-window.conf");
+            if (File.Exists(vDll) && File.Exists(vConf))
+            {
+                File.Copy(vDll, Path.Combine(AppDir(), "ddraw.dll"), true);
+                File.Copy(vConf, Path.Combine(AppDir(), "dgVoodoo.conf"), true);
+                string left = Path.Combine(AppDir(), "ddraw.ini");
+                if (File.Exists(left)) File.Delete(left);
+                Log("收尾回到默认档：dgVoodoo2 + dgVoodoo-window.conf");
+                return;
+            }
+            string dll = Path.Combine(AppDir(), "_cnc-ddraw", "ddraw.dll");
+            string conf = Path.Combine(AppDir(), "_presets", "ddraw.ini");
+            if (File.Exists(dll)) File.Copy(dll, Path.Combine(AppDir(), "ddraw.dll"), true);
+            if (File.Exists(conf)) File.Copy(conf, Path.Combine(AppDir(), "ddraw.ini"), true);
+            string rest = Path.Combine(AppDir(), "dgVoodoo.conf");
+            if (File.Exists(rest)) File.Delete(rest);
+            Log("收尾退回 cnc-ddraw GDI（缺 dgVoodoo2 文件）");
+        }
+        catch (Exception ex) { Log("恢复默认层失败：" + ex.Message); }
+    }
+
+    // ---------- 记住这台机器验证过能玩的画面方式 ----------
+    static string ModeMemoryPath() { return Path.Combine(AppDir(), "显示方式记忆.txt"); }
+
+    static int ReadModeMemory()
+    {
+        try
+        {
+            if (!File.Exists(ModeMemoryPath())) return -1;
+            int v;
+            if (!int.TryParse(File.ReadAllText(ModeMemoryPath(), Encoding.UTF8).Trim(), out v)) return -1;
+            return v;
+        }
+        catch { return -1; }
+    }
+
+    static void SaveModeMemory(int which)
+    {
+        try { File.WriteAllText(ModeMemoryPath(), which.ToString(), Encoding.UTF8); }
+        catch (Exception ex) { Log("记画面方式失败：" + ex.Message); }
     }
 
     // ---------- 启动逻辑 ----------
@@ -804,9 +1235,10 @@ class Launcher : Form
             return;
         }
         string presetPath = Path.Combine(AppDir(), "_presets", ModePresets[mode]);
-        if (!File.Exists(presetPath))
+        string layerSrc = Path.Combine(AppDir(), LayerDirOf(ModeLayer[mode]), "ddraw.dll");
+        if (!File.Exists(presetPath) || !File.Exists(layerSrc))
         {
-            Log("缺少显示预设：" + presetPath);
+            Log("缺少显示预设或兼容层：" + presetPath + " / " + layerSrc);
             status = "缺少显示文件，请先运行 兼容修复.bat";
             statusColor = Warn; Invalidate();
             return;
@@ -816,15 +1248,52 @@ class Launcher : Form
         SetBusy(true, "启动中：" + ModeNames[mode].Substring(ModeNames[mode].IndexOf(' ') + 1));
         Thread t = new Thread(delegate ()
         {
+            int usedMode = mode;
             try
             {
-                SetStatus("游戏运行中…", Ok);
                 PrepareGame();
                 EnsureRegistry();
-                File.Copy(presetPath, Path.Combine(AppDir(), "ddraw.ini"), true);
-                int code = RunGameWithAffinity(exePath, gameArgs, launchProcess);
-                Log("游戏退出，退出码 0x" + ((uint)code).ToString("X8") + "，启动器随之退出");
-                FinishWith(code);
+                string why;
+                if (SnapshotEnvironment(out why) && usedMode != WINDOW_MODE && usedMode != 3)
+                {
+                    Log("检测到能当除数的 0 值（" + why + "），本次改用「" + ModeNames[WINDOW_MODE] + "」");
+                    usedMode = WINDOW_MODE;
+                    SetStatus("已自动改用窗口画面，避免闪退", Ok);
+                }
+                int attempt = 0;
+                while (true)
+                {
+                    attempt++;
+                    string failLayer;
+                    if (!ApplyLayer(usedMode, out failLayer))
+                    {
+                        Log("该模式不可用（" + failLayer + "），退回「软件画面 GDI（全屏）」");
+                        usedMode = 0;
+                        if (attempt > 1) { FinishWith(1); break; }
+                        continue;
+                    }
+                    SetStatus("游戏运行中…", Ok);
+                    DateTime start = DateTime.Now;
+                    int code = RunGameWithAffinity(exePath, gameArgs, launchProcess);
+                    int secs = (int)(DateTime.Now - start).TotalSeconds;
+                    bool bad = (uint)code >= 0xC0000000;
+                    Log("游戏退出，用时 " + secs + "s，退出码 0x" + ((uint)code).ToString("X8") +
+                        (bad ? "（系统级异常）" : ""));
+                    if (bad && secs < 25 && attempt == 1 && usedMode != WINDOW_MODE && usedMode != 3)
+                    {
+                        Log("开局就异常退出，改用「" + ModeNames[WINDOW_MODE] + "」再试一次");
+                        SetStatus("游戏闪退，已自动改用窗口重试", Ok);
+                        usedMode = WINDOW_MODE;
+                        continue;
+                    }
+                    if (secs >= 45)
+                    {
+                        SaveModeMemory(usedMode);
+                        if (usedMode != mode) Log("这个画面方式在这台机器上稳住了，已记住，下次直接用它");
+                    }
+                    FinishWith(code);
+                    break;
+                }
             }
             catch (Exception ex)
             {
@@ -844,12 +1313,7 @@ class Launcher : Form
             }
             finally
             {
-                try
-                {
-                    string def = Path.Combine(AppDir(), "_presets", "ddraw.ini");
-                    if (File.Exists(def)) File.Copy(def, Path.Combine(AppDir(), "ddraw.ini"), true);
-                }
-                catch { }
+                RestoreDefaultLayer();
                 SetBusy(false, null);
             }
         });
@@ -966,6 +1430,16 @@ class Launcher : Form
     static extern bool GetExitCodeProcess(IntPtr h, out uint code);
     [DllImport("kernel32.dll", SetLastError = true)]
     static extern IntPtr OpenProcess(uint access, bool inherit, int pid);
+
+    // ---------- 除零类崩溃的取证用 API ----------
+    const int VREFRESH = 0, HORZRES = 8, VERTRES = 10, LOGPIXELSX = 88, LOGPIXELSY = 90;
+    [DllImport("user32.dll")] static extern IntPtr GetDC(IntPtr h);
+    [DllImport("user32.dll")] static extern int ReleaseDC(IntPtr h, IntPtr dc);
+    [DllImport("gdi32.dll")] static extern int GetDeviceCaps(IntPtr dc, int index);
+    // 注意出参顺序：每簇扇数、每扇区字节、可用簇、总簇（MSDN 就是这个顺序，写反会把日志标错）
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
+    static extern bool GetDiskFreeSpaceA(string root, out uint sectorsPerCluster,
+        out uint bytesPerSector, out uint freeClusters, out uint totalClusters);
 
     int RunGameWithAffinity(string exePath, string launchArgs, string launchProcess)
     {
@@ -1093,14 +1567,11 @@ class Launcher : Form
     {
         try
         {
-            string exe = Path.Combine(AppDir(), string.IsNullOrEmpty(gameIconExe) ? gameExe : gameIconExe);
-            if (File.Exists(exe))
-            {
-                Icon ic = Icon.ExtractAssociatedIcon(exe);
-                if (ic != null) { Icon = ic; return; }
-            }
+            Icon own = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (own != null) { Icon = own; return; }
         }
-        catch { }
+        catch (Exception ex) { Log("取 exe 图标失败：" + ex.Message); }
+        // 取不到只退回系统默认图标；绝不从游戏 exe 抽图标（平台/任务管理器会把启动器当成游戏进程）
         Icon = SystemIcons.Application;
     }
 
@@ -1172,7 +1643,7 @@ class Launcher : Form
         busy = value;
         hover = -1;
         if (value) focus = NoFocus;
-        if (cbMode != null) cbMode.Enabled = !value;
+        if (selMode != null) selMode.Enabled = !value;
         if (text != null) { status = text; statusColor = value ? Ok : statusColor; }
         RepaintControls();
     }

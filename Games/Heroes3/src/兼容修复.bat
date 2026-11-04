@@ -11,8 +11,14 @@ if not exist "_cnc-ddraw\ddraw.dll" (
   if /i not "%~1"=="/quiet" pause
   exit /b 1
 )
-if not exist "ddraw.dll" copy /y "_cnc-ddraw\ddraw.dll" "ddraw.dll" >nul
-if not exist "ddraw.ini" if exist "_presets\ddraw.ini" copy /y "_presets\ddraw.ini" "ddraw.ini" >nul
+if exist "_dgvoodoo2\ddraw.dll" (
+  copy /y "_dgvoodoo2\ddraw.dll" "ddraw.dll" >nul
+  if exist "_presets\dgVoodoo-window.conf" copy /y "_presets\dgVoodoo-window.conf" "dgVoodoo.conf" >nul
+  del "ddraw.ini" >/dev/null 2>&1
+) else (
+  copy /y "_cnc-ddraw\ddraw.dll" "ddraw.dll" >nul
+  if exist "_presets\ddraw.ini" copy /y "_presets\ddraw.ini" "ddraw.ini" >nul
+)
 
 set "GAMEDIR=%~dp0"
 set "GAMEDRIVE=%~d0"
@@ -41,7 +47,13 @@ echo.
 echo   已检查 cnc-ddraw 兼容层：
 echo   - ddraw.dll：存在
 echo   - 显示预设：_presets\ddraw.ini / ddraw-43.ini / ddraw-window.ini / ddraw-640.ini
+echo              另有 ddraw-d3d9.ini（DX9硬件加速）与 dgVoodoo-window.conf（dgVoodoo2）
+if exist "_dgvoodoo2\ddraw.dll" (
+  echo   - dgVoodoo2 层：_dgvoodoo2\ddraw.dll 已就位（默认档，当前就顶在 ddraw.dll）
+) else (
+  echo   - dgVoodoo2 层：缺 _dgvoodoo2\ddraw.dll，默认退回第 1 档软件画面 GDI
+)
 echo.
-echo   注意：本游戏只建议 GDI（最兼容）画面方式。
+echo   注意：默认第 6 档 dgVoodoo2转换（无边框全屏）；画面不对在启动器里往上回。
 if /i not "%~1"=="/quiet" pause
 exit /b 0

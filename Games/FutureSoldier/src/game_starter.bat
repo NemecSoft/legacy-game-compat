@@ -34,7 +34,7 @@ if /i not "%~1"=="/go" (
   echo.
   echo     启动方式
   echo       1  DX11（画质最好，默认）
-  echo       2  DX9（最兼容，老机器）
+  echo       2  DX9（老机器）
   echo.
   echo       3  打开运行日志
   echo       4  退出

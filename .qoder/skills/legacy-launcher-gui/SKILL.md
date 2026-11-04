@@ -1,6 +1,6 @@
 ---
 name: legacy-launcher-gui
-description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现配方：C# / .NET Framework WinForms + 纯 GDI+ 自绘，不用图片、不引第三方库、exe 控制在几十 KB。给出三栏布局（游戏介绍 / 选项与启动 / 键帽操作说明）、中国红主题令牌、键帽与卡片画法、键盘焦点环、DPI 缩放与体积红线，以及顶掉 bat 启动器必须满足的平台托管契约（游戏是直接子进程、启动器陪跑到退出、退出码原样回传、关窗不杀游戏）与统一命名 game_starter.exe / game_starter.bat。附 10 种风格 HTML 样张：新拟态、玻璃拟态、暗黑霓虹、瑞士极简、拟物皮革、3D 软塑、孟菲斯波普、东方水墨、科幻全息、治愈渐变。触发词：启动器、game_starter.exe、GUI、界面美化、键帽、exe 体积、WinForms、csc、设计规范、进程树监控、退出码、Playnite 启动、GUI 风格、样张、拟物皮革。改 Games\<游戏>\src\Launcher.cs、做新游戏启动器界面、或要把 bat 启动器换成 GUI 时用。
+description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现配方：C# / .NET Framework WinForms + 纯 GDI+ 自绘，不用图片、不引第三方库、exe 控制在几十 KB。给出三栏布局（游戏介绍 / 选项与启动 / 键帽操作说明）、拟物皮革主题令牌（用户定案）、键帽与卡片画法、键盘焦点环、DPI 缩放与体积红线，以及顶掉 bat 启动器必须满足的平台托管契约（游戏是直接子进程、启动器陪跑到退出、退出码原样回传、关窗不杀游戏）与统一命名 game_starter.exe / game_starter.bat。附 10 种风格 HTML 样张：新拟态、玻璃拟态、暗黑霓虹、瑞士极简、拟物皮革、3D 软塑、孟菲斯波普、东方水墨、科幻全息、治愈渐变。触发词：启动器、game_starter.exe、GUI、界面美化、键帽、exe 体积、WinForms、csc、设计规范、进程树监控、退出码、Playnite 启动、GUI 风格、样张、拟物皮革。改 Games\<游戏>\src\Launcher.cs、做新游戏启动器界面、或要把 bat 启动器换成 GUI 时用。
 ---
 
 # 老游戏启动器 GUI 规范
@@ -30,7 +30,7 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
 | 02 | 玻璃拟态 | `glass` | 紫青渐变、磨砂玻璃、悬浮层次，通透现代 |
 | 03 | 暗黑霓虹 | `cyber` | 深炭底、青/洋红辉光、网格角标，战斗 HUD |
 | 04 | 瑞士极简 | `swiss` | 黑白 + 一点朱红、严格网格、无阴影 |
-| 05 | 拟物皮革 | `leather` | 皮革压纹、缝线、黄铜按钮，厚重有收藏感 |
+| 05 | 拟物皮革 | `leather` | 皮革压纹、缝线、黄铜按钮，厚重有收藏感 ——**已选定，实际交付按这套** |
 | 06 | 3D 软塑 | `clay` | 奶油软塑、大圆角、柔和体积阴影，友好 |
 | 07 | 孟菲斯波普 | `memphis` | 高饱和几何、粗黑描边、错位阴影，80 年代玩心 |
 | 08 | 东方水墨 | `ink` | 宣纸、墨线、朱印、大量留白，克制安静 |
@@ -39,15 +39,17 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
 
 用法：先让用户选 2–3 个方向，再做完整版；样张只做风格参考，不直接当交付 exe，也不放进游戏目录。实际落地必须回到本技能的硬约束（WinForms/GDI+、零图片、≤60KB、平台托管契约）。
 
-这些样张是**风格探索**：选定方向后，配色、材质和字体可以替换默认的中国红令牌；但 WinForms/GDI+、零图片、≤60KB、可读性底线和平台托管契约仍是硬约束。未选定方向前，默认交付仍按中国红主题。
+这些样张是**风格探索**。**2026-11-03 用户定案：GUI 启动器统一按 05 拟物皮革 交付**（配色/材质见「设计令牌」）；
+但 WinForms/GDI+、零图片、≤60KB、可读性底线和平台托管契约仍是硬约束。
+已经交付出去的中国红 exe 不返工，新做的和重做的都走皮革。
 
 ## 硬约束（违反就是错）
 
 1. **只用 .NET Framework 4.x + WinForms + System.Drawing**，系统自带
    `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe` 单文件编译。
    不建 `.csproj`、不用 `.resx`、不引第三方 DLL（WinForms 是框架自带的，不算）。
-2. **零图片、零内嵌字体、零图标资源文件**（唯一例外：统一启动器图标 `D:\ico.ico`，构建时嵌入 exe；
-   `src\` 和游戏目录不放 ico）。键帽、卡片、按钮、状态点全部 GDI+ 现画。
+2. **零图片、零内嵌字体、零图标资源文件**（唯一例外：统一启动器图标，仓库资源 `assets\ico.ico`，
+   构建时嵌入 exe；`src\` 和游戏目录不放 ico）。键帽、卡片、按钮、状态点全部 GDI+ 现画。
    需要「图标」时用文字 + 形状（`↑` `Alt` `Shift` 就是键帽里的文字）。
 3. **体积红线：game_starter.exe ≤ 60 KB**（实测见 `Games\RoadRash\适配过程分析.md`）。
    超标先查：内嵌资源 / 图片 / 字体 / Designer.cs / 无用的 `using` 引到的类型。
@@ -56,17 +58,21 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
    它用 `echo` 自己生成菜单（中国红 `color 4f`），菜单项、顺序、默认值与 `game_starter.exe` 完全相同，
    玩家选完由 bat **自己启动游戏**并回传退出码；`/go` 跳过菜单按默认项启动。
    改选项/加模式必须两边一起改，不许分叉；两边都要满足下面的「平台托管契约」。
-5. **中国红主题**（仓库 AGENTS 规则 10）：底色 `#C0121E` 系，强调金 `#FFD85E`，
-   正文米白；**不要黑底**（键帽本身可以是深灰，那是物件色不是背景色）。
+5. **拟物皮革主题**（仓库 AGENTS 规则 10，2026-11-03 定案）：背景 `#3A2015 → #1C0F0A` 竖直渐变 +
+   皮纹斜线 + 四角压暗，卡片 `#5A3421 → #3B2116` 带黄铜缝线，强调金 `#E3C07A`、烫金 `#F0D596`，
+   正文米黄 `#F4E3C6`；**不要纯黑底**（最暗是近黑棕，那是皮革阴影不是背景色）。
+   控制台 bat 仍是中国红 `color 4f`（cmd 只有 16 色，跟 exe 不统一是已知取舍）。
 6. **键位表从 reg 现算，不写死文案**：右栏读当前所选 `road*.reg` 的 `Controls` 字节，
    用游戏内部键码表反查标签。写死的说明一定会和实际键位对不上（踩过坑）。
 7. 源文件只放仓库 `Games\<游戏>\src\`，游戏目录只收编译好的 `game_starter.exe` + `launcher.ini`。
-8. **统一启动器图标，不用游戏图标**：所有 exe 固定嵌入 `D:\ico.ico`（构建机路径），
-   构建时 `csc -win32icon:D:\ico.ico`；运行时用
+8. **统一启动器图标，不用游戏图标**：所有 exe 固定嵌入**仓库资源 `assets\ico.ico`**
+   （由构建机的 `D:\ico.ico` 复制入库，SHA-256 `4fb1af64…c495`；换机/换人不用重新摆文件），
+   构建时 `csc -win32icon:<仓库>\assets\ico.ico`；运行时用
    `Icon.ExtractAssociatedIcon(Application.ExecutablePath)` 取 exe 自身图标，
-   窗口 / 任务栏 / 托盘 / 资源管理器共用。取不到才退回 `SystemIcons.Application`。
+   窗口 / 任务栏 / 托盘 / 资源管理器共用。取不到才退回 `SystemIcons.Application` 并写进日志。
    **不要再从游戏 exe 抽图标**，否则任务管理器/平台会把启动器认成游戏进程。
-   `D:\ico.ico` 缺失时构建失败并提示，不要静默退回游戏图标。
+   `assets\ico.ico` 缺失时构建失败并提示，不要静默退回游戏图标，也不要在运行时兜底去找 `D:\ico.ico`
+   （交付目录里根本没有那个路径）。
    自绘图标（`Bitmap.GetHicon`）16px 下发糊、还多养一段代码，试过，不值得。
 9. **交付启动器名字统一：GUI `game_starter.exe`，控制台菜单版 `game_starter.bat`**
    （备用模式跟着叫 `game_starter-soft.bat` / `game_starter-640.bat`）。
@@ -94,7 +100,7 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
     核心提示再从官方手册/社区攻略精简，不自己编。
     玩家界面一律说人话：不出现 `DXVK` / `dgVoodoo` / `cnc-ddraw` / `Mesa` / 兼容层 / 翻译层 /
     HUD / 注册表 / 亲和性 / 偏移 / `0x...` / DLL 文件名。启动方式必须区分 DX9 / DX11 / GDI 时，
-    用玩家能懂的结果标注：`DX11（画质最好）`、`DX9（老机器）`、`GDI（最兼容，推荐）`；
+    用玩家能懂的结果标注：`DX11（画质更好）`、`DX9（老机器）`、`GDI（软件画面）`；
     不要写渲染器/管线/API。技术细节只进运行日志和仓库文档。
 13. **状态指示全窗口只出现一次**：左下角一个 `● 已就绪` 就够。标题带右上角的角标、
     左栏底部的"兼容层就绪 ddraw.dll"这类第二处状态都算重复，玩家会直接要求删掉。
@@ -191,42 +197,53 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
 
 | 令牌 | 值 | 用途 |
 |---|---|---|
-| `BaseTop` | `#800020` | 背景渐变上端 |
-| `BaseBottom` | `#4A0012` | 背景渐变下端（深红，不是黑） |
-| `PanelTop` | `#9B1B30` | 卡片渐变上端 |
-| `PanelBottom` | `#6E0F22` | 卡片渐变下端 |
-| `BandTop` | `#2A0A0F` | 页眉/页脚渐变带左端（深酒红，压住上下边缘） |
-| `BandBottom` | `#4A0E1A` | 页眉/页脚渐变带右端 |
-| `PanelEdge` | `#E0574F` | 卡片描边（1px，提亮用） |
-| `Gold` | `#FFD85E` | 标题、选中条、主按钮底、焦点环 |
-| `GoldDim` | `#C9A227` | 分隔线、次按钮描边 |
-| `Ink` | `#FFF3E6` | 正文米白（红底上对比度 ≥ 4.5:1） |
-| `InkDim` | `#F0C3A8` | 次要说明、脚注 |
-| `OnGold` | `#5C0810` | 金色按钮上的文字（深红，不用黑） |
-| `CapFace` | `#2E2E34` | 键帽正面 |
-| `CapTop` | `#54545E` | 键帽上沿高光 |
-| `CapSide` | `#17171B` | 键帽下沿/右侧阴影 |
-| `CapInk` | `#FFFFFF` | 键帽字符 |
-| `Ok` | `#7BD88F` | 就绪状态点（必须同时有文字） |
-| `Warn` | `#FFB454` | 警告状态点 |
+| `BgTop` | `#3A2015` | 背景渐变上端（深棕皮革） |
+| `BgBottom` | `#1C0F0A` | 背景渐变下端（近黑棕，不是纯黑） |
+| `CardTop` | `#5A3421` | 卡片渐变上端（皮革正面） |
+| `CardBottom` | `#3B2116` | 卡片渐变下端 |
+| `BandTop` | `#24130D` | 页眉/页脚渐变带左端（压暗边缘） |
+| `BandBottom` | `#3A2015` | 页眉/页脚渐变带右端 |
+| `PanelEdge` | `#B98A55` | 黄铜描边（次按钮 / 键帽 / 菜单框） |
+| `Gold` | `#E3C07A` | 栏标题、主按钮底、选中条、下拉箭头 |
+| `GoldBright` | `#F0D596` | 主标题、页脚品牌、焦点环（烫金高亮） |
+| `GoldDim` | `#9A6A2A` | 分隔线、主按钮渐变下端 |
+| `Ink` | `#F4E3C6` | 正文米黄（棕底上对比度 ≥ 4.5:1） |
+| `InkDim` | `#D8BD96` | 次要说明、脚注 |
+| `OnGold` | `#2A160D` | 金色按钮上的文字（深棕，不用黑） |
+| `LeatherDark` | `#1C0F0A` | 卡片外框（1.5px） |
+| `LeatherLight` | `#6F4A2C` | 主按钮描边 |
+| `Stitch` | `#B98A55` | 缝线：内缩 6px、Dash `2.5/2.2`、alpha 155 |
+| `CapFace` | `#4A2A1B` | 键帽渐变上端 |
+| `CapTopHi` | `#9C6A3B` | 键帽上沿高光 |
+| `CapSide` | `#1C0F0A` | 键帽渐变下端 / 阴影 |
+| `Ink` | `#F4E3C6` | 正文与键帽字符（米黄，不用纯白） |
+| `Ok` | `#D9A441` | 就绪状态点（黄铜，必须同时有文字） |
+| `Warn` | `#E07A5F` | 警告状态点 |
 
-**红色一律走渐变，不用大面积纯色**：窗口底 `BaseTop→BaseBottom`（竖直），
-卡片 `PanelTop→PanelBottom`（竖直），页眉/页脚带 `BandTop→BandBottom`（水平）。
-三条渐变拉开三层明度，卡片靠描边和金色高光线浮起来。
+**皮革质感全靠现画，不引图片**，三条固定做法：
+
+- 背景：竖直渐变打底，再叠两组 1px 斜线当皮纹（暗线 `alpha 12`、间距 9px；亮线 `255,220,160 / alpha 8`、
+  间距 13px、方向相反），最后用 `PathGradientBrush`（矩形路径，中心透明 → 四周 `alpha 120`）压出暗角。
+- 卡片 / 按钮：竖直渐变 + 上沿 1px 高光（`255,230,180`，卡片 alpha 55、按钮 alpha 95/45）
+  + 下沿 1px 阴影（`0,0,0 / alpha 80`）。卡片额外叠内缩 8px 的斜纹和内缩 6px 的黄铜缝线（`DashStyle.Dash`）。
+- 烫金压印：主标题和页脚品牌先画一遍 `Color.FromArgb(150, 0, 0, 0)` 偏移 1px，再画 `GoldBright`；
+  分隔线同理（`GoldDim` 一条 + 下面 1px 黑色阴影）。
 
 字阶（系统字体，不嵌字体；**优先微软雅黑**）：
 
 | 角色 | 字体 | 处理 |
 |---|---|---|
 | 全部界面文字 | `Microsoft YaHei` 优先，缺了依次退 `Microsoft YaHei UI` / `SimHei` / `SimSun` / 系统 UI 字体（运行时用 `InstalledFontCollection` 探测） | — |
-| 主标题 | 15pt | Bold + `Gold` |
+| 主标题 | 15pt | Bold + `GoldBright`（带 1px 深棕偏移压印） |
 | 栏标题 | 10.5pt | Bold + `Gold` |
 | 选项行 | 10pt | 选中 Bold + `Ink`，未选中 Regular + `InkDim` |
 | 正文 | 9.5pt | Regular + `Ink` |
-| 键帽字符 | 9pt | Bold + `CapInk` |
+| 键帽字符 | 9pt | Bold + `Ink` |
 | 技术串（版本号、状态） | `Consolas` 优先，缺了退 `Courier New` 9pt | `InkDim` |
 
-尺度：8px 栅格。圆角只两档 —— 卡片 10、行/按钮/键帽 6。间距只用 8 / 12 / 16 / 20。
+尺度：8px 栅格。圆角三档 —— 卡片 12、按钮 / 下拉框 8、键帽 5。间距只用 8 / 12 / 16 / 20。
+焦点环：`GoldBright` 2px（内缩圆角比目标大 3px）+ 外面再套一圈 `alpha 120` 黑色 3px，
+保证在皮革和金按钮上都看得见；重绘时 invalidate 要按控件并集外扩 8px，否则环会被裁掉。
 
 ## 布局
 
@@ -317,32 +334,38 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
 
 ## 组件配方
 
-代码片段见 `references/drawing-recipes.md`，逐个抄用即可：
+**先读 `references/leather-recipes.md`（皮革唯一施工依据，代码块抄了就能用），
+按它的 §0→§9 顺序落地：令牌 → 背景/皮纹 → 卡片 → 文本 → 自绘下拉 → 键帽 → 按钮 → 页脚品牌 → 图标 → 取证。
+不要再从旧游戏的中国红版本反推，也不要再写原生 ComboBox / 从游戏 exe 抽图标（配方里已给出替代做法）。
+
+配方覆盖：
 
 | 组件 | 做法要点 |
 |---|---|
-| 背景 | `OnPaint` 里 `LinearGradientBrush(BaseTop→BaseBottom, 90deg)` 刷满；页眉 0–76px、页脚 560–底 两条 `BandTop→BandBottom` 水平渐变带，中间夹红色渐变 |
-| 卡片 | 圆角矩形 `PanelTop→PanelBottom` 竖直渐变填充 + `PanelEdge` 1px 描边 + 顶部 1px `Gold` 20% 高光线 |
-| 选项 | **标准 `ComboBox`（`DropDownList`，保留模式，不自绘）**：不要 `OwnerDrawFixed` / `FlatStyle.Flat` / 子类化双缓冲，那些只会带来闪烁；框里那行用加粗字体，选中值本身就醒目 |
-| 选项分组 | 一张卡里「标签 + 下拉框」成组，组间等间距（标签 22 / 框 30 / 间距 20），整叠垂直居中；**不做「将启动」摘要卡** |
-| 主按钮 | 圆角 `Gold` 底 + `OnGold` 粗体字；hover 提亮、按下压暗、禁用 `#6E6E6E` 底 + `#B0B0B0` 字 |
-| 次按钮 | 透明底 + `GoldDim` 1px 描边 + `Ink` 字 |
-| 键帽 | 圆角矩形 `CapFace`，上沿 2px `CapTop`、下沿 2px `CapSide`，字符居中；宽键（Shift/Home/Page Up）按字数加宽 |
+| 背景 | `OnPaint` 里 `LinearGradientBrush(BgTop→BgBottom, Vertical)` 刷满，叠两组 1px 斜线当皮纹（暗 alpha 12 间距 9 / 亮 `255,220,160` alpha 8 间距 13，方向相反），最后 `PathGradientBrush` 矩形压暗角（中心透明 → 四周 alpha 120）；页眉 0–76px、页脚 560–底 两条 `BandTop→BandBottom` 水平渐变带（带内 7px 竖纹 + 顶部 1px 亮边） |
+| 卡片 | 圆角 12，`CardTop→CardBottom` 竖直渐变 + `LeatherDark` 1.5px 外框 + 内缩 6px 黄铜缝线（`Dash` 2.5/2.2、alpha 155）+ 内缩 8px 斜纹 + 上沿 1px `255,230,180 / alpha 55` 高光、下沿 1px 黑 / alpha 80 阴影 |
+| 选项 | 启动方式用自绘 `SelectPanel`（双缓冲 + `ContextMenuStrip`，见下一节）；选项很多的其他游戏仍可留原生 `ComboBox`（`DropDownList`、整体不自绘），**但别用 `OwnerDrawFixed` + `FlatStyle.Flat` 半自绘**，那套会闪 |
+| 选项分组 | 一张卡里「标签 + 下拉框」成组，组间等间距（标签 22 / 框 30 / 间距 20）；**不做「将启动」摘要卡** |
+| 主按钮 | 圆角 8，`Gold→GoldDim` 竖直渐变 + `LeatherLight` 描边 + `OnGold` 粗体字；hover 上端换 `GoldBright`；禁用 `#4A3A2E→#2E2119` 底 + `#B8A58E` 字 |
+| 次按钮 | 圆角 8，`CardTop→CardBottom` 皮革底 + `PanelEdge` 1px 描边 + `Ink` 字；hover 提亮到 `#6B4228`；上沿 1px `255,230,180 / alpha 45` 高光、下沿 1px 黑 / alpha 80 |
+| 键帽 | 圆角 5，`CapFace→CapSide` 竖直渐变 + `PanelEdge` 1px 描边 + 上沿 1px `CapTopHi / alpha 95` 高光、下沿 1px 黑 / alpha 90 阴影，字符 `Ink` 居中；宽键（Shift/Home/Page Up）按字数加宽 |
 | 状态点 | 直径 8 的实心圆 + 右侧文字；颜色只作辅助，**必须同时有文字** |
-| 页脚品牌 | 中间固定 `YunGame`，`fBrand`（12pt 粗体）+ `Gold`，与左状态/右提示同一行，居中 |
-| 分隔线 | 1px `GoldDim`，只在语义分界处用（键位 vs 秘技），不做装饰 |
-| 焦点环 | 2px `Gold` 描边，外扩 2px，仅键盘导航时显示（下拉框靠自绘边框变色） |
+| 页脚品牌 | 中间固定 `YunGame`，`fBrand`（12pt 粗体）：先画偏移 1px 的 `Color.FromArgb(150,0,0,0)`，再画 `GoldBright`（烫金压印），与左状态/右提示同一行，居中 |
+| 分隔线 | 1px `GoldDim` + 紧贴下方 1px 黑 / alpha 90（刻进皮革的凹槽），只在语义分界处用（页眉 / 页脚 / 键位 vs 秘技），不做装饰 |
+| 焦点环 | `GoldBright` 2px（外扩 3px）+ 外圈 `Color.FromArgb(120,0,0,0)` 3px（外扩 5px），仅键盘导航时显示；重绘要 invalidate「按钮并集 ∪ 下拉框」外扩 8px，否则环会被裁掉 |
 
 ## 交互与可访问性
 
 - 鼠标：行/按钮 hover 变亮，`Cursor=Hand`；点击即选中，主按钮点击才启动游戏。
-- 键盘（必须做，自绘不等于放弃键盘）：`Tab` / `Shift+Tab` 走「画面 → 按键 → 存档 → 启动 → 目录 → 退出」；
-  下拉框的 Tab 要靠窗体 `ProcessCmdKey` 接管（真控件不会自己跟自绘按钮串成一条链），
-  框内 `↑↓` 换项、`Enter` 确认；焦点在自绘按钮上时 `Enter` / `Space` 激活、`Esc` 关窗；
-  焦点环（按钮）或 2px 金色边框（下拉框）必须看得见。
+- 键盘（必须做，自绘不等于放弃键盘）：`Tab` / `Shift+Tab` 走「启动选项 → 启动 → 修复 → 日志 → 退出」；
+  下拉框（`Panel` 子类）默认不可聚焦，Tab 链要靠窗体 `ProcessCmdKey` 自己串：给下拉框留一个焦点序号、
+  `DrawCenter` 里给它画焦点环、`RepaintControls` 连它的区域一起失效。
+  **焦点在下拉框上时 `↑` / `↓` 直接换项**（不用先弹菜单，这是玩家最容易理解的走法），
+  `Enter` / `Space` 展开 `ContextMenuStrip`，菜单内 `↑↓` + `Enter` 照常可用；
+  焦点在自绘按钮上时 `Enter` / `Space` 激活、`Esc` 关窗；焦点环必须看得见。
 - 反馈只在状态变化时给：选中态、启动中（按钮文字变「游戏运行中…」并禁用）、
   退出后状态行回写。**不做装饰动画、不做逐卡淡入。**
-- 对比度：`Ink` 在 `Panel` 上 ≥ 4.5:1；金色按钮上的字用深红不用黑。
+- 对比度：`Ink` 在卡片上 ≥ 4.5:1；金色按钮上的字用深棕 `OnGold` 不用黑。
 - 状态不能只靠颜色表达（点 + 文字成对出现）。
 - 错误文案说清「哪坏了 + 下一步做什么」：
   `兼容层缺失，请先双击 兼容修复.bat`，不要 `启动失败`。
@@ -352,6 +375,8 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
 启动方式默认用下拉框，只放两个玩家能懂的结果：`游戏自动检测（推荐）` / `固定桌面分辨率`；
 不要写「备份 / 直接启动 / 自动检测（重置）/ config」这类技术选项。其他设置（按键方案、存档）
 只有确实需要时才加下拉框。
+这台机器上确实需要玩家手动挑画面（如英雄无敌3 的六个实测档位）时才可以多放几项，
+命名按下面「选项名字怎么起」的规则走。
 
 - 不要用原生 ComboBox 的 `OwnerDrawFixed` / `FlatStyle.Flat` 半自绘组合——换主题色后容易闪；
   要么接受系统外观（白底黑字），要么完全自绘。
@@ -361,6 +386,68 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
 - 原生 ComboBox 只设 `Font` / `BackColor` / `ForeColor`、绘制交给框架时，交付前必须人眼确认不闪；
   半自绘（OwnerDraw + Flat）在深色主题上最容易闪，直接避开。
 - 父窗体 hover / 选中变化只刷按钮区（`Invalidate(ButtonsRect)`），不要整窗重绘。
+
+### 弹层必须把每一项显示全（框宽不动）
+
+**横向和竖向都要显示全**（用户定案 2026-11-04）：弹层宽度 ≥ 最长一项的文字宽度，
+弹层高度 ≥ 项数 × 行高——`ComboBox` 默认只露 5 行半，第 6 项要点开滚动才看见，同样算缺陷。
+只加宽/加高**弹层**，**框本身的宽度/位置不许动**（动了整栏布局就歪）。
+**皮革主题优先用自绘 `SelectPanel` + `ContextMenuStrip`**：原生 ComboBox 的白底框、白底弹层和系统蓝高亮
+跟皮革主题不搭（英雄无敌3 就是先用了原生控件、改皮革时才发现突兀，2026-11-04 换成自绘）。
+
+- 原生 `ComboBox`（`DropDownList`）：设 `cb.DropDownWidth` / `cb.DropDownHeight`，不要改 `cb.Width`。
+  在**布局完成之后**再算（`PlaceCombo` 之前 `cb.Width` 还是默认的 121，量出来不可信）：
+
+  ```csharp
+  int widest = 0;
+  using (Graphics g = CreateGraphics())
+      foreach (string s in items)
+          widest = Math.Max(widest, TextRenderer.MeasureText(g, s, cb.Font).Width);
+  int want = widest + SystemInformation.VerticalScrollBarWidth + S(30);
+  int cap = Screen.FromControl(cb).WorkingArea.Width - S(24);   // 别超屏
+  cb.DropDownWidth = Math.Max(cb.Width, Math.Min(want, cap));
+
+  cb.MaxDropDownItems = items.Length;                             // 默认 8，但高度仍可能被截
+  int ih = cb.ItemHeight > 0 ? cb.ItemHeight : S(19);
+  int needH = items.Length * ih + 4;
+  if (cb.DropDownHeight < needH) cb.DropDownHeight = needH;
+  ```
+
+- 自绘 `SelectPanel` + `ContextMenuStrip`：给菜单设 `menu.MinimumSize = new Size(want, 0)`
+  （`want` 同上，用 `LeatherMenuRenderer` 的字量），`SelectPanel.Bounds` 保持不变；
+  条目多时靠 `MaximumSize` 保证一屏能看全，不要出现半行。
+- 每次启动往 `运行日志.txt` 记两行自检，报障时一眼能看出是不是又被截了：
+  `下拉宽度自检：框宽=264，最长项文字宽=243，DropDownWidth=290，能装下=True`
+  `下拉高度自检：项数=6 行高=19，DropDownHeight=118，能装下=True`。
+- **取证只能 `PrintWindow` 自己的窗口**：截图脚本按进程 pid 找主窗口 + `ComboLBox` 弹层
+  （WinForms 类名带后缀，用 `Contains("COMBOBOX")` 这种关键字匹配，别写死 `ComboBox`），
+  分别 `PrintWindow(PW_RENDERFULLCONTENT)` 后按相对坐标合成。
+  **不要 `CopyFromScreen` 截全屏再裁**——桌面上别的窗口（用户的浏览器等）会一起进证据里，
+  已经踩过两次；展开下拉用 `SendMessage(CB_SHOWDROPDOWN)`，别用合成鼠标点击（坐标一偏就点到启动按钮）。
+
+### 选项名字怎么起（用户定案，别再自创词）
+
+**大白话说清「这档干什么」+ 保留技术名（GDI / DX9 / dgVoodoo2）便于远程核对**，例如：
+
+```
+1  软件画面 GDI（全屏）              ← CPU 用 Windows 自带 2D 画，不碰显卡 3D 驱动
+2  软件画面 GDI（4:3黑边）
+3  软件画面 GDI（窗口1280×720）
+4  原版640×480（窗口）
+5  DX9硬件加速（全屏）              ← 交给显卡的 Direct3D9 画
+6  dgVoodoo2转换（无边框全屏）
+```
+
+- **不写保证词**：「最稳」「最兼容」「画质最好」「不会崩」一律不进选项名和界面文案（用户定案 2026-11-04）。
+  **是什么就是什么**——英雄无敌3 第 1 档原来叫「软件画面 GDI（最稳·全屏）」，而玩家默认点开的正是这一档，
+  网吧工单 YW027 的 `0xC0000094` 就崩在这里，承诺当场变成假话。稳不稳由程序兜
+  （现场快照 → 自动改档 → 重试 → 记这台机器的可用档），不靠界面许愿。
+- **不要自创抽象词**：反例「稳定全屏」「直连模式」「加速模式」——听完不知道走哪条路，用户明确否过。
+- **不要给玩家看不懂的词**：`auto` / `config` / `重置` / `备份` / `兼容层` 一律不当选项名。
+- **新游戏要定名字时，先给 3-4 套候选让用户挑**（可以混搭），别自己拍一套就写进界面和文档；
+  定下来之后界面、`game_starter.bat` 菜单、`launcher.ini` 的 `CenterNote/Tips/EntryGuide`、
+  适配文档必须一起对齐。
+- 名字变长时记得回头核对弹层宽度（见上一节），别让新名字被截断。
 
 **别信"录屏量亮度"这种自证**：试过用 ffmpeg 逐帧量下拉框区域平均亮度做 A/B，
 两种写法都只出 ±3 波动（鼠标指针、抓帧重复帧就够吃掉这个量），分辨不了闪烁——
@@ -415,15 +502,26 @@ csc -nologo -target:winexe -optimize+ -platform:anycpu -codepage:65001 ^
 
 ## 交付前检查清单
 
+- [ ] **`pwsh -NoProfile -File scripts\规范自检.ps1` 跑出 0 项**（禁词、令牌漂移、默认档三处一致、
+      nircmd 文件名逐字一致、CRLF、交付包字节一致、图标只取 `Application.ExecutablePath`）；
+      交付完还要按 AGENTS 规则 24 回头自净本技能：删冲突条目、合并重复、把踩过两次以上的坑加成检查，
+      并写一句「下次省掉哪一步」
 - [ ] `check-launcher.ps1` 通过：exe ≤ 60 KB，src 无图片/资源文件
-- [ ] exe 文件图标已嵌入（资源管理器/任务栏/托盘显示统一的 `D:\ico.ico`，不是白纸，也不是游戏图标）
-- [ ] 截图两张进 `Games\<游戏>\evidence\`：默认态、切到备用按键方案后的键帽变化
+- [ ] exe 文件图标已嵌入（资源管理器/任务栏/托盘显示统一的仓库资源 `assets\ico.ico`，不是白纸，也不是游戏图标）
+- [ ] **主题按拟物皮革令牌**：背景皮纹 + 四角压暗、卡片黄铜缝线、标题/页脚烫金压印、键帽皮革渐变；
+      不是纯色平涂，也不是玻璃/霓虹那类临时方向
+- [ ] 截图两张进 `Games\<游戏>\evidence\`：默认态、切到备用按键方案后的键帽变化；
+      **只用 `PrintWindow` 抓启动器自己的窗口**（配方 §9），禁止 `CopyFromScreen` 截全屏带进别人窗口
 - [ ] 100% 与 150% 缩放各看一次，无截断文字、无重叠
-- [ ] 键盘 Tab/↑↓/Enter 全程可走通，焦点环可见
+- [ ] **下拉每一项都显示全**：弹层宽度 ≥ 最长项文字宽度（框宽不变），`运行日志.txt` 里有「下拉宽度自检」这一行
+- [ ] 键盘 Tab/↑↓/Enter 全程可走通，焦点环可见；**下拉框也在 Tab 链里**，
+      焦点落在框上时 `↑↓` 能直接换项（截图或放大截图证明焦点环真的画出来了）
 - [ ] **不闪**：下拉选项不要用原生 ComboBox 的 OwnerDraw/FlatStyle 组合；用自绘的双缓冲面板
       + `ContextMenuStrip`（或等价自绘控件），hover/展开只重绘局部；最后请人眼确认
       （录屏量亮度分辨不出来，别拿它当证据）
-- [ ] **交付目录只有一个启动器 exe**：没有 `keymap.exe`、`nircmdc.exe` 等伴生文件，没有第三方 DLL
+- [ ] **GUI 交付只有一个启动器 exe**：没有 `keymap.exe` 这类伴生文件，没有第三方 DLL；
+      随包的 `_tools\nircmd\nircmdc.exe` 只服务控制台菜单版 bat（`if exist` 保护），
+      **文件名必须和 bat 里写的完全一致**（踩过 `ircmdc.exe` 少个 n、居中静默失效的坑）
 - [ ] 不置顶（`TopMost` 为 false，没有 `HWND_TOPMOST` 调用）
 - [ ] 「打开运行日志」可用，且本次启动在日志里留了行；出错信息只进日志不进界面
 - [ ] 左栏无技术名词（cnc-ddraw / DXVK / 注册表 / 回滚），状态默认「已就绪」
@@ -444,7 +542,7 @@ csc -nologo -target:winexe -optimize+ -platform:anycpu -codepage:65001 ^
 
 ## Resources
 
-- `references/drawing-recipes.md`：可直接抄的 GDI+ 片段（渐变底、卡片、键帽、分段选项、
+- `references/leather-recipes.md`：可直接抄的 GDI+ 片段（渐变底、卡片、键帽、分段选项、
   焦点环、DPI 缩放、`Controls` 字节 → 键帽标签反查表）。
 - `scripts/check-launcher.ps1`：体积 + 违规文件检查，构建后跑一次。
 - 参考实现：仓库 `Games\RoadRash\src\Launcher.cs`（本规范的首个落地版本）。

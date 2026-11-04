@@ -127,6 +127,7 @@ for %%F in ("运行日志.txt") do (
 rmdir "%TARGET%\_dxvk" 2>nul
 rmdir "%TARGET%\_presets" 2>nul
 rmdir "%TARGET%\_cnc-ddraw" 2>nul
+rmdir "%TARGET%\_dgvoodoo2" 2>nul
 rmdir "%TARGET%\_tools\nircmd" 2>nul
 rmdir "%TARGET%\_tools" 2>nul
 

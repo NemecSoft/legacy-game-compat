@@ -33,18 +33,13 @@ $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
 if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe' }
 if (-not (Test-Path $csc)) { throw "找不到 csc.exe" }
 $exe = Join-Path $Out 'game_starter.exe'
-$ico = Join-Path $Out 'game_starter.ico'
-$iconExe = Join-Path $GameDir 'Roadrash.exe'
-try {
-  Add-Type -AssemblyName System.Drawing
-  if (Test-Path $iconExe) {
-    $ic = [System.Drawing.Icon]::ExtractAssociatedIcon($iconExe)
-    if ($ic) { $fs = [IO.File]::Create($ico); $ic.Save($fs); $fs.Close(); $ic.Dispose() }
-  }
-} catch { Write-Host "图标提取失败，继续无图标：$($_.Exception.Message)" }
+$icon = Join-Path $Repo 'assets\ico.ico'
+if (-not (Test-Path $icon)) { throw "缺少统一启动器图标：$icon（仓库资源，所有 game_starter.exe 固定使用它）" }
+$oldIco = Join-Path $Out 'game_starter.ico'
+if (Test-Path $oldIco) { Remove-Item $oldIco -Force }
 $cscArgs = @('-nologo', '-target:winexe', '-optimize+', '-platform:anycpu', '-codepage:65001',
   '-r:System.Windows.Forms.dll', '-r:System.Drawing.dll', ('-out:' + $exe))
-if (Test-Path $ico) { $cscArgs += ('-win32icon:' + $ico) }
+$cscArgs += ('-win32icon:' + $icon)
 $cscArgs += (Join-Path $Src 'Launcher.cs')
 & $csc @cscArgs
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path $exe)) { throw "编译失败" }

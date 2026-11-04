@@ -2,4 +2,4 @@ game_starter.exe
 game_starter.bat
 launcher.ini
 game_starter.sha256
-_tools\nircmd\ircmdc.exe
+_tools\nircmd\nircmdc.exe

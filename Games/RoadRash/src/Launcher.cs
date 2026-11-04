@@ -57,12 +57,12 @@ class Launcher : Form
     {
         "1  兼容模式 1080p 4:3 黑边",
         "2  1080p 拉伸铺满 16:9",
-        "3  1080p 最兼容（老机器）",
+        "3  1080p（老机器）",
         "4  原版 640×480 全屏"
     };
     static readonly string[] ModeSubNames =
     {
-        "兼容模式 1080p 4:3 黑边", "1080p 拉伸铺满 16:9", "1080p 最兼容", "原版 640×480 全屏"
+        "兼容模式 1080p 4:3 黑边", "1080p 拉伸铺满 16:9", "1080p 老机器", "原版 640×480 全屏"
     };
     static readonly string[] KeyNames =
     {
@@ -1306,18 +1306,11 @@ class Launcher : Form
     {
         try
         {
-            string exe = Path.Combine(AppDir(), gameExe);
-            if (File.Exists(exe))
-            {
-                Icon ic = Icon.ExtractAssociatedIcon(exe);
-                if (ic != null)
-                {
-                    Icon = ic;
-                    return;
-                }
-            }
+            Icon own = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (own != null) { Icon = own; return; }
         }
-        catch { }
+        catch (Exception ex) { Log("取 exe 图标失败：" + ex.Message); }
+        // 取不到只退回系统默认图标；绝不从游戏 exe 抽图标（平台/任务管理器会把启动器当成游戏进程）
         Icon = SystemIcons.Application;
     }
 

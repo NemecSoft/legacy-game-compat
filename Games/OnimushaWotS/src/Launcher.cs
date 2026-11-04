@@ -17,42 +17,43 @@ using System.Windows.Forms;
 
 class Launcher : Form
 {
-    // ---------- 设计令牌 ----------
-    static readonly Color BgTop = Color.FromArgb(0x80, 0x00, 0x20);
-    static readonly Color BgBottom = Color.FromArgb(0x4A, 0x00, 0x12);
-    static readonly Color CardTop = Color.FromArgb(0x9B, 0x1B, 0x30);
-    static readonly Color CardBottom = Color.FromArgb(0x6E, 0x0F, 0x22);
-    static readonly Color BandTop = Color.FromArgb(0x2A, 0x0A, 0x0F);
-    static readonly Color BandBottom = Color.FromArgb(0x4A, 0x0E, 0x1A);
-    static readonly Color PanelEdge = Color.FromArgb(0xE0, 0x57, 0x4F);
-    static readonly Color Gold = Color.FromArgb(0xFF, 0xD8, 0x5E);
-    static readonly Color GoldDim = Color.FromArgb(0xC9, 0xA2, 0x27);
-    static readonly Color Ink = Color.FromArgb(0xFF, 0xF3, 0xE6);
-    static readonly Color InkDim = Color.FromArgb(0xF0, 0xC3, 0xA8);
-    static readonly Color OnGold = Color.FromArgb(0x5C, 0x08, 0x10);
-    static readonly Color CapFace = Color.FromArgb(0x2E, 0x2E, 0x34);
-    static readonly Color CapTopHi = Color.FromArgb(0x54, 0x54, 0x5E);
-    static readonly Color CapSide = Color.FromArgb(0x17, 0x17, 0x1B);
-    static readonly Color Ok = Color.FromArgb(0x7B, 0xD8, 0x8F);
-    static readonly Color Warn = Color.FromArgb(0xFF, 0xB4, 0x54);
+    // ---------- 设计令牌（拟物皮革 / Skeuomorphic Leather） ----------
+    static readonly Color BgTop = Color.FromArgb(0x3A, 0x20, 0x15);
+    static readonly Color BgMid = Color.FromArgb(0x2C, 0x18, 0x10);
+    static readonly Color BgBottom = Color.FromArgb(0x1C, 0x0F, 0x0A);
+    static readonly Color CardTop = Color.FromArgb(0x5A, 0x34, 0x21);
+    static readonly Color CardBottom = Color.FromArgb(0x3B, 0x21, 0x16);
+    static readonly Color BandTop = Color.FromArgb(0x24, 0x13, 0x0D);
+    static readonly Color BandBottom = Color.FromArgb(0x3A, 0x20, 0x15);
+    static readonly Color PanelEdge = Color.FromArgb(0xB9, 0x8A, 0x55);
+    static readonly Color Gold = Color.FromArgb(0xE3, 0xC0, 0x7A);
+    static readonly Color GoldBright = Color.FromArgb(0xF0, 0xD5, 0x96);
+    static readonly Color GoldDim = Color.FromArgb(0x9A, 0x6A, 0x2A);
+    static readonly Color Ink = Color.FromArgb(0xF4, 0xE3, 0xC6);
+    static readonly Color InkDim = Color.FromArgb(0xD8, 0xBD, 0x96);
+    static readonly Color OnGold = Color.FromArgb(0x2A, 0x16, 0x0D);
+    static readonly Color CapFace = Color.FromArgb(0x4A, 0x2A, 0x1B);
+    static readonly Color CapTopHi = Color.FromArgb(0x9C, 0x6A, 0x3B);
+    static readonly Color CapSide = Color.FromArgb(0x1C, 0x0F, 0x0A);
+    static readonly Color LeatherDark = Color.FromArgb(0x1C, 0x0F, 0x0A);
+    static readonly Color LeatherLight = Color.FromArgb(0x6F, 0x4A, 0x2C);
+    static readonly Color Stitch = Color.FromArgb(0xB9, 0x8A, 0x55);
+    static readonly Color Ok = Color.FromArgb(0xD9, 0xA4, 0x41);
+    static readonly Color Warn = Color.FromArgb(0xE0, 0x7A, 0x5F);
 
     // ---------- launcher.ini 可覆盖 ----------
     string gameTitle = "鬼武者：剑之道";
     string gameExe = "OnimushaWotS.exe";
     string gameArgs = "";
     string intro =
-        "《鬼武者：剑之道》是 CAPCOM 的战国题材\n" +
-        "动作游戏，以宫本武藏为主角，挥舞太刀\n" +
-        "与鬼之力斩妖除魔。\n" +
+        "《鬼武者：剑之道》是 CAPCOM 的战国题材动作游戏，以宫本武藏为主角，挥舞太刀与鬼之力斩妖除魔。\n" +
         "\n" +
-        "战斗讲究一击一杀的紧张感，\n" +
-        "关卡和演出充满和风与诡异气息。\n" +
+        "战斗讲究一击一杀的紧张感，关卡和演出充满和风与诡异气息。\n" +
         "\n" +
         "这份是免安装版，点「启动游戏」即可。\n" +
         "\n" +
         "# 玩不了或报错\n" +
-        "点「打开运行日志」\n" +
-        "把内容发给管理员";
+        "点「打开运行日志」，把内容发给管理员";
     string centerNote = "游戏会自动检测画面。";
 
     static readonly string[] LaunchModeNames =
@@ -234,7 +235,7 @@ class Launcher : Form
         StartPosition = FormStartPosition.CenterScreen;
         KeyPreview = true;
         Text = gameTitle;
-        BackColor = BgBottom;
+        BackColor = BgMid;
         ClientSize = new Size(900, 620);
     }
 
@@ -309,9 +310,10 @@ class Launcher : Form
         int comboY = labelY + S(24);
         int startY = comboY + S(34) + S(14);
         rcStart = new Rectangle(inner, startY, innerW, S(44));
-        int bw = (innerW - S(16)) / 3;
-        rcFix = new Rectangle(inner, rcStart.Bottom + S(10), bw, S(34));
-        rcLog = new Rectangle(rcFix.Right + S(8), rcFix.Y, bw, S(34));
+        // 三个按钮不等宽：「打开运行日志」六个字必须完整显示，退出两个字可以窄
+        int wFix = S(72), wLog = S(124);
+        rcFix = new Rectangle(inner, rcStart.Bottom + S(10), wFix, S(34));
+        rcLog = new Rectangle(rcFix.Right + S(8), rcFix.Y, wLog, S(34));
         rcExit = new Rectangle(rcLog.Right + S(8), rcLog.Y, innerW - (rcLog.Right + S(8) - inner), S(34));
         rcLabelMode = new Rectangle(inner, labelY, innerW, S(22));
         rcComboMode = new Rectangle(inner, comboY, innerW, S(30));
@@ -351,15 +353,12 @@ class Launcher : Form
         g.SmoothingMode = SmoothingMode.AntiAlias;
         g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
         Rectangle all = new Rectangle(0, 0, ClientSize.Width, ClientSize.Height);
-        using (LinearGradientBrush bg = new LinearGradientBrush(all, BgTop, BgBottom, LinearGradientMode.Vertical))
-            g.FillRectangle(bg, all);
+        DrawLeatherBg(g, all);
         Rectangle head = new Rectangle(0, 0, ClientSize.Width, S(76));
-        using (LinearGradientBrush hb = new LinearGradientBrush(head, BandTop, BandBottom, LinearGradientMode.Horizontal))
-            g.FillRectangle(hb, head);
+        DrawBand(g, head);
         int footY = S(560);
         Rectangle foot = new Rectangle(0, footY, ClientSize.Width, ClientSize.Height - footY);
-        using (LinearGradientBrush fb = new LinearGradientBrush(foot, BandTop, BandBottom, LinearGradientMode.Horizontal))
-            g.FillRectangle(fb, foot);
+        DrawBand(g, foot);
 
         DrawHeader(g);
         DrawLeft(g);
@@ -368,13 +367,50 @@ class Launcher : Form
         DrawFooter(g);
     }
 
+    void DrawLeatherBg(Graphics g, Rectangle r)
+    {
+        using (LinearGradientBrush b = new LinearGradientBrush(r, BgTop, BgBottom, LinearGradientMode.Vertical))
+            g.FillRectangle(b, r);
+        using (Pen dark = new Pen(Color.FromArgb(12, 0, 0, 0), 1f))
+            for (int x = -r.Height; x < r.Width; x += 9)
+                g.DrawLine(dark, x, 0, x + r.Height, r.Height);
+        using (Pen light = new Pen(Color.FromArgb(8, 255, 220, 160), 1f))
+            for (int x = 0; x < r.Width + r.Height; x += 13)
+                g.DrawLine(light, x, 0, x - r.Height, r.Height);
+        using (GraphicsPath path = new GraphicsPath())
+        {
+            path.AddRectangle(r);
+            using (PathGradientBrush pb = new PathGradientBrush(path))
+            {
+                pb.CenterColor = Color.FromArgb(0, 0, 0, 0);
+                pb.SurroundColors = new Color[] { Color.FromArgb(120, 10, 4, 2) };
+                g.FillPath(pb, path);
+            }
+        }
+    }
+
+    void DrawBand(Graphics g, Rectangle r)
+    {
+        using (LinearGradientBrush b = new LinearGradientBrush(r, BandTop, BandBottom, LinearGradientMode.Horizontal))
+            g.FillRectangle(b, r);
+        using (Pen p = new Pen(Color.FromArgb(14, 0, 0, 0), 1f))
+            for (int x = r.X; x < r.Right; x += 7)
+                g.DrawLine(p, x, r.Y, x, r.Bottom);
+        using (Pen hi = new Pen(Color.FromArgb(45, 255, 220, 160), 1f))
+            g.DrawLine(hi, r.X, r.Y, r.Right, r.Y);
+    }
+
     void DrawHeader(Graphics g)
     {
-        TextRenderer.DrawText(g, gameTitle, fTitle, new Point(colLeft.X, S(16)), Gold, Color.Transparent);
+        TextRenderer.DrawText(g, gameTitle, fTitle,
+            new Point(colLeft.X + S(1), S(17)), Color.FromArgb(150, 0, 0, 0), Color.Transparent);
+        TextRenderer.DrawText(g, gameTitle, fTitle, new Point(colLeft.X, S(16)), GoldBright, Color.Transparent);
         TextRenderer.DrawText(g, "Onimusha: Way of the Sword · CAPCOM",
             fMono, new Point(colLeft.X, S(48)), InkDim, Color.Transparent);
         using (Pen p = new Pen(GoldDim, 1f))
             g.DrawLine(p, colLeft.X, S(76), ClientSize.Width - S(20), S(76));
+        using (Pen sh = new Pen(Color.FromArgb(90, 0, 0, 0), 1f))
+            g.DrawLine(sh, colLeft.X, S(77), ClientSize.Width - S(20), S(77));
     }
 
     void DrawLeft(Graphics g)
@@ -405,6 +441,7 @@ class Launcher : Form
             hover == 2 || focus == 2, focus == 2);
         DrawButton(g, rcExit, "退出", false, true,
             hover == 3 || focus == 3, focus == 3);
+        if (focus == 4 && selMode != null) FocusRing(g, selMode.Bounds);
     }
 
     static bool InViewport(int y, int h, int top, int bottom) { return y >= top && y + h <= bottom; }
@@ -517,42 +554,82 @@ class Launcher : Form
         int y = S(578);
         using (Pen p = new Pen(GoldDim, 1f))
             g.DrawLine(p, colLeft.X, S(566), ClientSize.Width - S(20), S(566));
+        using (Pen sh = new Pen(Color.FromArgb(90, 0, 0, 0), 1f))
+            g.DrawLine(sh, colLeft.X, S(567), ClientSize.Width - S(20), S(567));
         StatusDot(g, status, statusColor, colLeft.X, y);
         string hint = busy ? "关窗只是隐藏，游戏继续跑" : "游戏退出后本窗口自动关闭";
         Size sz = TextRenderer.MeasureText(g, hint, fMono);
         TextRenderer.DrawText(g, hint, fMono,
             new Point(ClientSize.Width - S(20) - sz.Width, y), InkDim, Color.Transparent);
         Size brand = TextRenderer.MeasureText(g, BrandGuard.Text, fBrand);
+        Point bp = new Point((ClientSize.Width - brand.Width) / 2, y);
         TextRenderer.DrawText(g, BrandGuard.Text, fBrand,
-            new Point((ClientSize.Width - brand.Width) / 2, y), Gold, Color.Transparent);
+            new Point(bp.X + S(1), bp.Y + S(1)), Color.FromArgb(150, 0, 0, 0), Color.Transparent);
+        TextRenderer.DrawText(g, BrandGuard.Text, fBrand, bp, GoldBright, Color.Transparent);
     }
 
     void Card(Graphics g, Rectangle r)
     {
-        using (GraphicsPath p = Round(r, S(10)))
-        using (LinearGradientBrush b = new LinearGradientBrush(
-                   new Rectangle(r.X, r.Y, Math.Max(1, r.Width), Math.Max(1, r.Height)),
-                   CardTop, CardBottom, LinearGradientMode.Vertical))
+        Rectangle box = new Rectangle(r.X, r.Y, Math.Max(1, r.Width), Math.Max(1, r.Height));
+        using (GraphicsPath p = Round(r, S(12)))
+        using (LinearGradientBrush b = new LinearGradientBrush(box, CardTop, CardBottom, LinearGradientMode.Vertical))
             g.FillPath(b, p);
-        using (GraphicsPath p = Round(Rectangle.Inflate(r, -1, -1), S(10)))
-        using (Pen pen = new Pen(PanelEdge, 1f)) g.DrawPath(pen, p);
-        using (Pen hi = new Pen(Color.FromArgb(46, Gold), 1f))
+        Rectangle inner = Rectangle.Inflate(r, -S(8), -S(8));
+        using (Pen grain = new Pen(Color.FromArgb(10, 0, 0, 0), 1f))
+            for (int x = inner.Left - inner.Height; x < inner.Right; x += 8)
+                g.DrawLine(grain, x, inner.Top, x + inner.Height, inner.Bottom);
+        using (GraphicsPath p = Round(r, S(12)))
+        {
+            using (Pen edge = new Pen(LeatherDark, 1.5f)) g.DrawPath(edge, p);
+            using (GraphicsPath st = Round(Rectangle.Inflate(r, -S(6), -S(6)), S(9)))
+            using (Pen stitch = new Pen(Color.FromArgb(155, Stitch), 1f))
+            {
+                stitch.DashStyle = DashStyle.Dash;
+                stitch.DashPattern = new float[] { 2.5f, 2.2f };
+                g.DrawPath(stitch, st);
+            }
+        }
+        using (Pen hi = new Pen(Color.FromArgb(55, 255, 230, 180), 1f))
             g.DrawLine(hi, r.X + S(14), r.Y + 1, r.Right - S(14), r.Y + 1);
+        using (Pen sh = new Pen(Color.FromArgb(80, 0, 0, 0), 1f))
+            g.DrawLine(sh, r.X + S(14), r.Bottom - 2, r.Right - S(14), r.Bottom - 2);
     }
 
     void DrawButton(Graphics g, Rectangle r, string text, bool primary, bool enabled, bool hot, bool focused)
     {
-        Color back = !enabled ? Color.FromArgb(0x6E, 0x6E, 0x6E)
-                   : primary ? (hot ? Color.FromArgb(0xFF, 0xE6, 0x8C) : Gold)
-                   : (hot ? Color.FromArgb(70, Gold) : Color.Transparent);
-        using (GraphicsPath p = Round(r, S(6)))
+        Color top, bottom, edge, fore;
+        if (!enabled)
         {
-            if (back != Color.Transparent)
-                using (SolidBrush b = new SolidBrush(back)) g.FillPath(b, p);
-            if (!primary || !enabled)
-                using (Pen pen = new Pen(GoldDim, 1f)) g.DrawPath(pen, p);
+            top = Color.FromArgb(0x4A, 0x3A, 0x2E);
+            bottom = Color.FromArgb(0x2E, 0x21, 0x19);
+            edge = Color.FromArgb(0x5A, 0x4A, 0x3A);
+            fore = Color.FromArgb(0xB8, 0xA5, 0x8E);
         }
-        Color fore = !enabled ? Color.FromArgb(0xC8, 0xC8, 0xC8) : primary ? OnGold : Ink;
+        else if (primary)
+        {
+            top = hot ? GoldBright : Gold;
+            bottom = hot ? Color.FromArgb(0xD8, 0xB2, 0x5F) : GoldDim;
+            edge = LeatherLight;
+            fore = OnGold;
+        }
+        else
+        {
+            top = hot ? Color.FromArgb(0x6B, 0x42, 0x28) : CardTop;
+            bottom = hot ? CapFace : CardBottom;
+            edge = PanelEdge;
+            fore = Ink;
+        }
+        Rectangle box = new Rectangle(r.X, r.Y, Math.Max(1, r.Width), Math.Max(1, r.Height));
+        using (GraphicsPath p = Round(r, S(8)))
+        {
+            using (LinearGradientBrush b = new LinearGradientBrush(box, top, bottom, LinearGradientMode.Vertical))
+                g.FillPath(b, p);
+            using (Pen pen = new Pen(edge, 1f)) g.DrawPath(pen, p);
+        }
+        using (Pen hi = new Pen(Color.FromArgb(primary ? 95 : 45, 255, 230, 180), 1f))
+            g.DrawLine(hi, r.X + S(10), r.Y + S(2), r.Right - S(10), r.Y + S(2));
+        using (Pen sh = new Pen(Color.FromArgb(80, 0, 0, 0), 1f))
+            g.DrawLine(sh, r.X + S(10), r.Bottom - S(3), r.Right - S(10), r.Bottom - S(3));
         TextRenderer.DrawText(g, text, primary ? fRowSel : fRow, r, fore, Color.Transparent,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         if (focused) FocusRing(g, r);
@@ -561,15 +638,19 @@ class Launcher : Form
     void Keycap(Graphics g, string label, int x, int y, int w, int h)
     {
         Rectangle r = new Rectangle(x, y, w, h);
-        using (GraphicsPath p = Round(r, S(4)))
-        using (SolidBrush b = new SolidBrush(CapFace)) g.FillPath(b, p);
-        using (GraphicsPath hi = Round(new Rectangle(r.X + S(2), r.Y + S(1), r.Width - S(4), S(3)), S(2)))
-        using (SolidBrush tb = new SolidBrush(CapTopHi)) g.FillPath(tb, hi);
-        using (SolidBrush sb = new SolidBrush(CapSide))
-            g.FillRectangle(sb, r.X + S(3), r.Bottom - S(3), r.Width - S(6), S(2));
+        using (GraphicsPath p = Round(r, S(5)))
+        {
+            using (LinearGradientBrush b = new LinearGradientBrush(r, CapFace, CapSide, LinearGradientMode.Vertical))
+                g.FillPath(b, p);
+            using (Pen edge = new Pen(PanelEdge, 1f)) g.DrawPath(edge, p);
+        }
+        using (Pen hi = new Pen(Color.FromArgb(95, CapTopHi), 1f))
+            g.DrawLine(hi, r.X + S(3), r.Y + S(2), r.Right - S(3), r.Y + S(2));
+        using (Pen sh = new Pen(Color.FromArgb(90, 0, 0, 0), 1f))
+            g.DrawLine(sh, r.X + S(3), r.Bottom - S(2), r.Right - S(3), r.Bottom - S(2));
         Font f = CapFont(label);
         TextRenderer.DrawText(g, label, f,
-            new Rectangle(r.X, r.Y - S(1), r.Width, r.Height), Color.White, Color.Transparent,
+            new Rectangle(r.X, r.Y - S(1), r.Width, r.Height), Ink, Color.Transparent,
             TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
     }
 
@@ -593,8 +674,12 @@ class Launcher : Form
 
     void FocusRing(Graphics g, Rectangle r)
     {
-        using (GraphicsPath p = Round(Rectangle.Inflate(r, S(2), S(2)), S(8)))
-        using (Pen pen = new Pen(Gold, 2f)) g.DrawPath(pen, p);
+        using (GraphicsPath q = Round(Rectangle.Inflate(r, S(5), S(5)), S(10)))
+        using (Pen soft = new Pen(Color.FromArgb(120, 0, 0, 0), 3f))
+            g.DrawPath(soft, q);
+        using (GraphicsPath p = Round(Rectangle.Inflate(r, S(3), S(3)), S(9)))
+        using (Pen pen = new Pen(GoldBright, 2f))
+            g.DrawPath(pen, p);
     }
 
     static GraphicsPath Round(Rectangle r, int radius)
@@ -673,7 +758,11 @@ class Launcher : Form
         get { return Rectangle.Union(Rectangle.Union(Rectangle.Union(rcStart, rcFix), rcLog), rcExit); }
     }
 
-    void RepaintControls() { Invalidate(ButtonsRect); }
+    void RepaintControls()
+    {
+        Invalidate(Rectangle.Inflate(ButtonsRect, S(8), S(8)));
+        if (selMode != null) Invalidate(Rectangle.Inflate(selMode.Bounds, S(8), S(8)));
+    }
 
     void PlaceSelect(Control c, Rectangle slot)
     {
@@ -684,7 +773,7 @@ class Launcher : Form
     SelectPanel MakeModeSelect()
     {
         SelectPanel p = new SelectPanel();
-        p.BackColor = Color.FromArgb(0x4A, 0x00, 0x12);
+        p.BackColor = Color.Transparent;
         p.ForeColor = Ink;
         p.Font = fRow;
         p.Text = LaunchModeNames[launchMode];
@@ -698,18 +787,26 @@ class Launcher : Form
     void PaintModeSelect(object sender, PaintEventArgs e)
     {
         Control p = (Control)sender;
-        Color back = p.Enabled ? Color.FromArgb(0x4A, 0x00, 0x12) : Color.FromArgb(0x3A, 0x10, 0x18);
-        using (SolidBrush b = new SolidBrush(back)) e.Graphics.FillRectangle(b, p.ClientRectangle);
-        using (Pen edge = new Pen(p.Enabled ? GoldDim : Color.FromArgb(0x6A, 0x40, 0x30), 1f))
-            e.Graphics.DrawRectangle(edge, 0, 0, p.Width - 1, p.Height - 1);
-        Rectangle tr = new Rectangle(S(10), 0, p.Width - S(34), p.Height);
-        TextRenderer.DrawText(e.Graphics, p.Text, fRow, tr,
-            p.Enabled ? Ink : Color.FromArgb(0xC8, 0xA0, 0xA0), Color.Transparent,
-            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-        using (Pen pen = new Pen(p.Enabled ? Gold : GoldDim, 1.5f))
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        Rectangle box = new Rectangle(0, 0, Math.Max(1, p.Width), Math.Max(1, p.Height));
+        Color top = p.Enabled ? CardTop : Color.FromArgb(0x4A, 0x3A, 0x2E);
+        Color bottom = p.Enabled ? Color.FromArgb(0x2A, 0x16, 0x0D) : Color.FromArgb(0x2E, 0x21, 0x19);
+        using (GraphicsPath path = Round(box, S(8)))
         {
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            int cx = p.Width - S(14), cy = p.Height / 2;
+            using (LinearGradientBrush b = new LinearGradientBrush(box, top, bottom, LinearGradientMode.Vertical))
+                e.Graphics.FillPath(b, path);
+            using (Pen pen = new Pen(p.Enabled ? PanelEdge : Color.FromArgb(0x5A, 0x4A, 0x3A), 1f))
+                e.Graphics.DrawPath(pen, path);
+        }
+        using (Pen hi = new Pen(Color.FromArgb(45, 255, 230, 180), 1f))
+            e.Graphics.DrawLine(hi, S(10), S(2), p.Width - S(10), S(2));
+        Rectangle tr = new Rectangle(S(12), 0, p.Width - S(36), p.Height);
+        TextRenderer.DrawText(e.Graphics, p.Text, fRow, tr,
+            p.Enabled ? Ink : Color.FromArgb(0xB8, 0xA5, 0x8E), Color.Transparent,
+            TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
+        using (Pen pen = new Pen(p.Enabled ? Gold : GoldDim, 1.6f))
+        {
+            int cx = p.Width - S(15), cy = p.Height / 2;
             e.Graphics.DrawLine(pen, cx - S(4), cy - S(2), cx, cy + S(2));
             e.Graphics.DrawLine(pen, cx, cy + S(2), cx + S(4), cy - S(2));
         }
@@ -724,16 +821,25 @@ class Launcher : Form
         modeMenu.Show(selMode, new Point(0, selMode.Height + S(2)));
     }
 
+    void StepMode(int delta)
+    {
+        int n = LaunchModeNames.Length;
+        launchMode = ((launchMode + delta) % n + n) % n;
+        selMode.Text = LaunchModeNames[launchMode];
+        selMode.Invalidate();
+        Log("选择启动方式：" + LaunchModeNames[launchMode]);
+    }
+
     void BuildModeMenu()
     {
         modeMenu = new ContextMenuStrip();
         modeMenu.ShowImageMargin = false;
         modeMenu.ShowCheckMargin = false;
-        modeMenu.BackColor = Color.FromArgb(0x4A, 0x00, 0x12);
+        modeMenu.BackColor = LeatherMenuRenderer.MenuBack;
         modeMenu.ForeColor = Ink;
         modeMenu.Font = fRow;
         modeMenu.Padding = new Padding(S(4));
-        modeMenu.Renderer = new RedMenuRenderer();
+        modeMenu.Renderer = new LeatherMenuRenderer();
         for (int i = 0; i < LaunchModeNames.Length; i++)
         {
             int idx = i;
@@ -791,6 +897,12 @@ class Launcher : Form
         {
             case Keys.Tab: CycleFocus(1); return true;
             case Keys.Shift | Keys.Tab: CycleFocus(-1); return true;
+            case Keys.Down:
+                if (!busy && focus == 4) { StepMode(1); return true; }
+                break;
+            case Keys.Up:
+                if (!busy && focus == 4) { StepMode(-1); return true; }
+                break;
             case Keys.Escape: Close(); return true;
             case Keys.Enter:
                 if (busy) { Close(); return true; }
@@ -805,7 +917,7 @@ class Launcher : Form
 
     void CycleFocus(int delta)
     {
-        int[] order = busy ? new int[] { 2, 3 } : new int[] { 0, 1, 2, 3 };
+        int[] order = busy ? new int[] { 2, 3 } : new int[] { 4, 0, 1, 2, 3 };
         int idx = Array.IndexOf(order, focus);
         if (idx < 0) idx = delta > 0 ? order.Length - 1 : 0;
         focus = order[((idx + delta) % order.Length + order.Length) % order.Length];
@@ -814,6 +926,7 @@ class Launcher : Form
 
     void Activate(int i)
     {
+        if (i == 4) { ShowModeMenu(); return; }
         if (i == 0) { StartGame(); return; }
         if (i == 1) { FixResolution(); return; }
         if (i == 2) { OpenLog(); return; }
@@ -979,12 +1092,8 @@ class Launcher : Form
             if (ic != null) { Icon = ic; return; }
         }
         catch { }
-        try
-        {
-            if (File.Exists(@"D:\ico.ico")) { Icon = new Icon(@"D:\ico.ico"); return; }
-        }
-        catch { }
         Icon = SystemIcons.Application;
+        Log("警告：exe 未嵌入统一启动器图标（构建时 assets\\ico.ico 缺失）");
     }
 
     static int RunAndWait(string dir, string file, string args)
@@ -1130,34 +1239,44 @@ class Launcher : Form
         public SelectPanel()
         {
             DoubleBuffered = true;
-            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint
+                   | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
         }
     }
 
-    class RedMenuRenderer : ToolStripProfessionalRenderer
+    class LeatherMenuRenderer : ToolStripProfessionalRenderer
     {
+        public static readonly Color MenuBack = Color.FromArgb(0x2A, 0x16, 0x0D);
+        static readonly Color MenuHot = Color.FromArgb(0x6B, 0x42, 0x28);
+        static readonly Color MenuEdge = Color.FromArgb(0xB9, 0x8A, 0x55);
+
         protected override void OnRenderToolStripBackground(ToolStripRenderEventArgs e)
         {
-            using (SolidBrush b = new SolidBrush(Color.FromArgb(0x4A, 0x00, 0x12)))
+            using (SolidBrush b = new SolidBrush(MenuBack))
                 e.Graphics.FillRectangle(b, e.AffectedBounds);
+            using (Pen hi = new Pen(Color.FromArgb(40, 255, 220, 160), 1f))
+                e.Graphics.DrawLine(hi, 1, 1, e.ToolStrip.Width - 2, 1);
         }
 
         protected override void OnRenderMenuItemBackground(ToolStripItemRenderEventArgs e)
         {
             Rectangle r = new Rectangle(Point.Empty, e.Item.Size);
-            using (SolidBrush b = new SolidBrush(e.Item.Selected ? Color.FromArgb(0x7A, 0x0F, 0x22) : Color.FromArgb(0x4A, 0x00, 0x12)))
+            using (SolidBrush b = new SolidBrush(e.Item.Selected ? MenuHot : MenuBack))
                 e.Graphics.FillRectangle(b, r);
+            if (e.Item.Selected)
+                using (SolidBrush bar = new SolidBrush(Gold))
+                    e.Graphics.FillRectangle(bar, new Rectangle(r.X + 2, r.Y + 3, 2, Math.Max(1, r.Height - 6)));
         }
 
         protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
         {
-            e.TextColor = e.Item.Selected ? Color.FromArgb(0xFF, 0xE6, 0x8C) : Color.FromArgb(0xFF, 0xF3, 0xE6);
+            e.TextColor = e.Item.Selected ? GoldBright : Ink;
             base.OnRenderItemText(e);
         }
 
         protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
         {
-            using (Pen p = new Pen(Color.FromArgb(0xC9, 0xA2, 0x27), 1f))
+            using (Pen p = new Pen(MenuEdge, 1f))
                 e.Graphics.DrawRectangle(p, 0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1);
         }
     }

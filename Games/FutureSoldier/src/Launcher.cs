@@ -66,20 +66,20 @@ class Launcher : Form
     string entryGuide =
         "启动后先等加载（第一次较慢）\n" +
         "过场动画按 Esc / Enter 跳过\n" +
-        "默认 DX11；进不去选 DX9（最兼容）\n" +
+        "默认 DX11；进不去选 DX9（老机器）\n" +
         "画面、按键在游戏「选项」里改\n" +
         "不要再用 go.bat";
     string tips =
         "# 提示\n" +
         "默认 DX11，画质最好\n" +
-        "老机器 / 进不去选 DX9（最兼容）\n" +
+        "老机器 / 进不去选 DX9\n" +
         "DX9 模式左上角显示帧数，说明兼容方式已生效\n" +
         "按键以游戏内「选项 → 控制」为准\n" +
         "修改器在 Win11 可能被安全功能拦住\n" +
         "（详见 修改器说明.txt）";
     string centerNote =
         "默认 DX11（画质最好）；\n" +
-        "进不去时，在「启动方式」里改选 DX9（最兼容）。\n" +
+        "进不去时，在「启动方式」里改选 DX9（老机器）。\n" +
         "\n" +
         "不改分辨率、不覆盖游戏设置。\n" +
         "第一次进游戏先等加载；\n" +
@@ -91,7 +91,7 @@ class Launcher : Form
     static readonly string[] ModeNames =
     {
         "1  DX11（画质最好，默认）",
-        "2  DX9（最兼容，老机器）"
+        "2  DX9（老机器）"
     };
 
     // ---------- 运行状态 ----------
@@ -1044,14 +1044,11 @@ class Launcher : Form
     {
         try
         {
-            string exe = Path.Combine(AppDir(), string.IsNullOrEmpty(gameIconExe) ? gameExe : gameIconExe);
-            if (File.Exists(exe))
-            {
-                Icon ic = Icon.ExtractAssociatedIcon(exe);
-                if (ic != null) { Icon = ic; return; }
-            }
+            Icon own = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (own != null) { Icon = own; return; }
         }
-        catch { }
+        catch (Exception ex) { Log("取 exe 图标失败：" + ex.Message); }
+        // 取不到只退回系统默认图标；绝不从游戏 exe 抽图标（平台/任务管理器会把启动器当成游戏进程）
         Icon = SystemIcons.Application;
     }
 

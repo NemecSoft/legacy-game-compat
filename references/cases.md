@@ -346,7 +346,7 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 - 交付：`Games\FutureSoldier\release\`（`一键应用.bat` / `一键撤回.bat` + payload + manifest），
   payload 含 DX9 的 DXVK 2.5.3；应用会调用 `兼容修复.bat /quiet` 清 XP 兼容性、恢复 DX9 层并写记录；
   撤回保留被玩家改过的文件并记录跳过。
-- 玩家界面按 AGENTS 19 只写 `DX11（画质最好，默认）` / `DX9（最兼容，老机器）`；
+- 玩家界面按 AGENTS 19 只写 `DX11（画质更好，默认）` / `DX9（老机器）`（旧文案里的「最兼容」已按 2026-11-04 定案去掉，不再写保证词）；
   DXVK、Vulkan、XP 兼容层、Themida 等词只进运行日志和仓库文档。
 - 证据：`Games\FutureSoldier\evidence\future-soldier-dx11.png`、
   `future-soldier-launcher-game.png`、`future-soldier-bat-game.png`、
@@ -358,11 +358,21 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 - 路径：`D:\YunGame\E\Heroes3`；v3.1 简体中文完整版，`Heroes3.exe` 导入 `DDRAW.dll`。
 - 目录已有 **cnc-ddraw 7.1**（`ddraw.dll`），`ddraw.ini` 的 `[Heroes3]` 段为
   `renderer=gdi`、`fullscreen=true`、`maxfps=60`；go.bat 只设置 AppPath/CDDrive，不写 XP 兼容性。
-- **显示方式（启动器四选一）**：稳定全屏 GDI（默认）/ 保持 4:3（左右黑边）/
-  窗口 1280×720 / 原版 640×480（窗口）；全部用 GDI 软件渲染。
-- **不提供 auto / direct3d9 / DXVK**：现有《必读-崩溃修复说明》记录该链路会
-  `dxvk::DxvkError`/黑屏；本游戏是 DirectDraw，DXVK 的 d3d9 通道不适合，别放 d3d9/dxgi。
-- 启动器 GUI 中栏下拉切 `_presets\ddraw*.ini`，启动后恢复默认；bat 同菜单，`/go` 默认稳定全屏。
+- **显示方式（启动器六选一，2026-11-04 定名「大白话 + 技术名」，禁止写保证词）**：
+  1 软件画面 GDI（全屏）/ 2 软件画面 GDI（4:3黑边）/ 3 软件画面 GDI（窗口1280×720）/
+  4 原版640×480（窗口）/ 5 DX9硬件加速（全屏）/ **6 dgVoodoo2转换（无边框全屏）= 默认**。
+  名字用「大白话 + 技术名」两套信息并存：前半句说这档干什么，后半句留 GDI/DX9/dgVoodoo2 便于远程核对；
+  这套是给用户从四个候选里挑的（用户否掉了「稳定全屏」「直连模式」这类自创词）。
+  **第 1 档原名「软件画面 GDI（最稳·全屏）」，用户实测后否掉了「最稳」**：玩家默认点开的就是这一档，
+  网吧 YW027 的 `0xC0000094` 恰恰崩在这里——界面不写保证词，稳不稳交给启动器的现场快照 + 自动改窗口去兜。
+  选 6 时把 `_dgvoodoo2\ddraw.dll` 顶到 `ddraw.dll`、只留 `dgVoodoo.conf`；
+  **默认档就是第 6 档（2026-11-04 用户定）**，退出后收尾也回到这一档（缺 dgVoodoo2 文件才退回 cnc-ddraw GDI）。
+  **dgVoodoo2 全屏实测让游戏弹自身报错框 `DDERR_INVALIDRECT`（WINGRAPH.CPP:456），已撤下并留证据。**
+  水印按用户要求保留显示（`dgVoodooWatermark = true`），当通道标识用。
+- **不提供 auto / opengl / DXVK**：包内《必读-崩溃修复说明》记录 `auto → direct3d9 → DXVK` 链路会
+  `dxvk::DxvkError`/黑屏；本机也没有硬件 OpenGL。`direct3d9` 只走 cnc-ddraw 自己的 D3D9 通道
+  （第 5 档，实测可玩，`evidence\mode-5.png`），**不叠 DXVK，不放 `d3d9.dll`/`dxgi.dll`**。
+- 启动器 GUI 中栏下拉切 `_presets\ddraw*.ini`，启动后恢复默认；bat 同菜单，`/go` 走默认档（现在是第 6 档 dgVoodoo2）。
   启动器/兼容修复会设置 `AppPath/CDDrive`（32 位注册表视图），游戏直接子进程并回传退出码。
 - 交付包 `Games\Heroes3\release\`：应用备份目标 ddraw/ddraw.ini 并复制启动器/预设/兼容层；
   撤回恢复原文件、删除未修改的交付文件；注册表 AppPath/CDDrive 不自动恢复，记录写明。
@@ -373,7 +383,7 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 - 分辨率如实记录：640 模式是 640×480 窗口，桌面仍 1920×1080，不写成原生 1080p。
 - cnc-ddraw 的 `[Heroes3]` 默认给了 `keytogglefullscreen2=0x73`（F4 单键切换），但本机
   Win11 合成按键实测窗口矩形/样式不变（`hotkey-toggle.txt`）；界面不写未验证的快捷键，
-  换窗口统一用启动器的「窗口模式」预设。玩家界面只保留 `GDI（最兼容）`，不出现层名。
+  换窗口统一用启动器的第 3 档「软件画面 GDI（窗口1280×720）」。
 - 未验证：高 DPI、多显示器、IPX 房间互连（IPXWrapper 已在目录里）。
 
 ## 13. 绝命时刻：五星之光 —— Zero Hour 模组 + 注册表/画质重实现
@@ -431,3 +441,90 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
   回退最低画质和最小分辨率。因此本作默认项必须锁桌面分辨率；启动器下拉框第 3 项
   “让游戏自动检测（重置画面设置）”只作为可选退路，并提示“检测不到显卡时可能回到最低画面”。
 - 未验证：2K / 超宽屏 / 150% DPI 真机；机制上跟随物理桌面，本机只实测 1920×1080。
+
+## 15. 战神III 重制版（SpartanPort 移植版）—— 重实现「游戏设置.exe」+ PC 键位（2026-11-03）
+
+**包性质**：不是官方 PC 版，是 SpartanPort（上游 `FelipePrado0/SpartanPort`）用 C/C++ 重写 PS4 运行时、
+直接加载 `game\eboot.bin`（CUSA01740），渲染走 **Vulkan**。
+→ **没有兼容层可选装**：不装 DXVK / dgVoodoo / cnc-ddraw，也没有 `config.ini`；
+设置分两份：`spartanport.ini`（画面/性能，游戏内 Insert 菜单改同一份）+ `settings.json`（启动器：语言、补丁、按键）。
+
+**原版启动链（实测，不是猜）**：
+`开始游戏.exe` / `游戏设置.exe` / `Play *.exe` 四个文件字节完全相同（247,808，XDGAME `PortableEntry` 壳，
+只 import `CreateProcessW`），**靠自身文件名分人格**：
+
+- `游戏设置.exe` → `SpartanPort.exe`（无参）= 中文启动器界面
+- `开始游戏.exe` → `SpartanPort.exe --play` → `--run` → `bin\spartanport-probe.exe <out\boot-linked.bin>
+  --content-profile out\content.bin --patches out\patches.bin --app0 game --user user --timeout 0`
+- 界面点「开始游戏」→ `SpartanPort.exe --run`
+
+**坑 1**：单独跑 `SpartanPort.exe --run` 报 `No eboot.bin in D:\YunGame\F\CUSA01623 (set SPARTAN_GAME_DIR)`。
+游戏目录靠环境变量传（`SPARTAN_GAME_DIR=game`，工作目录 = 包根）。启动器共传 **23 个 `SPARTAN_*`**，
+用 `psutil` 读子进程环境块拿到完整清单（`tools\env` 侧取证，比反汇编快且是 ground truth）。
+
+**坑 2（按键）**：移植器默认把 **□ 主攻击 = 鼠标左键**、△ = 鼠标右键、R2 = 鼠标前进键——
+鼠标既要看镜头又要攻击，PC 玩家最难受的地方。
+重映射：□→**J**、△→**K**、R2→**鼠标左键**（按住 R 瞄准后左键射击），其余保持默认。
+写入格式实测得到：`settings.json → controls.key` 只存**与默认不同**的项（`{"square":"J","triangle":"K","r2":"Mouse Left"}`），
+而 `SPARTAN_KEY_MAP=square=J,triangle=K,...` 每次**完整**传给移植器；
+动作名与取值词汇（`Mouse Left` / `Wheel Up` / `Left Shift` / `Escape` / `None`）逐字照抄移植器自己的表，别发明。
+
+**最终方案**：`game_starter.exe`（拟物皮革，54 KB）重新实现「游戏设置」的核心职责——
+两个下拉（启动选项 / 按键方案）+ 启动游戏 / 修复画面 / 打开运行日志 / 退出；
+画面兜底只写 6 个 ini 键（`display_mode=borderless`、`render_resolution=native`、`fps_limit=60`、
+`engine_fps=60`、`vsync=1`、`hdr=0`），默认项**一个字节都不改**；
+改前自动备份到 `_legacy_compat_backup\GodofWarIII\`；`game_starter.bat` 同选项。
+
+**验证**：`tools\settings-test.ps1` 23 PASS（用 cmd.exe 当假游戏，回读它收到的环境块）、
+`tools\close-test.ps1` 7 PASS（直接子进程 / 关窗不杀游戏 / 退出码回传 / 无残留）、
+`tools\release-test.ps1` 14 PASS（一键应用+撤回）；真机 `game_starter.exe /go` 出画面
+（RX 580 2048SP，Vulkan，1920×1080，`evidence\game-running-pc-keys.png`）。
+
+**没做也不写进界面**：`glyph_style=keyboard`（游戏内图标换成键盘按键）要生成约 410 MB 的游戏文件副本，
+本启动器没实现，所以界面上完全不提——不要承诺启动器控制不了的事。
+
+---
+
+## 16. 三国群英传 8（KingdomHeroes8 / SG8）—— 包内自带受保护离线机制时的启动器复写（2026-11-04）
+
+**症状/需求**：包根只有 `SG8Launcher.exe`（141 MB）+ `GAME\`（Unity IL2CPP x64）+ `Runtime\`（便携 Steam + `MiniPipeDll.dll`）。
+用户要求分析这个启动器并复写成我们统一的 `game_starter.exe`，另外「把左下角 XDGAME / 萌芽游戏 隐藏掉」。
+
+**它是什么**：.NET 8 WPF 单文件包（overlay 里 529 个 `BSJB` 元数据、整套 `PresentationCore/Framework`，
+运行时解到 `%TEMP%\.net\SG8Launcher\<随机>\`；程序名 `SG8OfflineLauncher`）。
+尾部不是标准单文件格式，程序集抽不出来 → 实现细节改用**运行时取证**：它自己的
+`Runtime\logs\wpf-launcher.log` + 进程树 + 环境块 + 注册表快照，逐条对上。
+
+**它的流程**（日志原文，不是推测）：全局互斥 `steam3` → 生成私有管道名 `master=SG8<8hex>` →
+挂起创建 `Runtime\steam\steam.exe -silent` → 算 `challenge` → 把 `MiniPipeDll` 注入便携 Steam
+（`minipipe_injected` / `minipipe_ready`）→ 以 steam.exe 为父进程**挂起**创建 `GAME\SG8.exe` →
+给游戏装私有注册表视图 `HKCU\Software\SG8Offline\Transient\Game_<pid>_<guid>` → 恢复主线程 →
+游戏退出后删临时视图、停便携 Steam。环境块里 12 个 `STEAM*` / `SG8_*` 变量用 psutil 读出来了。
+
+**死胡同（实测）**：
+- 直接 `GAME\SG8.exe` → 约 6s 崩 `0xC0000005`，还留下两个**挂起**的子进程；
+- 带全套环境变量 + 先起便携 steam.exe，但不注入 → 一样 `0xC0000005`；
+- `STEAM_MASTER_IPC_NAME_OVERRIDE` / `SG8_*` 只在 `MiniPipeDll.dll` 里出现，Valve 的 `steam_api64.dll`
+  （262944 字节，与 `Steamworks.NET.txt` 声明逐字一致，是正版）根本不认这些名字。
+  → 结论：离线机制 = 注入 + challenge + 私有注册表 + 反调试标记，**不复刻**（不合规也不稳）。
+
+**最终方案**：`game_starter.exe`（21 KB，C# WinForms + 框架自带 UIAutomation）接管「启动器」这一层：
+拉起包内 `SG8Launcher.exe` → 按主窗口句柄在 UIA 里挑窗口（同 pid 有多个顶层窗口，挑错拿到空树）→
+窗口在屏幕外就先拉回（屏幕外时 WPF 不排布局，UIA 树为空）→
+用 `PrintWindow` 取原版**自己**的页脚底色，贴一个 `GWLP_HWNDPARENT` 从属、`WS_EX_NOACTIVATE` 不抢焦点的
+遮罩盖住左下角两个 `Hyperlink`（从属窗口只跟层级不跟位置，所以 400–500ms 重算一次跟着贴）→
+带重试地点「启动游戏」（原版要先跑完依赖检查，点早了不响应）→
+**按父进程链**认游戏（`SG8Launcher → steam.exe → SG8.exe`；游戏进程加了保护，读 `StartTime` 会拒绝访问）→
+陪跑等退出、`EnableRaisingEvents` 保证进程释放后仍能读到退出码 → 原样回传 → 发 `WM_CLOSE` 让原版自己清理。
+`game_starter.bat` 同选项（1 启动 / 2 自己点 / 3 日志 / 4 退出）。
+
+**验证**：`tools\launcher-test.ps1` **27 PASS**（交付完整性/体积/GBK+CRLF/三处 sha256 一致/
+包内 `SG8Launcher.exe`+`MiniPipeDll.dll`+`SG8.exe` 指纹未变/失败路径退出码 2 与 4 且 <60s 返回/
+一键应用与撤回只动交付文件）；真机全流程出画面 1920×1080
+（Unity 2018.4.23f1，**原生 D3D11 level 11.1**，RX 580 正常，不需要兼容层），
+遮罩实拍 `Games\KingdomHeroes8\evidence\starter-cover-live.png`。
+
+**如实记录的局限**：游戏内分辨率/窗口模式写在原版给的**临时注册表视图**里，退出即删 → 设置不持久（实测
+`HKCU\Software\UserJoy` 在游戏退出后不存在）；我们无法给游戏传命令行（进程不是我们创建的），
+所以不做「固定桌面分辨率」这种控制不了的选项；本包按用户要求保留原版界面，没有我们的三栏皮革 GUI，
+也就没有 YunGame 页脚与品牌自校验（已在 `适配过程分析.md` 写明偏差）。

@@ -27,14 +27,14 @@ Convert-Bat (Join-Path $Src 'game_starter.bat') (Join-Path $Payload 'game_starte
 $n = Join-Path $Payload '_tools\nircmd'
 New-Item -ItemType Directory -Force -Path $n | Out-Null
 $nircmd = Join-Path $Repo 'tools\nircmd\nircmdc.exe'
-if (Test-Path $nircmd) { Copy-Item $nircmd (Join-Path $n 'ircmdc.exe') -Force }
+if (Test-Path $nircmd) { Copy-Item $nircmd (Join-Path $n 'nircmdc.exe') -Force }
 
 $manifest = @(
   'game_starter.exe',
   'game_starter.bat',
   'launcher.ini',
   'game_starter.sha256',
-  '_tools\nircmd\ircmdc.exe'
+  '_tools\nircmd\nircmdc.exe'
 )
 [IO.File]::WriteAllText((Join-Path $Payload 'manifest.txt'), ($manifest -join "`r`n") + "`r`n", [Text.Encoding]::ASCII)
 

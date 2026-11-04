@@ -3,6 +3,7 @@ game_starter.bat
 launcher.ini
 ºÊ»›–ﬁ∏¥.bat
 ddraw.dll
+dgVoodoo.conf
 ddraw.ini
 ddraw-43.ini
 ddraw-window.ini
@@ -11,6 +12,9 @@ _presets\ddraw.ini
 _presets\ddraw-43.ini
 _presets\ddraw-window.ini
 _presets\ddraw-640.ini
+_presets\ddraw-d3d9.ini
+_presets\dgVoodoo-window.conf
 _cnc-ddraw\ddraw.dll
 _cnc-ddraw\ddraw.ini
-_tools\nircmd\ircmdc.exe
+_dgvoodoo2\ddraw.dll
+_tools\nircmd\nircmdc.exe

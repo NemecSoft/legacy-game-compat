@@ -340,9 +340,10 @@ class Launcher : Form
         rcLabelGamma = new Rectangle(inner, btnY - S(66), innerW, S(22));
         rcComboGamma = new Rectangle(inner, btnY - S(40), innerW, S(30));
         rcStart = new Rectangle(inner, btnY, innerW, S(44));
-        int bw = (innerW - S(16)) / 3;
-        rcRegister = new Rectangle(inner, btnY + S(44) + S(10), bw, S(34));
-        rcFolder = new Rectangle(rcRegister.Right + S(8), rcRegister.Y, bw, S(34));
+        // 三个按钮不等宽：长标签（算号并注册 / 打开运行日志）必须完整显示，退出两个字可以窄
+        int wReg = S(80), wLog = S(112);
+        rcRegister = new Rectangle(inner, btnY + S(44) + S(10), wReg, S(34));
+        rcFolder = new Rectangle(rcRegister.Right + S(8), rcRegister.Y, wLog, S(34));
         rcExit = new Rectangle(rcFolder.Right + S(8), rcRegister.Y, innerW - (rcFolder.Right + S(8) - inner), S(34));
         PlaceCombo(cbMode, rcComboMode);
         PlaceCombo(cbGamma, rcComboGamma);
@@ -1290,14 +1291,11 @@ class Launcher : Form
     {
         try
         {
-            string exe = Path.Combine(AppDir(), string.IsNullOrEmpty(gameIconExe) ? gameExe : gameIconExe);
-            if (File.Exists(exe))
-            {
-                Icon ic = Icon.ExtractAssociatedIcon(exe);
-                if (ic != null) { Icon = ic; return; }
-            }
+            Icon own = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (own != null) { Icon = own; return; }
         }
-        catch { }
+        catch (Exception ex) { Log("取 exe 图标失败：" + ex.Message); }
+        // 取不到只退回系统默认图标；绝不从游戏 exe 抽图标（平台/任务管理器会把启动器当成游戏进程）
         Icon = SystemIcons.Application;
     }
 

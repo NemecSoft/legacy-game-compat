@@ -115,8 +115,8 @@ you will get banned. Redistribute at your own risk; all third-party tools remain
 3. 全部落在游戏目录：`d3d8.dll`/`d3d9.dll` + `_dxvk\` 留底 + `兼容修复.bat`/`恢复原版.bat`；
 4. 用游戏自带的分辨率测试、截图、DXVK HUD 做**客观验证**；
 5. 分辨率：DXVK 不能强制，dgVoodoo2 的 Force resolution 才能；老引擎只有 4:3 档时按最高档全屏 + 显卡缩放；
-6. 玩家界面说人话：只保留 `DX11（画质最好）`、`DX9（老机器）`、`GDI（最兼容，推荐）`
-   这类结果标注，层名、注册表、亲和性、DLL 文件名等技术细节只写进运行日志和仓库文档。
+6. 玩家界面说人话：只保留 `DX11（画质更好）`、`DX9（老机器）`、`GDI（软件画面）`
+   这类结果标注，不写「最稳」「最兼容」这种保证词；层名、注册表、亲和性、DLL 文件名等技术细节只写进运行日志和仓库文档。
 
 实战踩坑都写在 `SKILL.md` 和 `references/` 里了。
 
