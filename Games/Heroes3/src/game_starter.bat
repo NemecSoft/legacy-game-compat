@@ -11,12 +11,12 @@ if not exist "Heroes3.exe" (
   exit /b 1
 )
 if not exist "ddraw.dll" (
-  echo   缺少运行文件，请先双击 兼容修复.bat
+  echo   运行文件不完整，请把运行日志发给我们
   if /i not "%~1"=="/go" pause
   exit /b 1
 )
 if not exist "_presets\ddraw.ini" (
-  echo   缺少显示文件，请先双击 兼容修复.bat
+  echo   显示文件不完整，请把运行日志发给我们
   if /i not "%~1"=="/go" pause
   exit /b 1
 )
@@ -28,9 +28,10 @@ if /i not "%~1"=="/go" (
   echo     英雄无敌3：死亡阴影  Heroes of Might and Magic III
   echo     New World Computing · v3.1 简体中文完整版
   echo   ------------------------------------------------------------
-  echo     共 6 档，默认第 6 档 dgVoodoo2转换（无边框全屏）。
-  echo     画面不对往上回：5 DX9硬件加速、1 软件画面 GDI，
-  echo     要窗口选 3 或 4；多人用 IPX 或 TCP/IP。
+  echo     共 6 档，默认第 6 档 dgVoodoo2（无边框全屏）。
+  echo     1 软件画面 GDI（全屏）  2 人物变胖时用（4:3）
+  echo     3 要切窗口时用（1280×720）  4 原版 640×480 窗口
+  echo     5 交给显卡画（DX9）。
   echo   ============================================================
   echo.
   echo     显示方式（直接回车 = 6）
@@ -48,6 +49,7 @@ if /i not "%~1"=="/go" (
   set /p "sel=  请选择 [1-8]，直接回车 = 6: "
 )
 if not defined sel set "sel=6"
+set "sel=%sel%"
 set "sel=%sel: =%"
 if not "%sel%"=="1" if not "%sel%"=="2" if not "%sel%"=="3" if not "%sel%"=="4" if not "%sel%"=="5" if not "%sel%"=="6" if not "%sel%"=="7" if not "%sel%"=="8" set "sel=6"
 if "%sel%"=="7" (
@@ -63,8 +65,11 @@ if "%sel%"=="3" set "preset=ddraw-window.ini"
 if "%sel%"=="4" set "preset=ddraw-640.ini"
 if "%sel%"=="5" set "preset=ddraw-d3d9.ini"
 if "%sel%"=="6" (set "preset=dgVoodoo-window.conf"&set "layer=_dgvoodoo2")
+rem 2026-11-07 判死（规则 26 / references\do-not-retry.md）：dgVoodoo2 全屏和窗口都会弹
+rem DirectDraw Error 150 DDERR_INVALIDRECT（WINGRAPH.CPP:456），菜单里不再提供，保留这行备查：
+rem 当年第 6 档的落地行（编号已改成 5 档，这行只是备查）：if "%sel%"=="6" (set "preset=dgVoodoo-window.conf"&set "layer=_dgvoodoo2")
 if not exist "_presets\%preset%" (
-  echo   缺少显示文件，请先双击 兼容修复.bat
+  echo   显示文件不完整，请把运行日志发给我们
   if /i not "%~1"=="/go" pause
   exit /b 1
 )
@@ -75,13 +80,8 @@ if not exist "%layer%\ddraw.dll" (
 )
 if exist "兼容修复.bat" call "兼容修复.bat" /quiet >nul 2>&1
 copy /y "%layer%\ddraw.dll" "ddraw.dll" >nul
-if "%layer%"=="_dgvoodoo2" (
-  copy /y "_presets\%preset%" "dgVoodoo.conf" >nul
-  del /q "ddraw.ini" >nul 2>&1
-) else (
-  copy /y "_presets\%preset%" "ddraw.ini" >nul
-  del /q "dgVoodoo.conf" >nul 2>&1
-)
+copy /y "_presets\%preset%" "ddraw.ini" >nul
+del /q "dgVoodoo.conf" >nul 2>&1
 echo.
 echo   正在启动游戏，退出后本窗口自动关闭
 echo.

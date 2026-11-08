@@ -28,7 +28,8 @@ if ($LASTEXITCODE -ne 0 -or -not (Test-Path $exe)) { throw '编译失败' }
 Write-Host "已编译 $exe"
 $check = Join-Path $Repo '.qoder\skills\legacy-launcher-gui\scripts\check-launcher.ps1'
 if (Test-Path $check) {
-  & $check -Exe $exe -SrcDir $Src -MaxKB 60
+  # 2026-11-07 点名英雄无敌3：对齐 2026-11-04 放宽后的 1 MB 红线（keycaps.md §5）
+  & $check -Exe $exe -SrcDir $Src -MaxKB 1024
   if ($LASTEXITCODE -ne 0) { throw '启动器 GUI 规范检查未通过' }
 }
 
@@ -62,12 +63,19 @@ if (-not (Test-Path $bakDll) -and (Test-Path $curDll)) { Copy-Item $curDll $bakD
 Copy-Item (Join-Path $Src 'ddraw.ini') (Join-Path $GameDir 'ddraw.ini') -Force
 Copy-Item (Join-Path $Src 'ddraw.ini') (Join-Path $layer 'ddraw.ini') -Force
 
-# dgVoodoo2 层：仓库自带的 32 位 DDraw.dll（游戏是 32 位），落成 _dgvoodoo2\ddraw.dll
+# dgVoodoo2 层（32 位）：默认档，落成 _dgvoodoo2\ddraw.dll
 $vd = Join-Path $GameDir '_dgvoodoo2'
 New-Item -ItemType Directory -Force -Path $vd | Out-Null
-$vdSrc = Join-Path $Repo 'tools\dgvoodoo\x86\DDraw.dll'
-if (-not (Test-Path $vdSrc)) { throw ('缺少 dgVoodoo2 层：' + $vdSrc) }
-Copy-Item $vdSrc (Join-Path $vd 'ddraw.dll') -Force
+Copy-Item (Join-Path $Repo 'tools\dgvoodoo\x86\DDraw.dll') (Join-Path $vd 'ddraw.dll') -Force
+
+# IPXWrapper：IPX 联机组件（绿色文件；dplay-setup.exe /q 由启动器静默登记）
+$ipx = Join-Path $Repo 'tools\ipxwrapper'
+if (Test-Path $ipx) {
+  foreach ($f in 'ipxwrapper.dll', 'dpwsockx.dll', 'mswsock.dll', 'wsock32.dll', 'dplay-setup.exe') {
+    $srcF = Join-Path $ipx $f
+    if (Test-Path $srcF) { Copy-Item $srcF (Join-Path $GameDir $f) -Force }
+  }
+}
 
 Deploy-Bat 'game_starter.bat'
 Deploy-Bat '兼容修复.bat'

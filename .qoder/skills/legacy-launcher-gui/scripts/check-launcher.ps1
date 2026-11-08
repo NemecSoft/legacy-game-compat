@@ -2,7 +2,8 @@ param(
   [Parameter(Mandatory = $true)][string]$Exe,
   [string]$SrcDir,
   [string]$GameDir,
-  [int]$MaxKB = 60
+  # 2026-11-04 用户放宽：exe ≤ 1 MB 即可（通用键帽库等标准件进来后 60 KB 太紧）
+  [int]$MaxKB = 1024
 )
 
 # 启动器交付前检查：体积红线 + 不许出现的资源/源码文件

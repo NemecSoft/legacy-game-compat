@@ -33,7 +33,7 @@ def patch(lines, section, key, value):
 
 edits = {
     # 两条通道都关掉水印、限 60 帧、开垂直同步（1999 年的帧逻辑跟刷新率绑死）
-    'common': [('[DirectX]', 'dgVoodooWatermark', 'true')   # 水印保留：一眼能看出走的是哪条通道,
+    'common': [('[DirectX]', 'dgVoodooWatermark', 'true'),  # 水印保留：一眼能看出走的是哪条通道
                ('[GeneralExt]', 'FPSLimit', '60'),
                ('[DirectX]', 'ForceVerticalSync', 'true'),
                ('[General]', 'CaptureMouse', 'true')],

@@ -6,7 +6,10 @@
 - 已按本配方交付的样板：`Games\OnimushaWotS\src\Launcher.cs`、`Games\GodofWarIII\src\Launcher.cs`、
   `Games\Heroes3\src\Launcher.cs`（六档下拉 + 换层）。
 - 已经发出去的**中国红** exe 不返工；新做 / 重做的一律皮革（AGENTS 规则 10）。
-- 体积红线：exe ≤ 60 KB（`scripts\check-launcher.ps1` 会量）。
+- 体积上限：exe ≤ 1 MB（2026-11-04 用户放宽；早期 60 KB 作废，见 `references\keycaps.md` §5）。
+  零图片 / 零字体 / 零第三方 DLL 仍是硬约束。
+- **所有按键（PC / PS / Switch / Xbox）一律用 `templates\Keycaps.cs` 的通用拟物键帽库**，
+  不要在 Launcher.cs 里临时画，详见 `references\keycaps.md`。
 - 文字渲染规则（2026-11-01 定，仍然有效）：**全窗口统一 `TextRenderer`（GDI ClearType）**；
   键帽只是形状（圆角 + 高光 + 阴影），不要为了键帽引入灰度 / 离屏位图 / 特殊抗锯齿。
 

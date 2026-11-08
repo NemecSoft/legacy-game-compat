@@ -1,52 +1,56 @@
 ============================================================
-[2026/11/04 周三 20:28:28.11] 一键应用：英雄无敌3：死亡阴影
+[2026/11/07 周六 16:33:01.72] 一键应用：英雄无敌3：死亡阴影
 目标目录："D:\AI\legacy-game-compat\Games\Heroes3\test-target"
 包目录："D:\AI\legacy-game-compat\Games\Heroes3\release\"
 记录说明：应用脚本会备份目标同名文件并调用兼容修复设置 AppPath/CDDrive；撤回不自动恢复该注册表项。
 记录说明：运行日志.txt 为启动器运行产物，撤回会删除；显示预设与存档不改。
 ------------------------------------------------------------
-[20:28:28.12] 新增文件：game_starter.exe
-[20:28:28.12] 复制交付文件：game_starter.exe
-[20:28:28.14] 备份原文件：game_starter.bat -> _legacy_compat_backup\Heroes3\game_starter.bat
-[20:28:28.14] 复制交付文件：game_starter.bat
-[20:28:28.15] 备份原文件：launcher.ini -> _legacy_compat_backup\Heroes3\launcher.ini
-[20:28:28.43] 复制交付文件：launcher.ini
-[20:28:28.44] 新增文件：兼容修复.bat
-[20:28:28.44] 复制交付文件：兼容修复.bat
-[20:28:28.46] 备份原文件：ddraw.dll -> _legacy_compat_backup\Heroes3\ddraw.dll
-[20:28:28.62] 复制交付文件：ddraw.dll
-[20:28:28.63] 新增文件：dgVoodoo.conf
-[20:28:28.66] 复制交付文件：dgVoodoo.conf
-[20:28:28.68] 备份原文件：ddraw.ini -> _legacy_compat_backup\Heroes3\ddraw.ini
-[20:28:28.80] 复制交付文件：ddraw.ini
-[20:28:28.80] 新增文件：ddraw-43.ini
-[20:28:28.85] 复制交付文件：ddraw-43.ini
-[20:28:28.85] 新增文件：ddraw-window.ini
-[20:28:28.91] 复制交付文件：ddraw-window.ini
-[20:28:28.91] 新增文件：ddraw-640.ini
-[20:28:28.94] 复制交付文件：ddraw-640.ini
-[20:28:28.95] 新增文件：_presets\ddraw.ini
-[20:28:28.99] 复制交付文件：_presets\ddraw.ini
-[20:28:29.00] 新增文件：_presets\ddraw-43.ini
-[20:28:29.03] 复制交付文件：_presets\ddraw-43.ini
-[20:28:29.03] 新增文件：_presets\ddraw-window.ini
-[20:28:29.08] 复制交付文件：_presets\ddraw-window.ini
-[20:28:29.08] 新增文件：_presets\ddraw-640.ini
-[20:28:29.13] 复制交付文件：_presets\ddraw-640.ini
-[20:28:29.13] 新增文件：_presets\ddraw-d3d9.ini
-[20:28:29.17] 复制交付文件：_presets\ddraw-d3d9.ini
-[20:28:29.17] 新增文件：_presets\dgVoodoo-window.conf
-[20:28:29.22] 复制交付文件：_presets\dgVoodoo-window.conf
-[20:28:29.22] 新增文件：_cnc-ddraw\ddraw.dll
-[20:28:29.45] 复制交付文件：_cnc-ddraw\ddraw.dll
-[20:28:29.60] 新增文件：_cnc-ddraw\ddraw.ini
-[20:28:29.62] 复制交付文件：_cnc-ddraw\ddraw.ini
-[20:28:29.62] 新增文件：_dgvoodoo2\ddraw.dll
-[20:28:29.92] 复制交付文件：_dgvoodoo2\ddraw.dll
-[20:28:29.92] 新增文件：_tools\nircmd\nircmdc.exe
-[20:28:29.95] 复制交付文件：_tools\nircmd\nircmdc.exe
-[20:28:29.95] 调用兼容修复：设置 AppPath/CDDrive、检查 cnc-ddraw
+[16:33:01.73] 新增文件：game_starter.exe
+[16:33:01.73] 复制交付文件：game_starter.exe
+[16:33:01.75] 备份原文件：game_starter.bat -> _legacy_compat_backup\Heroes3\game_starter.bat
+[16:33:01.75] 复制交付文件：game_starter.bat
+[16:33:01.77] 备份原文件：launcher.ini -> _legacy_compat_backup\Heroes3\launcher.ini
+[16:33:01.82] 复制交付文件：launcher.ini
+[16:33:01.82] 新增文件：兼容修复.bat
+[16:33:01.82] 复制交付文件：兼容修复.bat
+[16:33:01.84] 备份原文件：ddraw.dll -> _legacy_compat_backup\Heroes3\ddraw.dll
+[16:33:01.87] 复制交付文件：ddraw.dll
+[16:33:01.88] 新增文件：ipxwrapper.dll
+[16:33:01.88] 复制交付文件：ipxwrapper.dll
+[16:33:01.88] 新增文件：dpwsockx.dll
+[16:33:01.88] 复制交付文件：dpwsockx.dll
+[16:33:01.88] 新增文件：mswsock.dll
+[16:33:01.89] 复制交付文件：mswsock.dll
+[16:33:01.89] 新增文件：wsock32.dll
+[16:33:01.89] 复制交付文件：wsock32.dll
+[16:33:01.89] 新增文件：dplay-setup.exe
+[16:33:01.90] 复制交付文件：dplay-setup.exe
+[16:33:01.90] 新增文件：dgVoodoo.conf
+[16:33:01.90] 复制交付文件：dgVoodoo.conf
+[16:33:01.92] 备份原文件：ddraw.ini -> _legacy_compat_backup\Heroes3\ddraw.ini
+[16:33:01.97] 复制交付文件：ddraw.ini
+[16:33:01.97] 新增文件：_presets\ddraw.ini
+[16:33:01.97] 复制交付文件：_presets\ddraw.ini
+[16:33:01.97] 新增文件：_presets\ddraw-43.ini
+[16:33:01.98] 复制交付文件：_presets\ddraw-43.ini
+[16:33:01.98] 新增文件：_presets\ddraw-window.ini
+[16:33:01.98] 复制交付文件：_presets\ddraw-window.ini
+[16:33:01.98] 新增文件：_presets\ddraw-640.ini
+[16:33:01.98] 复制交付文件：_presets\ddraw-640.ini
+[16:33:01.99] 新增文件：_presets\ddraw-d3d9.ini
+[16:33:01.99] 复制交付文件：_presets\ddraw-d3d9.ini
+[16:33:01.99] 新增文件：_presets\dgVoodoo-window.conf
+[16:33:01.99] 复制交付文件：_presets\dgVoodoo-window.conf
+[16:33:01.99] 新增文件：_cnc-ddraw\ddraw.dll
+[16:33:02.00] 复制交付文件：_cnc-ddraw\ddraw.dll
+[16:33:02.00] 新增文件：_cnc-ddraw\ddraw.ini
+[16:33:02.00] 复制交付文件：_cnc-ddraw\ddraw.ini
+[16:33:02.00] 新增文件：_dgvoodoo2\ddraw.dll
+[16:33:02.01] 复制交付文件：_dgvoodoo2\ddraw.dll
+[16:33:02.01] 新增文件：_tools\nircmd\nircmdc.exe
+[16:33:02.01] 复制交付文件：_tools\nircmd\nircmdc.exe
+[16:33:02.01] 调用兼容修复：设置 AppPath/CDDrive、检查 cnc-ddraw
 ------------------------------------------------------------
-[20:28:30.03] 完成：复制 20 个，备份 4 个，错误=0
+[16:33:02.11] 完成：复制 22 个，备份 4 个，错误=0
 记录与备份保留在："D:\AI\legacy-game-compat\Games\Heroes3\test-target\_legacy_compat_backup\Heroes3"
 ============================================================

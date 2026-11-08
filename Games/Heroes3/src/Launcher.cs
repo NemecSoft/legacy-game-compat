@@ -50,12 +50,7 @@ class Launcher : Form
     string gameExe = "Heroes3.exe";
     string gameArgs = "";
     string gameProcess = "Heroes3";
-    string gameIconExe = "Heroes3.exe";
-    string initExe = "";
-    bool runInit = false;
     long affinity = 0;
-    string savesSource = "";
-    string savesTarget = "";
     string layerDll = "ddraw.dll";
     string layerBackupDir = "_cnc-ddraw";
     string intro =
@@ -68,28 +63,15 @@ class Launcher : Form
         "\n" +
         "# 玩不了或报错\n" +
         "点「打开运行日志」\n" +
-        "把内容发给管理员";
-    string entryGuide =
-        "启动后先等加载（第一次较慢）\n" +
-        "想切窗口选第 3 档\n" +
-        "画面异常先回第 1 档\n" +
-        "多人：游戏内选 IPX 或 TCP/IP\n" +
-        "联机组件已带好，不用另装";
-    string tips =
-        "# 提示\n" +
-        "默认第 1 档：软件画面 GDI\n" +
-        "黑屏/花屏先回第 1 档，再试窗口档\n" +
-        "备选：DX9硬件加速、\n" +
-        "dgVoodoo2转换（无边框全屏），能用就别常换\n" +
-        "花屏/黑屏先关远程软件、HDR、覆盖层\n" +
-        "高刷屏已经处理过，不用再调";
+        "把内容发给我们";
     string centerNote =
-        "共 6 档，默认第 1 档软件画面 GDI。\n" +
-        "人物拉胖选 2，切窗口选 3 或 4，\n" +
-        "都不行再试：5 DX9硬件加速、\n" +
-        "6 dgVoodoo2转换（无边框全屏）。\n" +
-        "\n" +
-        "启动器只切换显示方式，不改存档。";
+        "1  软件画面 GDI（全屏）\n" +
+        "2  软件画面 GDI（4:3黑边）\n" +
+        "3  软件画面 GDI（窗口1280×720）\n" +
+        "4  原版640×480（窗口）\n" +
+        "5  DX9硬件加速（全屏）\n" +
+        "6  dgVoodoo2转换（无边框全屏）\n" +
+        "";
 
     // ---------- 启动方式 ----------
     static readonly string[] ModeNames =
@@ -113,7 +95,7 @@ class Launcher : Form
     // 每个模式顶在 ddraw.dll 位置上的层：cnc = cnc-ddraw，voodoo = dgVoodoo2
     static readonly string[] ModeLayer =
     {
-        // dgVoodoo2 全屏这条路实测会让游戏报 DDERR_INVALIDRECT（WINGRAPH.CPP:456），已撤下，只留窗口
+        // dgVoodoo2 全屏那条实测报 DDERR_INVALIDRECT（WINGRAPH.CPP:456）已判死；窗口档正常，是默认档
         "cnc", "cnc", "cnc", "cnc", "cnc", "voodoo"
     };
     static readonly string[] LayerDirs =
@@ -138,6 +120,7 @@ class Launcher : Form
     volatile bool finishing;
     NotifyIcon tray;
     bool autoStart;
+
 
     // ---------- 字体/布局 ----------
     Font fTitle, fHead, fRowSel, fRow, fBody, fCap, fCapZh, fMono, fBrand;
@@ -172,6 +155,28 @@ class Launcher : Form
         Log("启动参数：" + (args.Length == 0 ? "（无）" : string.Join(" ", args)) +
             "；父进程：" + (parentName.Length == 0 ? "未知" : parentName) +
             "；零交互：" + (l.autoStart ? "是" : "否"));
+        foreach (string a0 in args)
+        {
+            if (a0 == "/readings" || a0 == "-readings") return DumpReadings();
+            // /wer "<某个 Report.wer>"：只把这份崩溃报告读成一行结论（维护/回归用，不启动游戏、不写日志）
+            if (a0 == "/wer")
+            {
+                if (args.Length < 2 || !File.Exists(args[1]))
+                {
+                    Console.WriteLine("用法：game_starter.exe /wer \"<Report.wer 路径>\" [结论另存的 UTF-8 文件]");
+                    return 2;
+                }
+                string line = "崩溃捕获：" + ParseWer(args[1]);
+                // 结论同时可以另存成 UTF-8：控制台代码页五花八门，脚本要读的是这份字节
+                if (args.Length > 2)
+                {
+                    try { File.AppendAllText(args[2], line + "\r\n", new UTF8Encoding(false)); }
+                    catch (Exception ex) { Console.WriteLine("结论另存失败：" + ex.Message); }
+                }
+                Console.WriteLine(line);
+                return line.IndexOf("没读到") >= 0 || line.IndexOf("没认出") >= 0 ? 3 : 0;
+            }
+        }
         if (!BrandGuard.Verify())
         {
             MessageBox.Show("启动器文件被修改，请重新解压。", "启动器");
@@ -285,7 +290,11 @@ class Launcher : Form
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        using (Graphics g = CreateGraphics()) { dpi = g.DpiX / 96f; }
+        // 取不到 DPI（返回 0 或离谱值）时绝不让它变成 0 缩放：字体尺寸 0 会直接抛异常，界面全塌
+        float rawDpi = 96f;
+        using (Graphics g = CreateGraphics()) { if (g.DpiX > 0f) rawDpi = g.DpiX; }
+        dpi = rawDpi / 96f;
+        if (dpi < 0.5f || dpi > 4f) dpi = 1f;
         MakeFonts();
         ClientSize = new Size(S(900), S(620));
         RebuildLegend();
@@ -297,6 +306,7 @@ class Launcher : Form
         statusColor = layerOk ? Ok : Warn;
         LoadGameIcon();
         Log("启动 " + gameTitle + "｜" + status + (autoStart ? "｜/go 零交互" : ""));
+        LogRegistrySnapshot();   // 先记原始状态：别让补齐动作把「客户机原本缺什么」盖掉
         if (autoStart) BeginInvoke(new Action(delegate { StartGame(); }));
     }
 
@@ -468,46 +478,12 @@ class Launcher : Form
         int x = colRight.X + S(16), w = colRight.Width - S(32);
         int h = TextRenderer.MeasureText(g, "国", fHead).Height;
         if (InViewport(y, h, top, bottom))
-            TextRenderer.DrawText(g, "进游戏说明", fHead, new Point(x, y), Gold, Color.Transparent);
-        y += S(28);
-        y = DrawWrappedVisible(g, entryGuide, x, y, w, fBody, Ink, top, bottom);
-        y += S(16);
-        if (InViewport(y, h, top, bottom))
             TextRenderer.DrawText(g, "操作说明", fHead, new Point(x, y), Gold, Color.Transparent);
         y += S(30);
-        y = DrawLegendRows(g, legend, x, y, top, bottom);
-        y += S(10);
-        if (InViewport(y, 2, top, bottom))
-        {
-            using (Pen p = new Pen(GoldDim, 1f)) g.DrawLine(p, x, y, x + w, y);
-        }
-        y += S(12);
-        return DrawWrappedVisible(g, tips, x, y, w, fBody, Ink, top, bottom);
+        return DrawLegendRows(g, legend, x, y, top, bottom);
     }
 
-    int DrawWrappedVisible(Graphics g, string text, int x, int y, int width, Font font, Color color, int top, int bottom)
-    {
-        int lh = TextRenderer.MeasureText(g, "国", font).Height + S(3);
-        foreach (string raw in text.Split('\n'))
-        {
-            if (raw.Length == 0) { y += lh / 2; continue; }
-            bool head = raw.StartsWith("# ");
-            Font f = head ? fHead : font;
-            Color c = head ? Gold : color;
-            if (head) y += S(2);
-            string line = head ? raw.Substring(2) : raw;
-            while (line.Length > 0)
-            {
-                int take = line.Length;
-                while (take > 1 && TextRenderer.MeasureText(g, line.Substring(0, take), f).Width > width) take--;
-                if (InViewport(y, lh, top, bottom))
-                    TextRenderer.DrawText(g, line.Substring(0, take), f, new Point(x, y), c, Color.Transparent);
-                y += lh;
-                line = line.Substring(take);
-            }
-        }
-        return y;
-    }
+
 
     int DrawLegendRows(Graphics g, LegendItem[][] rows, int x, int y, int top, int bottom)
     {
@@ -1050,67 +1026,312 @@ class Launcher : Form
         if (i == 2) { Close(); }
     }
 
-    // ---------- 现场快照 ----------
+    // ---------- 现场读数：启动前和 /readings 共用这一套采集 ----------
     // 0xC0000094 是整数除零。这游戏是 1999 年的代码，导入表里就有 GetDeviceCaps 和 GetDiskFreeSpaceA：
     // 系统把刷新率报成 0、或某个盘的扇区/簇大小报成 0，它拿去当除数就直接炸。
-    // 这里把这两个来源原样记进 运行日志.txt，并据此决定要不要改用窗口模式。
-    bool SnapshotEnvironment(out string reason)
+    class EnvRead
     {
-        reason = "";
-        int refresh = 0, cx = 0, cy = 0, dpiX = 0, dpiY = 0;
+        public int refresh, cx, cy, dpiX, dpiY, screens = 1;
+        public string root = "", abDrives = "";
+        public uint bps, spc, freeC, totalC;
+        public bool diskOk;
+        public string driveType = "";
+    }
+
+    static EnvRead ReadEnvironment()
+    {
+        EnvRead e = new EnvRead();
         try
         {
             IntPtr hdc = GetDC(IntPtr.Zero);
             try
             {
-                refresh = GetDeviceCaps(hdc, VREFRESH);
-                cx = GetDeviceCaps(hdc, HORZRES);
-                cy = GetDeviceCaps(hdc, VERTRES);
-                dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
-                dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
+                e.refresh = GetDeviceCaps(hdc, VREFRESH);
+                e.cx = GetDeviceCaps(hdc, HORZRES);
+                e.cy = GetDeviceCaps(hdc, VERTRES);
+                e.dpiX = GetDeviceCaps(hdc, LOGPIXELSX);
+                e.dpiY = GetDeviceCaps(hdc, LOGPIXELSY);
             }
             finally { ReleaseDC(IntPtr.Zero, hdc); }
         }
         catch (Exception ex) { Log("取显示参数失败：" + ex.Message); }
-        int screens = 1;
-        try { screens = Screen.AllScreens.Length; } catch { }
-
-        string root = "";
-        try { root = Path.GetPathRoot(AppDir()); } catch { }
-        uint bps = 0, spc = 0, freeC = 0, totalC = 0;
-        bool diskOk = false;
-        if (root.Length > 0)
+        try { e.screens = Screen.AllScreens.Length; } catch { }
+        try { e.root = Path.GetPathRoot(AppDir()); } catch { }
+        if (e.root.Length > 0)
         {
-            try { diskOk = GetDiskFreeSpaceA(root, out spc, out bps, out freeC, out totalC); }
+            // 盘类型先问：老游戏对「映射盘/网络盘/内存盘」的几何读数最容易变成 0 除数
+            e.driveType = DriveTypeName(GetDriveTypeW(e.root));
+            try { e.diskOk = GetDiskFreeSpaceA(e.root, out e.spc, out e.bps, out e.freeC, out e.totalC); }
             catch (Exception ex) { Log("取磁盘参数失败：" + ex.Message); }
         }
-        string floppy = "";
         try
         {
             foreach (DriveInfo d in DriveInfo.GetDrives())
             {
                 string n = d.Name;
                 if (n != "A:\\" && n != "B:\\") continue;
-                uint a, b, c, e;
-                bool ok = GetDiskFreeSpaceA(n, out a, out b, out c, out e);
-                floppy += " " + n + (ok ? ("(每簇扇数" + a + " 每扇区字节" + b + ")") : "(读不到)");
+                // 盘符不等于设备：现在的 A:/B: 基本都是虚拟盘或误报，类型只认 GetDriveType 的回答
+                string kind = DriveTypeName(GetDriveTypeW(n));
+                uint a, b, c, g;
+                bool ok = GetDiskFreeSpaceA(n, out a, out b, out c, out g);
+                e.abDrives += " " + n + "（" + kind + "）" +
+                    (ok ? ("(每簇扇数" + a + " 每扇区字节" + b + ")") : "(读不到)");
             }
         }
         catch { }
+        return e;
+    }
 
-        Log("现场快照：显示 " + cx + "×" + cy + " 刷新率=" + refresh + " DPI=" + dpiX + "/" + dpiY +
-            " 屏幕数=" + screens + "；游戏盘 " + root + " 每扇区字节=" + bps + " 每簇扇区=" + spc +
-            " 簇 总" + totalC + "/可用" + freeC + (diskOk ? "" : "（GetDiskFreeSpace 失败）") +
-            (floppy.Length == 0 ? "" : "；软驱" + floppy) +
-            "；AppPath=" + RegValue("AppPath") + " CDDrive=" + RegValue("CDDrive"));
+    static string ReadingsLine(EnvRead e)
+    {
+        return "现场快照：显示 " + e.cx + "×" + e.cy + " 刷新率=" + e.refresh +
+            " DPI=" + e.dpiX + "/" + e.dpiY + " 屏幕数=" + e.screens +
+            "；游戏盘 " + e.root + (e.driveType.Length == 0 ? "" : "（" + e.driveType + "）") +
+            " 每扇区字节=" + e.bps + " 每簇扇区=" + e.spc +
+            " 簇 总" + e.totalC + "/可用" + e.freeC + (e.diskOk ? "" : "（GetDiskFreeSpace 失败）") +
+            (e.abDrives.Length == 0 ? "" : "；A/B 盘" + e.abDrives) +
+            "；AppPath=" + RegValue("AppPath") + " CDDrive=" + RegValue("CDDrive");
+    }
 
-        List<string> zero = new List<string>();
-        if (refresh <= 0) zero.Add("刷新率=" + refresh);
-        if (bps == 0 || spc == 0) zero.Add("游戏盘每扇区字节/每簇扇区=" + bps + "/" + spc);
-        if (cx <= 0 || cy <= 0) zero.Add("桌面尺寸=" + cx + "×" + cy);
-        if (zero.Count == 0) return false;
-        reason = string.Join("、", zero.ToArray());
+    // 这些值会被 1999 年的代码直接当除数：0、越界、自相矛盾都算坏值
+    static List<string> BadReadings(EnvRead e)
+    {
+        List<string> bad = new List<string>();
+        if (e.refresh < 1 || e.refresh > 1000) bad.Add("刷新率=" + e.refresh);
+        if (e.cx <= 0 || e.cy <= 0) bad.Add("桌面尺寸=" + e.cx + "×" + e.cy);
+        if (!e.diskOk) bad.Add("游戏盘读数失败");
+        else
+        {
+            if (e.bps == 0 || e.spc == 0) bad.Add("每扇区字节/每簇扇区=" + e.bps + "/" + e.spc);
+            ulong bytesPerCluster = (ulong)e.bps * e.spc;
+            if (bytesPerCluster > 0 && (bytesPerCluster < 512 || bytesPerCluster > 2097152))
+                bad.Add("每簇字节=" + bytesPerCluster + "（" + e.driveType + "）");
+            if (e.totalC > 0 && e.freeC > e.totalC) bad.Add("可用簇 " + e.freeC + " > 总簇 " + e.totalC);
+        }
+        return bad;
+    }
+
+    // /readings：只采集读数写日志，不启动游戏（给远程排障用）
+    static int DumpReadings()
+    {
+        EnvRead e = ReadEnvironment();
+        List<string> bad = BadReadings(e);
+        string line = ReadingsLine(e);
+        string verdict = "读数校验：" + (bad.Count == 0 ? "全部合理" : "可疑 —— " + string.Join("、", bad.ToArray()));
+        Log(line);
+        Log(verdict);
+        Console.WriteLine(line);
+        Console.WriteLine(verdict);
+        string[] regLines = RegistrySnapshotLines();
+        LogRegistrySnapshot();
+        foreach (string rl in regLines) Console.WriteLine(rl);
+        return 0;
+    }
+
+    bool SnapshotEnvironment(out string reason)
+    {
+        reason = "";
+        EnvRead e = ReadEnvironment();
+        System.Collections.Generic.List<string> bad = BadReadings(e);
+        Log(ReadingsLine(e));
+        Log("读数校验：" + (bad.Count == 0 ? "全部合理" : "可疑 —— " + string.Join("、", bad.ToArray())));
+        if (bad.Count == 0) return false;
+        reason = string.Join("、", bad.ToArray());
         return true;
+    }
+
+    // IPX 联机（DirectPlay）要把 dpwsockx.dll 登记到 HKLM。
+    // 按 dplay-setup 源码里的键值自己写（不跑它的窗口程序），无窗口、无点击；没权限只记日志。
+    // 崩了以后自动把 Windows 的崩溃报告（含出错模块 + 偏移）收进游戏目录，不用远程连机器。
+    // WER 报告是系统自动生成的：不动任何设置，也不需要谁去点。
+    void CaptureWerReport(string exeName)
+    {
+        try
+        {
+            string common = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string[] roots =
+            {
+                Path.Combine(common, @"Microsoft\Windows\WER\ReportQueue"),
+                Path.Combine(common, @"Microsoft\Windows\WER\ReportArchive"),
+                Path.Combine(local, @"Microsoft\Windows\WER\ReportQueue")
+            };
+            string best = null;
+            DateTime bestTime = DateTime.MinValue;
+            for (int wait = 0; wait < 8 && best == null; wait++)
+            {
+                if (wait > 0) Thread.Sleep(1000);
+                best = FindWerFolder(roots, exeName, out bestTime);
+            }
+            if (best == null) { Log("崩溃报告：WER 里没有本游戏的记录"); return; }
+            string[] wers = Directory.GetFiles(best, "*.wer");
+            if (wers.Length == 0) { Log("崩溃报告：" + best + " 里没有 .wer"); return; }
+            string dstFile = Path.Combine(AppDir(), "崩溃转储", Path.GetFileName(best) + ".wer");
+            Directory.CreateDirectory(Path.GetDirectoryName(dstFile));
+            File.Copy(wers[0], dstFile, true);
+            Log("崩溃捕获：" + ParseWer(wers[0]) + "；报告已存 " + dstFile);
+        }
+        catch (Exception ex) { Log("读崩溃报告失败：" + ex.Message); }
+    }
+
+    // .wer 是 UTF-16，Sig[n].Name / Sig[n].Value 成对排；名字随系统语言（中文叫「异常代码」，英文叫 "Exception Code"），
+    // 所以按名字认，别按序号猜。异常码 + 偏移 + 故障模块就是定位要的那三样。
+    static string ParseWer(string werPath)
+    {
+        string code = "", offset = "", module = "", want = "";
+        foreach (string raw in File.ReadAllLines(werPath, Encoding.Unicode))
+        {
+            string s = raw.Trim();
+            int eq = s.IndexOf('=');
+            if (eq <= 0) continue;
+            string key = s.Substring(0, eq), val = s.Substring(eq + 1).Trim();
+            if (key.EndsWith(".Name")) want = val;
+            else if (key.EndsWith(".Value"))
+            {
+                string kind = SigKind(want);
+                if (kind == "code") code = val;
+                else if (kind == "offset") offset = val;
+                else if (kind == "module") module = val;
+                want = "";
+            }
+            else if (key == "ModName" && module.Length == 0) module = val;
+        }
+        if (code.Length == 0 && offset.Length == 0 && module.Length == 0) return "报告里没认出异常码/模块（原文见报告）";
+        return "异常码 " + (code.Length == 0 ? "没读到" : "0x" + code) +
+               "，出错地址 " + (offset.Length == 0 ? "没读到" : "+0x" + offset) +
+               "，故障模块 " + (module.Length == 0 ? "没读到" : module);
+    }
+
+    static string SigKind(string name)
+    {
+        if (name.Length == 0) return "";
+        if (name.IndexOf("异常代码") >= 0 || name.IndexOf("Exception Code") >= 0) return "code";
+        if (name.IndexOf("异常偏移") >= 0 || name.IndexOf("Exception Offset") >= 0) return "offset";
+        // 中文「故障模块名称」/ 英文 "Fault Module Name"（别把「故障模块版本 / Fault Module Version」也认进来）
+        if (name.IndexOf("模块名称") >= 0 ||
+            (name.IndexOf("Module") >= 0 && name.IndexOf("Name") >= 0)) return "module";
+        return "";
+    }
+
+    static string FindWerFolder(string[] roots, string exeName, out DateTime newest)
+    {
+        string best = null;
+        newest = DateTime.MinValue;
+        foreach (string root in roots)
+        {
+            try
+            {
+                if (!Directory.Exists(root)) continue;
+                foreach (string d in Directory.GetDirectories(root, "AppCrash_" + exeName + "*"))
+                {
+                    DateTime tm = Directory.GetLastWriteTime(d);
+                    if (tm < DateTime.Now.AddMinutes(-15)) continue;
+                    if (tm > newest) { newest = tm; best = d; }
+                }
+            }
+            catch { }
+        }
+        return best;
+    }
+
+    void EnsureDirectPlayIpx()
+    {
+        try
+        {
+            const string spKey = @"SOFTWARE\Microsoft\DirectPlay\Service Providers\{685BC400-9D2C-11cf-A9CD-00AA006886E3}";
+            const string svKey = @"SOFTWARE\Microsoft\DirectPlay\Services\{5146ab8cb6b1ce11920c00aa006c4972}";
+            if (IpxRegistered(spKey)) { Log("DirectPlay IPX：已登记"); return; }
+            if (!File.Exists(Path.Combine(AppDir(), "dpwsockx.dll")))
+            {
+                Log("DirectPlay IPX：缺 dpwsockx.dll，跳过");
+                return;
+            }
+            using (Microsoft.Win32.RegistryKey hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
+                       Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32))
+            using (Microsoft.Win32.RegistryKey k = hklm.CreateSubKey(spKey))
+            {
+                k.SetValue("DescriptionA", "IPX Connection For DirectPlay", Microsoft.Win32.RegistryValueKind.String);
+                k.SetValue("DescriptionW", "IPX Connection For DirectPlay", Microsoft.Win32.RegistryValueKind.String);
+                k.SetValue("dwReserved1", 50, Microsoft.Win32.RegistryValueKind.DWord);
+                k.SetValue("dwReserved2", 0, Microsoft.Win32.RegistryValueKind.DWord);
+                k.SetValue("Guid", "{685BC400-9D2C-11cf-A9CD-00AA006886E3}", Microsoft.Win32.RegistryValueKind.String);
+                k.SetValue("Path", "dpwsockx.dll", Microsoft.Win32.RegistryValueKind.String);
+            }
+            using (Microsoft.Win32.RegistryKey hklm2 = Microsoft.Win32.RegistryKey.OpenBaseKey(
+                       Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32))
+            using (Microsoft.Win32.RegistryKey k = hklm2.CreateSubKey(svKey))
+            {
+                k.SetValue("Description", "WinSock IPX Connection For DirectPlay", Microsoft.Win32.RegistryValueKind.String);
+                k.SetValue("Path", "dpwsockx.dll", Microsoft.Win32.RegistryValueKind.ExpandString);
+            }
+            Log("DirectPlay IPX：" + (IpxRegistered(spKey) ? "已静默登记" : "登记没成功（不影响启动，多人房可能连不上）"));
+        }
+        catch (Exception ex) { Log("DirectPlay IPX 登记异常：" + ex.Message); }
+    }
+
+    // 多网卡（局域网 + Radmin/虚拟网）都在 IPX 网络号 00:00:00:01 下会让游戏初始化失败。
+    // 这里自动挑一块物理网卡写进 HKCU\Software\IPXWrapper\primary（写当前用户那一份，不动系统）。
+    void EnsureIpxPrimaryInterface()
+    {
+        try
+        {
+            string[] skip = { "radmin", "virtual", "vmware", "virtualbox", "hyper-v", "vethernet",
+                              "tap-", "loopback", "wsl", "bluetooth", "wan miniport" };
+            System.Net.NetworkInformation.NetworkInterface best = null;
+            int bestScore = -1;
+            foreach (System.Net.NetworkInformation.NetworkInterface ni in
+                     System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (ni.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) continue;
+                if (ni.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
+                string desc = (ni.Description ?? "").ToLowerInvariant();
+                bool virt = false;
+                foreach (string s in skip) if (desc.IndexOf(s, StringComparison.Ordinal) >= 0) { virt = true; break; }
+                if (virt) continue;
+                string ip = null;
+                foreach (System.Net.NetworkInformation.UnicastIPAddressInformation u in
+                         ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (u.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    { ip = u.Address.ToString(); break; }
+                }
+                if (ip == null) continue;
+                int score = ip.StartsWith("192.168.") ? 3 : ip.StartsWith("10.") ? 2 : ip.StartsWith("172.") ? 1 : 0;
+                if (score > bestScore) { bestScore = score; best = ni; }
+            }
+            if (best == null) { Log("IPX 网卡：没有可用物理网卡，保持默认"); return; }
+            byte[] b = best.GetPhysicalAddress().GetAddressBytes();
+            if (b.Length < 6) { Log("IPX 网卡：读不到 MAC，保持默认"); return; }
+            string mac = "";
+            for (int i = 0; i < 6; i++) mac += (i > 0 ? ":" : "") + b[i].ToString("X2");
+            using (Microsoft.Win32.RegistryKey k = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\IPXWrapper"))
+            {
+                object cur = k.GetValue("primary");
+                if (cur != null && string.Equals(Convert.ToString(cur), mac, StringComparison.OrdinalIgnoreCase))
+                {
+                    Log("IPX 网卡：" + best.Description + " " + mac + "（已是主网卡）");
+                    return;
+                }
+                k.SetValue("primary", mac, Microsoft.Win32.RegistryValueKind.String);
+                Log("IPX 网卡：" + best.Description + " " + mac + "（已写入 HKCU\\Software\\IPXWrapper）");
+            }
+        }
+        catch (Exception ex) { Log("IPX 网卡选择失败：" + ex.Message); }
+    }
+
+    static bool IpxRegistered(string spKey)
+    {
+        try
+        {
+            using (Microsoft.Win32.RegistryKey hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(
+                       Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32))
+            using (Microsoft.Win32.RegistryKey k = hklm.OpenSubKey(spKey))
+            {
+                object v = k == null ? null : k.GetValue("Path");
+                return v != null && string.Equals(Convert.ToString(v), "dpwsockx.dll", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        catch { return false; }
     }
 
     static string RegValue(string name)
@@ -1138,6 +1359,64 @@ class Launcher : Form
     }
 
     // 返回 false 表示这个模式的层或配置不在，调用方要退回默认模式
+    // 1999 年的代码把刷新率当除数，虚拟显示器/串流驱动又常给它 0。
+    // 不去猜、也不依赖读数：启动前直接把桌面设成 60Hz，游戏自己读到的就是 60；退出后还原。
+    DEVMODE? Apply60Hz()
+    {
+        try
+        {
+            DEVMODE cur = new DEVMODE();
+            cur.dmSize = (ushort)Marshal.SizeOf(typeof(DEVMODE));
+            if (!EnumDisplaySettings(null, -1, ref cur)) { Log("取当前显示模式失败，跳过 60Hz 设置"); return null; }
+            // 只改刷新率这一项，分辨率沿用当前模式；所有机器走同一条路，不做“先探测再决定”
+            DEVMODE want = cur;
+            want.dmDisplayFrequency = 60;
+            want.dmFields = 0x400000;                       // DM_DISPLAYFREQUENCY
+            int rc = ChangeDisplaySettings(ref want, 0);
+            Log("启动前设 60Hz：" + (rc == 0 ? "成功" : "失败 rc=" + rc + "，按原样启动") +
+                "（当前模式 " + cur.dmPelsWidth + "×" + cur.dmPelsHeight + "）");
+            if (rc != 0) return null;
+
+            IntPtr hdc = GetDC(IntPtr.Zero);
+            try { Log("设完复查刷新率=" + GetDeviceCaps(hdc, VREFRESH)); } finally { ReleaseDC(IntPtr.Zero, hdc); }
+            return cur;
+        }
+        catch (Exception ex) { Log("设 60Hz 失败：" + ex.Message); return null; }
+    }
+
+    void RestoreDisplay(DEVMODE? before)
+    {
+        if (before == null) return;
+        try
+        {
+            DEVMODE dm = before.Value;
+            dm.dmFields = 0x400000;
+            int rc = ChangeDisplaySettings(ref dm, 0);
+            Log("退出后还原显示模式：" + (rc == 0 ? "成功" : "失败 rc=" + rc));
+        }
+        catch (Exception ex) { Log("还原显示模式失败：" + ex.Message); }
+    }
+
+    // 玩家只面对一个界面：配置缺了就自己找一份能用的，绝不叫他去点别的 bat
+    string FallbackPreset(int which, string wanted)
+    {
+        string[] tries =
+        {
+            Path.Combine(AppDir(), "_presets", "ddraw.ini"),
+            Path.Combine(AppDir(), "ddraw.ini"),
+            Path.Combine(AppDir(), "_cnc-ddraw", "ddraw.ini")
+        };
+        foreach (string c in tries)
+        {
+            if (File.Exists(c) && !string.Equals(c, wanted, StringComparison.OrdinalIgnoreCase))
+            {
+                Log("显示预设缺失（" + Path.GetFileName(wanted) + "），自动改用 " + c);
+                return c;
+            }
+        }
+        return wanted;
+    }
+
     bool ApplyLayer(int which, out string fail)
     {
         fail = "";
@@ -1146,6 +1425,7 @@ class Launcher : Form
         string dllSrc = Path.Combine(AppDir(), dir, "ddraw.dll");
         string confSrc = Path.Combine(AppDir(), "_presets", ModePresets[which]);
         if (!File.Exists(dllSrc)) { fail = dir + "\\ddraw.dll 缺失"; return false; }
+        if (!File.Exists(confSrc)) confSrc = FallbackPreset(which, confSrc);   // 自己找一份能用的
         if (!File.Exists(confSrc)) { fail = "_presets\\" + ModePresets[which] + " 缺失"; return false; }
         try
         {
@@ -1168,8 +1448,7 @@ class Launcher : Form
         catch (Exception ex) { fail = ex.Message; return false; }
     }
 
-    // 收尾回到默认档（第 6 档 dgVoodoo2）；缺 dgVoodoo2 文件时退回 cnc-ddraw GDI，
-    // 总之只留一份配置在位，不在机器上留两层叠着的现场
+    // 收尾回到默认档（第 6 档 dgVoodoo2）；缺文件时退回 cnc-ddraw GDI
     void RestoreDefaultLayer()
     {
         try
@@ -1236,10 +1515,12 @@ class Launcher : Form
         }
         string presetPath = Path.Combine(AppDir(), "_presets", ModePresets[mode]);
         string layerSrc = Path.Combine(AppDir(), LayerDirOf(ModeLayer[mode]), "ddraw.dll");
+        if (!File.Exists(layerSrc)) { EnsureLayer(out message); }
+        if (!File.Exists(presetPath)) presetPath = FallbackPreset(mode, presetPath);
         if (!File.Exists(presetPath) || !File.Exists(layerSrc))
         {
-            Log("缺少显示预设或兼容层：" + presetPath + " / " + layerSrc);
-            status = "缺少显示文件，请先运行 兼容修复.bat";
+            Log("缺少显示预设或兼容层（自修也失败）：" + presetPath + " / " + layerSrc);
+            status = "显示文件不完整，请把运行日志发给我们";
             statusColor = Warn; Invalidate();
             return;
         }
@@ -1251,8 +1532,9 @@ class Launcher : Form
             int usedMode = mode;
             try
             {
-                PrepareGame();
                 EnsureRegistry();
+                EnsureDirectPlayIpx();
+                EnsureIpxPrimaryInterface();
                 string why;
                 if (SnapshotEnvironment(out why) && usedMode != WINDOW_MODE && usedMode != 3)
                 {
@@ -1273,12 +1555,19 @@ class Launcher : Form
                         continue;
                     }
                     SetStatus("游戏运行中…", Ok);
+                    // 把所有可能变成 0 的环境值先钉死：启动前无条件按 60Hz 设置一次显示模式，退出后还原。
+                    // 1999 年的代码会把刷新率直接当除数，遇到虚拟显示器/串流驱动报 0 就 0xC0000094。
+                    DEVMODE? beforeMode = Apply60Hz();
                     DateTime start = DateTime.Now;
-                    int code = RunGameWithAffinity(exePath, gameArgs, launchProcess);
+                    int code;
+                    try { code = RunGameWithAffinity(exePath, gameArgs, launchProcess); }
+                    finally { RestoreDisplay(beforeMode); }
                     int secs = (int)(DateTime.Now - start).TotalSeconds;
                     bool bad = (uint)code >= 0xC0000000;
+                    if (bad) CaptureWerReport(gameExe);
                     Log("游戏退出，用时 " + secs + "s，退出码 0x" + ((uint)code).ToString("X8") +
                         (bad ? "（系统级异常）" : ""));
+                    Log("注册表复查：" + RegistrySummary());
                     if (bad && secs < 25 && attempt == 1 && usedMode != WINDOW_MODE && usedMode != 3)
                     {
                         Log("开局就异常退出，改用「" + ModeNames[WINDOW_MODE] + "」再试一次");
@@ -1321,88 +1610,157 @@ class Launcher : Form
         t.Start();
     }
 
-    void PrepareGame()
+    // ---------- 注册表：启动前原始快照 + 缺啥补啥（2026-11-07 客户机 0xC0000094 追查） ----------
+    // 11.reg 的键名是 Magic® III（0xAE + 空格），setup.reg / 旧启动器是 Magic?III：两套都写，别猜游戏读哪个。
+    // 只写 32 位视图（游戏是 32 位进程）；64 位视图只读、进日志当证据（老 reg 双击常落到那边去）。
+    // 幂等：AppPath/CDDrive 与实际目录不同才改；其余值只在缺失时补默认值，绝不覆盖玩家在游戏里改过的设置。
+    const string RegKeyQ = @"SOFTWARE\New World Computing\Heroes of Might and Magic?III\1.0";
+    static readonly string RegKeyR =
+        @"SOFTWARE\New World Computing\Heroes of Might and Magic" + "\u00AE" + @" III\1.0";
+    static readonly string[] RegKeyPaths = { RegKeyQ, RegKeyR };
+
+    // 名字|类型(s字符串/d数字)|默认值，分号分隔；AppPath/CDDrive 运行时换成实际目录和盘符
+    // 默认值 = 本机实测能跑通的全套（与 tools\注册表修复.bat 完全一致，Test 三项=0）。
+    // 2026-11-07 客户机实证：bat 写入这套值后游戏不再 0xC0000094，故启动器默认值向 bat 看齐。
+    const string RegDefaults =
+        "AppPath|s|.;CDDrive|s|.;Show Intro|d|1;Music Volume|d|5;Sound Volume|d|5;" +
+        "Last Music Volume|d|5;Last Sound Volume|d|5;Walk Speed|d|2;Computer Walk Speed|d|3;" +
+        "Show Route|d|1;Move Reminder|d|1;Quick Combat|d|0;Video Subtitles|d|0;Town Outlines|d|1;" +
+        "Animate SpellBook|d|1;Window Scroll Speed|d|1;Bink Video|d|0;Blackout Computer|d|0;First Time|d|0;" +
+        "Test Decomp|d|0;Test Read|d|0;Test Blit|d|0;Unique System ID|s|I29;Network Default Name|s|Playerer;" +
+        "Autosave|d|1;Show Combat Grid|d|0;Show Combat Mouse Hex|d|0;Combat Shade Level|d|0;" +
+        "Combat Army Info Level|d|0;Combat Auto Creatures|d|1;Combat Auto Spells|d|1;Combat Catapult|d|1;" +
+        "Combat Ballista|d|1;Combat First Aid Tent|d|1;Combat Speed|d|0;Main Game Show Menu|d|1;" +
+        "Main Game X|d|0;Main Game Y|d|0;Main Game Full Screen|d|1";
+
+    struct RegItem { public string Name; public bool IsString; public string Def; }
+
+    static RegItem[] RegItems()
     {
-        if (runInit && File.Exists(Path.Combine(AppDir(), initExe)))
+        string[] parts = RegDefaults.Split(';');
+        RegItem[] r = new RegItem[parts.Length];
+        for (int i = 0; i < parts.Length; i++)
         {
-            try
-            {
-                ProcessStartInfo psi = new ProcessStartInfo(Path.Combine(AppDir(), initExe));
-                psi.WorkingDirectory = AppDir();
-                psi.UseShellExecute = false;
-                using (Process p = Process.Start(psi))
-                {
-                    p.WaitForExit();
-                    Log("init.exe 已执行，退出码 " + p.ExitCode);
-                }
-            }
-            catch (Exception ex) { Log("init.exe 执行失败（继续启动）：" + ex.Message); }
+            string[] f = parts[i].Split('|');
+            r[i].Name = f[0]; r[i].IsString = f[1] == "s"; r[i].Def = f[2];
         }
-        if (savesSource.Length > 0 && savesTarget.Length > 0)
+        return r;
+    }
+
+    static string RegTag(string keyPath)
+    {
+        return keyPath.IndexOf("\u00AE") >= 0 ? "\u00AEIII" : "?III";
+    }
+
+    static string ValText(object v) { return v == null ? "（无）" : Convert.ToString(v); }
+
+    // 只读：把「客户机原本缺什么」原样写进日志，必须在补齐之前写
+    static string[] RegistrySnapshotLines()
+    {
+        List<string> lines = new List<string>();
+        string dir = AppDir().TrimEnd('\\') + "\\";
+        string drive = "";
+        try { drive = Path.GetPathRoot(dir).TrimEnd('\\'); } catch { }
+        lines.Add("注册表快照：游戏目录 " + dir + " 盘符 " + drive +
+                  "；应有 " + RegItems().Length + " 项（对照 11.reg / setup.reg）");
+        RegItem[] items = RegItems();
+        foreach (RegistryView view in new RegistryView[] { RegistryView.Registry32, RegistryView.Registry64 })
         {
-            try
+            foreach (string keyPath in RegKeyPaths)
             {
-                string target = Environment.ExpandEnvironmentVariables(savesTarget);
-                Directory.CreateDirectory(target);
-                string src = Path.Combine(AppDir(), savesSource);
-                if (Directory.Exists(src))
+                string tag = (view == RegistryView.Registry32 ? "32位" : "64位") + " " + RegTag(keyPath);
+                try
                 {
-                    foreach (string f in new[] { "profile.bin", "slot-A.bin", "slot-B.bin", "slot-C.bin" })
+                    using (RegistryKey b = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, view))
+                    using (RegistryKey k = b.OpenSubKey(keyPath))
                     {
-                        string s = Path.Combine(src, f), d = Path.Combine(target, f);
-                        if (File.Exists(s) && !File.Exists(d)) File.Copy(s, d, true);
+                        if (k == null)
+                        {
+                            lines.Add("注册表键：" + tag + " 不存在（缺 " + items.Length + " 项）");
+                            continue;
+                        }
+                        List<string> miss = new List<string>();
+                        foreach (RegItem it in items) if (k.GetValue(it.Name, null) == null) miss.Add(it.Name);
+                        lines.Add("注册表键：" + tag + " 存在/" + k.ValueCount + "项" +
+                            " AppPath=" + ValText(k.GetValue("AppPath")) +
+                            " CDDrive=" + ValText(k.GetValue("CDDrive")) +
+                            " 缺" + miss.Count + "项" +
+                            (miss.Count == 0 ? "；已齐" : "（" + string.Join("、", miss.ToArray()) + "）"));
                     }
-                    Log("存档目录已检查：" + target);
                 }
+                catch (Exception ex) { lines.Add("注册表键：" + tag + " 读失败：" + ex.Message); }
             }
-            catch (Exception ex) { Log("存档准备失败（继续启动）：" + ex.Message); }
         }
+        return lines.ToArray();
+    }
+
+    static bool regSnapshotLogged = false;
+    static void LogRegistrySnapshot()
+    {
+        if (regSnapshotLogged) return;
+        regSnapshotLogged = true;
+        foreach (string s2 in RegistrySnapshotLines()) Log(s2);
+    }
+
+    // 游戏退出后再看一眼：哪个键的值数变了，就说明游戏实际读的是那一个
+    static string RegistrySummary()
+    {
+        string s2 = "";
+        foreach (string keyPath in RegKeyPaths)
+        {
+            string tag = RegTag(keyPath);
+            if (s2.Length > 0) s2 += "；";
+            try
+            {
+                using (RegistryKey b = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+                using (RegistryKey k = b.OpenSubKey(keyPath))
+                    s2 += tag + "=" + (k == null ? "不存在" : k.ValueCount + "项");
+            }
+            catch (Exception ex) { s2 += tag + "=读失败(" + ex.Message + ")"; }
+        }
+        return s2;
     }
 
     void EnsureRegistry()
     {
         string dir = AppDir().TrimEnd('\\') + "\\";
-        string keyPath = @"SOFTWARE\New World Computing\Heroes of Might and Magic?III\1.0";
-        try
+        string drive = "";
+        try { drive = Path.GetPathRoot(dir).TrimEnd('\\'); } catch { }
+        RegItem[] items = RegItems();
+        foreach (string keyPath in RegKeyPaths)
         {
-            using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
-            using (RegistryKey k = baseKey.OpenSubKey(keyPath))
+            string tag = "32位 " + RegTag(keyPath);
+            try
             {
-                if (k != null && string.Equals(Convert.ToString(k.GetValue("AppPath")), dir,
-                    StringComparison.OrdinalIgnoreCase))
+                using (RegistryKey b = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+                using (RegistryKey k = b.CreateSubKey(keyPath))
                 {
-                    Log("注册表 AppPath 已就绪");
-                    return;
+                    if (k == null) { Log("注册表补齐：" + tag + " 打不开（权限不足？），跳过"); continue; }
+                    List<string> added = new List<string>();
+                    int fixedN = 0;
+                    foreach (RegItem it in items)
+                    {
+                        object cur = k.GetValue(it.Name, null);
+                        string want = it.Name == "AppPath" ? dir : (it.Name == "CDDrive" ? drive : it.Def);
+                        if (cur == null)
+                        {
+                            added.Add(it.Name);
+                            if (it.IsString) k.SetValue(it.Name, want, RegistryValueKind.String);
+                            else k.SetValue(it.Name, Convert.ToInt32(want), RegistryValueKind.DWord);
+                        }
+                        else if ((it.Name == "AppPath" || it.Name == "CDDrive") &&
+                                 !string.Equals(Convert.ToString(cur), want, StringComparison.OrdinalIgnoreCase))
+                        {
+                            k.SetValue(it.Name, want, RegistryValueKind.String);
+                            fixedN++;
+                        }
+                    }
+                    Log("注册表补齐：" + tag + " 补" + added.Count + "项/校正" + fixedN + "项（应有" +
+                        items.Length + "项）" +
+                        (added.Count == 0 ? "；原本已齐" : "；补的是：" + string.Join("、", added.ToArray())));
                 }
             }
-
-            string drive = Path.GetPathRoot(dir).TrimEnd('\\');
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("Windows Registry Editor Version 5.00");
-            sb.AppendLine();
-            sb.AppendLine(@"[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\New World Computing\Heroes of Might and Magic?III\1.0]");
-            sb.AppendLine("\"AppPath\"=\"" + dir.Replace("\\", "\\\\") + "\"");
-            sb.AppendLine("\"CDDrive\"=\"" + drive + "\"");
-            sb.AppendLine("\"Show Intro\"=dword:00000001");
-            sb.AppendLine("\"Test Decomp\"=dword:00000000");
-            sb.AppendLine("\"Test Read\"=dword:00000000");
-            sb.AppendLine("\"Test Blit\"=dword:00000000");
-            string tmp = Path.Combine(Path.GetTempPath(), "h3-launcher.reg");
-            File.WriteAllText(tmp, sb.ToString(), Encoding.Unicode);
-            ProcessStartInfo psi = new ProcessStartInfo("reg.exe", "import \"" + tmp + "\"");
-            psi.UseShellExecute = false;
-            psi.CreateNoWindow = true;
-            using (Process p = Process.Start(psi))
-            {
-                p.WaitForExit();
-                if (p.ExitCode == 0) Log("注册表 AppPath 已写入：" + dir);
-                else Log("注册表写入失败（继续启动），退出码 " + p.ExitCode);
-            }
-            try { File.Delete(tmp); } catch { }
-        }
-        catch (Exception ex)
-        {
-            Log("注册表设置失败（继续启动）：" + ex.Message);
+            catch (Exception ex) { Log("注册表补齐：" + tag + " 写不进（继续启动，不阻塞）：" + ex.Message); }
         }
     }
 
@@ -1432,95 +1790,86 @@ class Launcher : Form
     static extern IntPtr OpenProcess(uint access, bool inherit, int pid);
 
     // ---------- 除零类崩溃的取证用 API ----------
-    const int VREFRESH = 0, HORZRES = 8, VERTRES = 10, LOGPIXELSX = 88, LOGPIXELSY = 90;
+    // VREFRESH = 116（不是 0；0 是 DRIVERVERSION，真实驱动返回 0x4000=16384，害我们一直把刷新率记成 16384）
+    const int VREFRESH = 116, HORZRES = 8, VERTRES = 10, LOGPIXELSX = 88, LOGPIXELSY = 90;
     [DllImport("user32.dll")] static extern IntPtr GetDC(IntPtr h);
     [DllImport("user32.dll")] static extern int ReleaseDC(IntPtr h, IntPtr dc);
     [DllImport("gdi32.dll")] static extern int GetDeviceCaps(IntPtr dc, int index);
+    // DEVMODEW 的规范布局（sizeof = 220）：dmPosition 是 POINTL(8) + dmDisplayOrientation(4)，
+    // 之后还有 dmDisplayFixedOutput(4)；少一个字段整体错位，读出来的宽高/刷新率全是隔壁字段的值
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    struct DEVMODE
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmDeviceName;
+        public ushort dmSpecVersion, dmDriverVersion, dmSize, dmDriverExtra;
+        public uint dmFields;
+        public int dmPositionX, dmPositionY;
+        public uint dmDisplayOrientation, dmDisplayFixedOutput;
+        public short dmColor, dmDuplex, dmYResolution, dmTTOption, dmCollate;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string dmFormName;
+        public ushort dmLogPixels;
+        public uint dmBitsPerPel, dmPelsWidth, dmPelsHeight, dmDisplayFlags, dmDisplayFrequency;
+        public uint dmICMMethod, dmICMIntent, dmMediaType, dmDitherType;
+        public uint dmReserved1, dmReserved2, dmPanningWidth, dmPanningHeight;
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    static extern bool EnumDisplaySettings(string device, int mode, ref DEVMODE dm);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    static extern int ChangeDisplaySettings(ref DEVMODE dm, int flags);
     // 注意出参顺序：每簇扇数、每扇区字节、可用簇、总簇（MSDN 就是这个顺序，写反会把日志标错）
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi)]
     static extern bool GetDiskFreeSpaceA(string root, out uint sectorsPerCluster,
         out uint bytesPerSector, out uint freeClusters, out uint totalClusters);
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    static extern uint GetDriveTypeW(string root);
+    static string DriveTypeName(uint t)
+    {
+        // GetDriveType：0 未知、1 路径没有根目录、2 可移动、3 本地硬盘、4 网络、5 光盘、6 内存盘
+        switch (t)
+        {
+            case 0: return "未知"; case 1: return "路径无效"; case 2: return "可移动盘";
+            case 3: return "本地硬盘"; case 4: return "网络盘"; case 5: return "光盘";
+            case 6: return "内存盘";
+            default: return "未知(" + t + ")";
+        }
+    }
 
+    // 直接启动游戏并等它退出：不做「包装进程 / 再去找实际进程」那一套，少一层就少一处出错
     int RunGameWithAffinity(string exePath, string launchArgs, string launchProcess)
     {
-        DateTime startedAt = DateTime.Now;
         STARTUPINFO si = new STARTUPINFO();
         si.cb = Marshal.SizeOf(typeof(STARTUPINFO));
         PROCESS_INFORMATION pi;
         string cmd = "\"" + exePath + "\"" + (launchArgs.Length > 0 ? " " + launchArgs : "");
-        bool started = CreateProcess(exePath, cmd, IntPtr.Zero, IntPtr.Zero,
-            false, 0x4, IntPtr.Zero, AppDir(), ref si, out pi);     // CREATE_SUSPENDED
-        if (started)
+        bool started = CreateProcess(exePath, cmd, IntPtr.Zero, IntPtr.Zero, false,
+            0x4, IntPtr.Zero, AppDir(), ref si, out pi);      // CREATE_SUSPENDED
+        if (!started)
         {
-            if (affinity > 0)
+            Log("CreateProcess 失败（err=" + Marshal.GetLastWin32Error() + "），改用 Process.Start");
+            ProcessStartInfo psi = new ProcessStartInfo(exePath, launchArgs);
+            psi.WorkingDirectory = AppDir();
+            psi.UseShellExecute = false;
+            using (Process game = Process.Start(psi))
             {
-                bool ok = SetProcessAffinityMask(pi.hProcess, (UIntPtr)(ulong)affinity);
-                Log("SetProcessAffinityMask 0x" + affinity.ToString("X") + " = " + ok);
+                game.WaitForExit();
+                return game.ExitCode;
             }
-            ResumeThread(pi.hThread);
-            CloseHandle(pi.hThread);
-            Log("包装进程 " + pi.dwProcessId + (affinity > 0 ? "（亲和性 0x" + affinity.ToString("X") + "）" : ""));
-
-            // 游戏自己会再拉一层 Future Soldier DX11.exe；等待真正的游戏进程，
-            // 这样崩溃码来自游戏本体，而不是只拿到包装进程的 0。
-            Process actual = null;
-            DateTime deadline = DateTime.UtcNow.AddSeconds(30);
-            while (DateTime.UtcNow < deadline && actual == null)
-            {
-                foreach (Process p in Process.GetProcessesByName(launchProcess))
-                {
-                    bool match;
-                    try { match = p.StartTime >= startedAt.AddSeconds(-2); }
-                    catch { match = true; }
-                    if (match && actual == null) actual = p;
-                    else p.Dispose();
-                }
-                if (actual == null) Thread.Sleep(250);
-            }
-
-            bool gotActualCode = false;
-            int actualCode = 0;
-            if (actual != null)
-            {
-                int actualPid = actual.Id;
-                actual.Dispose();
-                Log("实际游戏进程 " + actualPid + "（" + launchProcess + "）");
-                IntPtr hActual = OpenProcess(0x101000, false, actualPid);   // SYNCHRONIZE | QUERY_LIMITED_INFORMATION
-                if (hActual != IntPtr.Zero)
-                {
-                    WaitForSingleObject(hActual, 0xFFFFFFFF);   // INFINITE
-                    uint code;
-                    gotActualCode = GetExitCodeProcess(hActual, out code);
-                    if (gotActualCode) actualCode = (int)code;
-                    CloseHandle(hActual);
-                }
-                else
-                {
-                    Log("OpenProcess 实际游戏进程失败：" + Marshal.GetLastWin32Error());
-                }
-                WaitForSingleObject(pi.hProcess, 30000);
-            }
-            else
-            {
-                Log("未找到 " + launchProcess + "，等待包装进程");
-                WaitForSingleObject(pi.hProcess, 0xFFFFFFFF);   // INFINITE
-            }
-
-            uint wrapperCode;
-            bool gotWrapper = GetExitCodeProcess(pi.hProcess, out wrapperCode);
-            CloseHandle(pi.hProcess);
-            Log("GetExitCodeProcess(包装) = " + gotWrapper + "，退出码 " + wrapperCode + "；游戏实际退出码 = " + (gotActualCode ? actualCode.ToString() : "未取到"));
-            return gotActualCode ? actualCode : (int)wrapperCode;
         }
-        Log("CreateProcess 失败，退回普通启动：错误 " + Marshal.GetLastWin32Error());
-        ProcessStartInfo psi = new ProcessStartInfo(exePath, launchArgs);
-        psi.WorkingDirectory = AppDir();
-        psi.UseShellExecute = false;
-        using (Process game = Process.Start(psi))
+        if (affinity > 0)
         {
-            game.WaitForExit();
-            return game.ExitCode;
+            bool ok = SetProcessAffinityMask(pi.hProcess, (UIntPtr)(ulong)affinity);
+            Log("SetProcessAffinityMask 0x" + affinity.ToString("X") + " = " + ok);
         }
+        ResumeThread(pi.hThread);
+        CloseHandle(pi.hThread);
+        Log("已启动游戏 " + pi.dwProcessId);
+        WaitForSingleObject(pi.hProcess, 0xFFFFFFFF);
+        uint code;
+        bool got = GetExitCodeProcess(pi.hProcess, out code);
+        CloseHandle(pi.hProcess);
+        Log("游戏退出码：" + (got ? ((int)code).ToString() : "取不到"));
+        return got ? (int)code : -1;
     }
 
     void FinishWith(int code)
@@ -1670,7 +2019,7 @@ class Launcher : Form
                 string p = LogPath;
                 FileInfo fi = new FileInfo(p);
                 if (!fi.Exists)
-                    File.WriteAllText(p, "运行日志：出问题时把这个文件发给管理员\r\n", Encoding.UTF8);
+                    File.WriteAllText(p, "运行日志：出问题时把这个文件发给我们\r\n", Encoding.UTF8);
                 else if (fi.Length > 200000)
                 {
                     string[] all = File.ReadAllLines(p, Encoding.UTF8);
@@ -1721,21 +2070,14 @@ class Launcher : Form
                 case "gameexe": gameExe = val; break;
                 case "gameargs": gameArgs = val; break;
                 case "gameprocess": gameProcess = val; break;
-                case "gameiconexe": gameIconExe = val; break;
-                case "initexe": initExe = val; break;
-                case "runinit": runInit = val == "1" || val.Equals("true", StringComparison.OrdinalIgnoreCase); break;
                 case "affinity":
                     long a;
                     if (long.TryParse(val, System.Globalization.NumberStyles.HexNumber, null, out a)) affinity = a;
                     else if (long.TryParse(val, out a)) affinity = a;
                     break;
-                case "savessource": savesSource = val; break;
-                case "savestarget": savesTarget = val; break;
                 case "layerdll": layerDll = val; break;
                 case "layerbackupdir": layerBackupDir = val; break;
                 case "intro": intro = val; break;
-                case "entryguide": entryGuide = val; break;
-                case "tips": tips = val; break;
                 case "centernote": centerNote = val; break;
             }
         }

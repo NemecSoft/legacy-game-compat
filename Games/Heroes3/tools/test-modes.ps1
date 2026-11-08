@@ -1,17 +1,41 @@
 param(
   [string]$GameDir = 'D:\YunGame\E\Heroes3',
   [string]$Modes = '1,2,3,4,5,6,7',
-  [int]$WaitSec = 26
+  [int]$WaitSec = 26,
+  [switch]$AllowGameLaunch
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
+# 这个脚本会**真的把游戏拉起 7 次**。用户明确说过别再反复运行游戏（AGENTS 规则 24 第 14 类），
+# 所以默认直接退出；确实要跑六档验证，必须显式加 -AllowGameLaunch。
+if (-not $AllowGameLaunch) {
+  Write-Output ('这个脚本会逐个档位真启动游戏（本次会拉起 ' + $Modes.Split(',').Count + ' 次）。' +
+    '规则 24 第 14 条：收尾只跑不启动游戏的测试（readings-test / wer-test / test-delivery / 规范自检）。' +
+    '确认要跑就加 -AllowGameLaunch。')
+  exit 90
+}
+
+Add-Type -Namespace H3Shot -Name PW -MemberDefinition @'
+[System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool GetWindowRect(System.IntPtr h, out RECT r);
+[System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool PrintWindow(System.IntPtr h, System.IntPtr dc, uint flags);
+[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+public struct RECT { public int Left, Top, Right, Bottom; }
+'@
+
+# 取证只用 PrintWindow 抓游戏自己的窗口（规则：禁止 CopyFromScreen 截全屏，会把用户桌面带进证据）
 function Shot([string]$path) {
   $g = Get-Process -Name Heroes3 -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
   if (-not $g) { return $null }
-  $b = New-Object System.Drawing.Bitmap 1920, 1080
+  $r = New-Object H3Shot.PW+RECT
+  [H3Shot.PW]::GetWindowRect($g.MainWindowHandle, [ref]$r) | Out-Null
+  $w = $r.Right - $r.Left; $h = $r.Bottom - $r.Top
+  if ($w -le 0 -or $h -le 0 -or $w -gt 16384 -or $h -gt 16384) { return $g.MainWindowTitle }
+  $b = New-Object System.Drawing.Bitmap $w, $h
   $gr = [System.Drawing.Graphics]::FromImage($b)
-  $gr.CopyFromScreen(0, 0, 0, 0, (New-Object System.Drawing.Size 1920, 1080))
+  $hdc = $gr.GetHdc()
+  [H3Shot.PW]::PrintWindow($g.MainWindowHandle, $hdc, 2) | Out-Null   # PW_RENDERFULLCONTENT
+  $gr.ReleaseHdc($hdc)
   $b.Save($path)
   $gr.Dispose(); $b.Dispose()
   return $g.MainWindowTitle

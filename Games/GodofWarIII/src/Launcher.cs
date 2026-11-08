@@ -54,7 +54,9 @@ class Launcher : Form
         "\n" +
         "# 玩不了或报错\n" +
         "点「修复画面」，仍不行就点「打开运行日志」，把内容发给管理员";
+    // 2026-11-05 用户定案：用途说明紧贴下拉框上方，前缀点明「本下拉框的作用是」
     string centerNote = "游戏会自动检测画面。";
+    string comboHint = "本下拉框的作用是：如果有闪退等异常，换另一种模式，再启动游戏试试。";
 
     static readonly string[] LaunchModeNames =
     {
@@ -66,11 +68,11 @@ class Launcher : Form
     // ---------- 运行状态 ----------
     const int NoFocus = -99;
     int hover = -1, focus = NoFocus;
-    int rightScroll, rightScrollMax;
     bool busy, finishing;
+    bool openDetailOnStart;
+    CheatSheetForm cheatSheet;
     string status = "已就绪";
     Color statusColor = Ok;
-    LegendItem[] legend = new LegendItem[0];
     volatile int exitCode;
     NotifyIcon tray;
     bool autoStart;
@@ -81,16 +83,9 @@ class Launcher : Form
     Font fTitle, fHead, fRowSel, fRow, fBody, fCap, fCapZh, fMono, fBrand;
     float dpi = 1f;
     Rectangle colLeft, colCenter, colRight;
-    Rectangle rcLabelMode, rcComboMode, rcStart, rcFix, rcLog, rcExit;
+    Rectangle rcLabelMode, rcComboHint, rcComboMode, rcStart, rcFix, rcLog, rcExit, rcCheats;
     SelectPanel selMode;
     ContextMenuStrip modeMenu;
-
-    class LegendItem
-    {
-        public string Caption;
-        public string[] Caps;
-        public string Glyph;   // square / circle / cross / triangle：游戏里显示的手柄符号
-    }
 
     [STAThread]
     static int Main(string[] args)
@@ -129,6 +124,8 @@ class Launcher : Form
             string a = args[i];
             if (a == "/go" || a == "-go" || a == "--go" || a == "/auto") l.autoStart = true;
             if (a == "/desktop" || a == "-desktop" || a == "/fixed" || a == "-fixed") l.launchMode = 1;
+            // 取证用：起来就同时开详细按键窗口，方便一次拍两张图（玩家不用记这个参数）
+            if (a == "/detail" || a == "-detail") l.openDetailOnStart = true;
         }
         Log("启动参数：" + (args.Length == 0 ? "（无）" : string.Join(" ", args)) +
             "；父进程：" + ParentProcessName() +
@@ -241,16 +238,23 @@ class Launcher : Form
         KeyPreview = true;
         Text = gameTitle;
         BackColor = BgMid;
-        ClientSize = new Size(900, 620);
+        // 窗口尺寸在构造函数里一步到位：按 UI 规范基准 900×620、三栏 252/296/280，
+        // 完整按键速查放进独立普通窗口，主窗口不再为塞长表撑大（用户定案 2026-11-05）。
+        // CenterScreen 按窗口创建时的 Size 定位置，先给个小尺寸再放大会让左上角不跟着动
+        // （实测 900×620 → 1340×880 偏右下 220×130、底边出屏，规范 28）。
+        // 此时窗口句柄还没建，dpi 从桌面 DC 取；后续不再改尺寸。
+        try { using (Graphics g = Graphics.FromHwnd(IntPtr.Zero)) dpi = g.DpiX / 96f; }
+        catch { dpi = 1f; }
+        Rectangle wa = Screen.PrimaryScreen.WorkingArea;
+        ClientSize = new Size(Math.Min(S(900), wa.Width - S(30)), Math.Min(S(620), wa.Height - S(30)));
+        MakeFonts();
+        // 通用拟物键帽库：四平台一套标准件，注入 DPI 与键帽字体后全窗口复用
+        Keycaps.Configure(dpi, fCap, fCapZh);
     }
 
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        using (Graphics g = CreateGraphics()) { dpi = g.DpiX / 96f; }
-        MakeFonts();
-        ClientSize = new Size(S(900), S(620));
-        RebuildLegend();
         if (selMode == null)
         {
             selMode = MakeSelect(LaunchModeNames, launchMode, delegate { ShowModeMenu(); });
@@ -265,6 +269,7 @@ class Launcher : Form
         Log("启动 " + gameTitle + "｜桌面 " + msg + "（" + desktopSource + "）｜DPI " + dpi.ToString("0.##") +
             "｜按键 " + Spartan.KeyMapOf());
         if (autoStart) BeginInvoke(new Action(delegate { StartGame(); }));
+        if (openDetailOnStart) BeginInvoke(new Action(delegate { OpenCheatSheet(); }));
     }
 
     void MakeFonts()
@@ -303,9 +308,11 @@ class Launcher : Form
 
     void LayoutRects()
     {
+        // 规范基准三栏 252 / 296 / 280，栏间距 16，外边距 20（900×620）
         int pad = S(20), gut = S(16);
-        int c1 = S(252), c2 = S(276), c3 = S(300);
-        int top = S(88), bottom = S(552);
+        int c1 = S(252), c2 = S(296);
+        int c3 = ClientSize.Width - pad * 2 - c1 - c2 - gut * 2;
+        int top = S(88), bottom = ClientSize.Height - S(68);
         colLeft = new Rectangle(pad, top, c1, bottom - top);
         colCenter = new Rectangle(pad + c1 + gut, top, c2, bottom - top);
         colRight = new Rectangle(pad + c1 + gut + c2 + gut, top, c3, bottom - top);
@@ -313,7 +320,10 @@ class Launcher : Form
         int inner = colCenter.X + S(16), innerW = colCenter.Width - S(32);
         int noteBottom = colCenter.Y + S(46) + MeasureCenterNoteHeight(innerW);
         rcLabelMode = new Rectangle(inner, noteBottom + S(14), innerW, S(22));
-        rcComboMode = new Rectangle(inner, rcLabelMode.Bottom + S(2), innerW, S(30));
+        // 用途说明紧贴下拉框上方：标签 → 说明 → 框，三步挨着，不另拉空白（硬约束 18）
+        rcComboHint = new Rectangle(inner, rcLabelMode.Bottom + S(4), innerW,
+            MeasureComboHintHeight(innerW));
+        rcComboMode = new Rectangle(inner, rcComboHint.Bottom + S(6), innerW, S(30));
         int startY = rcComboMode.Bottom + S(18);
         rcStart = new Rectangle(inner, startY, innerW, S(44));
         // 三个按钮不等宽：「打开运行日志」六个字必须完整显示，退出两个字可以窄
@@ -322,6 +332,10 @@ class Launcher : Form
         rcLog = new Rectangle(rcFix.Right + S(8), rcFix.Y, wLog, S(34));
         rcExit = new Rectangle(rcLog.Right + S(8), rcLog.Y, innerW - (rcLog.Right + S(8) - inner), S(34));
         PlaceSelect(selMode, rcComboMode);
+
+        // 右栏底部：一键打开完整按键速查（独立普通窗口，不模态、不遮挡主窗口）
+        int rx = colRight.X + S(14);
+        rcCheats = new Rectangle(rx, colRight.Bottom - S(52), colRight.Width - S(28), S(38));
     }
 
     int MeasureCenterNoteHeight(int width)
@@ -350,6 +364,26 @@ class Launcher : Form
         }
     }
 
+    // 下拉框用途说明按中栏宽度折行，返回它占几行的高度，供 LayoutRects 给下拉框让位
+    int MeasureComboHintHeight(int width)
+    {
+        using (Graphics g = CreateGraphics())
+        {
+            int lh = TextRenderer.MeasureText(g, "国", fBody).Height + S(2);
+            int lines = 0;
+            string line = comboHint;
+            while (line.Length > 0)
+            {
+                int take = line.Length;
+                while (take > 1 && TextRenderer.MeasureText(g, line.Substring(0, take), fBody).Width > width)
+                    take--;
+                lines++;
+                line = line.Substring(take);
+            }
+            return lines * lh;
+        }
+    }
+
     // ---------- 绘制 ----------
     protected override void OnPaint(PaintEventArgs e)
     {
@@ -360,7 +394,7 @@ class Launcher : Form
         DrawLeatherBg(g, all);
         Rectangle head = new Rectangle(0, 0, ClientSize.Width, S(76));
         DrawBand(g, head);
-        int footY = S(560);
+        int footY = ClientSize.Height - S(60);
         Rectangle foot = new Rectangle(0, footY, ClientSize.Width, ClientSize.Height - footY);
         DrawBand(g, foot);
 
@@ -424,6 +458,7 @@ class Launcher : Form
         TextRenderer.DrawText(g, "关于这款游戏", fHead, new Point(x, y), Gold, Color.Transparent);
         y += S(28);
         y += S(10);
+        // 左栏只写游戏说明；表的看法写在右栏自己头上，翻页玩家用滚轮，不用教
         DrawWrapped(g, intro, x, y, colLeft.Width - S(32), fBody, Ink);
     }
 
@@ -436,6 +471,8 @@ class Launcher : Form
         DrawWrapped(g, centerNote, x, y, colCenter.Width - S(32), fBody, Ink);
         TextRenderer.DrawText(g, "启动选项", fHead,
             new Point(rcLabelMode.X, rcLabelMode.Y), Gold, Color.Transparent);
+        // 紧贴下拉框上方的用途说明（用户定案 2026-11-05）
+        DrawWrapped(g, comboHint, rcComboHint.X, rcComboHint.Y, rcComboHint.Width, fBody, InkDim);
 
         DrawButton(g, rcStart, busy ? "游戏运行中…" : "启动游戏", true, !busy,
             hover == 0 || focus == 0, focus == 0);
@@ -446,84 +483,288 @@ class Launcher : Form
         DrawButton(g, rcExit, "退出", false, true,
             hover == 3 || focus == 3, focus == 3);
         if (focus == 4 && selMode != null) FocusRing(g, selMode.Bounds);
+        // 中栏只放玩家用得上的东西。启动器内部做了什么属于维护者笔记，
+        // 写在「适配过程分析.md」4.1，不上界面（2026-11-04 用户定案）。
     }
 
     static bool InViewport(int y, int h, int top, int bottom) { return y >= top && y + h <= bottom; }
 
+    // 主窗口右栏只放极简常用键 + 一个「详细按键」按钮；完整六卡片速查在独立窗口里。
+    // 用户定案 2026-11-05：主窗口回归规范三栏，长表不再把窗口撑大。
+    static readonly CheatRow[] QuickRows =
+    {
+        new CheatRow("ps:stick_l", "pc:W pc:A pc:S pc:D", "移动"),
+        new CheatRow("ps:square ps:triangle ps:circle ps:cross", "pc:J pc:K pc:L pc:Space", "轻击 / 重击 / 抓人 / 跳"),
+        new CheatRow("ps:L1 ps:R1", "pc:Q pc:E", "防御 / 互动"),
+        new CheatRow("ps:L2 ps:R2", "pc:U pc:O", "道具 / 魔法"),
+        new CheatRow("ps:L1 + ps:cross", "pc:I", "连招换武器"),
+        new CheatRow("ps:dpad", "pc:1 pc:2 pc:3 pc:4", "直选武器")
+    };
+
     void DrawRight(Graphics g)
     {
         Card(g, colRight);
-        Region oldClip = g.Clip;
-        g.SetClip(colRight, CombineMode.Replace);
-        int top = colRight.Y + S(6);
-        int bottom = colRight.Bottom - S(6);
-        int startY = colRight.Y + S(14) - rightScroll;
-        int endY = DrawRightContent(g, startY, top, bottom);
-        int contentH = endY - startY;
-        int viewport = colRight.Height - S(14) - S(12);
-        rightScrollMax = Math.Max(0, contentH - viewport);
-        int clamped = Math.Max(0, Math.Min(rightScroll, rightScrollMax));
-        if (clamped != rightScroll) { rightScroll = clamped; Invalidate(colRight); }
-        g.Clip = oldClip;
-        DrawRightScroll(g, viewport, contentH);
-    }
-
-    int DrawRightContent(Graphics g, int y, int top, int bottom)
-    {
-        int x = colRight.X + S(16);
-        int h = TextRenderer.MeasureText(g, "国", fHead).Height;
-        if (InViewport(y, h, top, bottom))
-            TextRenderer.DrawText(g, "操作说明", fHead, new Point(x, y), Gold, Color.Transparent);
-        y += S(28);
-        int textH = TextRenderer.MeasureText(g, "国", fBody).Height;
-        if (InViewport(y, textH, top, bottom))
-        {
-            TextRenderer.DrawText(g, "手柄", fBody, new Point(x, y), InkDim, Color.Transparent);
-            TextRenderer.DrawText(g, "说明", fBody, new Point(x + S(54), y), InkDim, Color.Transparent);
-            TextRenderer.DrawText(g, "键盘按键", fBody, new Point(x + S(150), y), InkDim, Color.Transparent);
-        }
-        y += S(24);
-        return DrawLegendTable(g, legend, x, y, top, bottom);
-    }
-
-    int DrawLegendTable(Graphics g, LegendItem[] rows, int x, int y, int top, int bottom)
-    {
+        int x = colRight.X + S(14), w = colRight.Width - S(28);
+        int y = colRight.Y + S(14);
+        int headH = TextRenderer.MeasureText(g, "国", fHead).Height;
+        TextRenderer.DrawText(g, "操作说明", fHead, new Point(x, y), GoldBright, Color.Transparent);
+        y += headH + S(6);
+        TextRenderer.DrawText(g, "深色 = 手柄键，金色 = 键盘键", fBody,
+            new Point(x, y), InkDim, Color.Transparent);
+        y += headH + S(12);
+        int lh = TextRenderer.MeasureText(g, "国", fBody).Height + S(2);
         int capH = S(21);
-        int descX = x + S(54);
-        int keyX = x + S(150);
-        int textH = TextRenderer.MeasureText(g, "国", fBody).Height;
-        foreach (LegendItem item in rows)
+        foreach (CheatRow r in QuickRows)
         {
-            if (InViewport(y, capH, top, bottom))
+            int gw = Keycaps.GroupWidth(g, r.Glyph, capH);
+            Keycaps.DrawGroup(g, r.Glyph, x, y, capH, false);
+            Keycaps.DrawGroup(g, r.Pc, x + gw + S(6), y, capH, true);
+            y += capH + S(3);
+            foreach (string ln in WrapLines(g, r.Text, w, fBody))
             {
-                int ty = y + (capH - textH) / 2;
-                if (item.Glyph != null)
-                    PsGlyph(g, item.Glyph, x, y, GlyphWidth(g, item.Glyph), capH);
-                TextRenderer.DrawText(g, item.Caption, fBody, new Point(descX, ty), Ink, Color.Transparent);
-                int cx = keyX;
-                foreach (string cap in item.Caps)
-                {
-                    int cw = CapWidth(g, cap);
-                    Keycap(g, cap, cx, y, cw, capH);
-                    cx += cw + S(3);
-                }
+                TextRenderer.DrawText(g, ln, fBody, new Point(x, y), Ink, Color.Transparent);
+                y += lh;
             }
-            y += capH + S(2);
+            y += S(6);
         }
-        return y;
+        DrawButton(g, rcCheats, "详细按键", false, true,
+            hover == 5 || focus == 5, focus == 5);
     }
 
-    void DrawRightScroll(Graphics g, int viewport, int contentH)
+    // ---------- 按键速查：照 PS4 官方默认键位图复刻，每行补上本启动器的全键盘键 ----------
+    // 金色键帽 = 玩家要按的键盘键；深色键帽 = 游戏画面上的手柄符号，只用来对照。
+    class CheatRow
     {
-        if (rightScrollMax <= 0) return;
-        int trackX = colRight.Right - S(7);
-        int trackY = colRight.Y + S(10);
-        int trackH = colRight.Height - S(20);
-        int thumbH = Math.Max(S(24), (int)((long)trackH * viewport / Math.Max(1, contentH)));
-        int thumbY = trackY + (int)((long)(trackH - thumbH) * rightScroll / Math.Max(1, rightScrollMax));
+        public string Glyph;
+        public string Pc;
+        public string Text;
+        public CheatRow(string glyph, string pc, string text) { Glyph = glyph; Pc = pc; Text = text; }
+    }
+
+    class CheatCard
+    {
+        public string Title;
+        public Color Accent;
+        public CheatRow[] Rows;
+        public CheatCard(string title, Color accent, params CheatRow[] rows)
+        {
+            Title = title; Accent = accent; Rows = rows;
+        }
+    }
+
+    CheatCard[] cheatCards;
+    CheatCard[] CheatCards
+    {
+        get { if (cheatCards == null) cheatCards = BuildCheatCards(); return cheatCards; }
+    }
+
+    // 底部提醒同样按「手柄键帽 + 金色 PC 键帽 + 说明」排版：
+    // 说明里提到的每个手柄键都要能在这行键帽上找到对应键盘键，别让玩家看着手柄键名猜键盘。
+    static readonly CheatRow[] CheatNotes =
+    {
+        new CheatRow("ps:stick_r", "pc:Up pc:Down pc:Left pc:Right",
+            "1  右摇杆是闪避 / 翻滚，不是转视角；镜头自动固定。键盘按 ↑↓←→ 翻滚，别推摇杆找敌人。"),
+        new CheatRow("ps:L2 ps:R2", "pc:U pc:O",
+            "2  L2(U) 是道具，R2(O) 才是魔法；不少二手攻略把这两个写反了。"),
+        new CheatRow("ps:R1 ps:circle ps:options", "pc:E pc:L pc:Tab",
+            "3  场景机关看 R1(E)，抓人处决看 ○(L)；拿不准就照屏幕提示按。OPTIONS(Tab) 里随时可查官方招式表。")
+    };
+
+    static CheatCard[] BuildCheatCards()
+    {
+        Color red = Warn, cyan = Color.FromArgb(0x7C, 0xC3, 0xEE);
+        // Glyph / Pc 都是通用键帽库的 id 串（见 templates\Keycaps.cs）：
+        // 空格分隔 = 一排独立键帽，"+" = 组合键的小加号；"—" = 这行没有这个键。
+        return new CheatCard[]
+        {
+            new CheatCard("基础移动", red,
+                new CheatRow("ps:stick_l", "pc:W pc:A pc:S pc:D", "移动、攀爬、飞行、游泳的方向"),
+                new CheatRow("ps:stick_r", "pc:Up pc:Down pc:Left pc:Right", "翻滚闪避（按推的方向）。镜头是自动固定视角，右摇杆不转镜头"),
+                new CheatRow("ps:cross", "pc:Space", "跳跃 / 二段跳；空中按住滑翔，游泳下潜，挂边翻上平台"),
+                new CheatRow("ps:triangle", "pc:K", "游泳时按住上浮")),
+
+            new CheatCard("战斗", red,
+                new CheatRow("ps:square", "pc:J", "轻攻击、起手连段；抓住敌人时可当冲撞槌；踢开可推动的物体"),
+                new CheatRow("ps:triangle", "pc:K", "重攻击；长按把敌人挑空"),
+                new CheatRow("ps:circle", "pc:L", "抓取 / QTE 处决；抓住后 △□○✕ → K J L 空格：冲撞、撕杀、连拳、投掷"),
+                new CheatRow("ps:L1", "pc:Q", "按住防御；敌人命中瞬间点按可弹反（配金羊毛反弹）"),
+                new CheatRow("ps:L1 + ps:circle", "—", "链刃钩索，拉近或骑乘敌人；移植器无对应动作，未绑定键盘键"),
+                new CheatRow("ps:L2", "pc:U", "按住 U 再按 □△○✕ → J K L 空格，用道具见右侧"),
+                new CheatRow("ps:L3 + ps:R3", "pc:F", "怒气满后 F 开斯巴达之怒，短时无敌；□△✕ → J K 空格 三种攻击")),
+
+            new CheatCard("武器 · 魔法 · 道具", Gold,
+                new CheatRow("ps:dpad", "pc:1 pc:2 pc:3 pc:4", "直选四把主武器：流亡双刃、哈迪斯之爪、涅墨亚拳套、复仇之鞭"),
+                new CheatRow("ps:L1 + ps:cross", "pc:I", "连招中不中断地换武器并接一段攻击"),
+                new CheatRow("ps:R2", "pc:O", "魔法随武器变：斯巴达军团 / 灵魂召唤 / 涅墨亚咆哮 / 复仇之怒"),
+                new CheatRow("ps:L2", "pc:U", "按住 U + J/K/L/空格 用：阿波罗之弓、赫利俄斯之首、赫尔墨斯之靴"),
+                new CheatRow("ps:triangle ps:cross ps:L1", "pc:K pc:Space pc:Q", "△(K) 上浮 · ✕(空格) 下潜 · 按住 L1(Q) 再放开冲刺")),
+
+            new CheatCard("场景互动", cyan,
+                new CheatRow("ps:R1", "pc:E", "互动键：跳跃点、落链、拉杆、沿墙下滑等，照屏幕提示按"),
+                new CheatRow("ps:circle", "pc:L", "抓人和 QTE；部分宝箱、大门、存档点也会提示 ○，键盘按 L"),
+                new CheatRow("—", "—", "QTE / 机关照屏幕左上角提示，键盘对照每行金色键帽")),
+
+            new CheatCard("一句话速记", Gold,
+                new CheatRow("ps:square ps:triangle ps:circle ps:cross", "pc:J pc:K pc:L pc:Space", "轻击 / 重击 / 抓人 / 跳"),
+                new CheatRow("ps:L1 ps:R1", "pc:Q pc:E", "防御 / 场景指令"),
+                new CheatRow("ps:L2 ps:R2", "pc:U pc:O", "道具 / 魔法"),
+                new CheatRow("ps:dpad", "pc:1 pc:2 pc:3 pc:4", "直接选武器；L1+✕ 连招换武器 = 单键 I"),
+                new CheatRow("ps:L3 + ps:R3", "pc:F", "两个摇杆一起按下去 = 斯巴达之怒")),
+
+            new CheatCard("PS4 重制版专属 / 菜单", cyan,
+                new CheatRow("ps:options", "pc:Tab", "暂停 + 角色菜单：升级武器、道具、状态、招式表；PS3 上为 START"),
+                new CheatRow("ps:touchpad", "—", "进 / 出照片模式，调远近、滤镜、边框；本方案已解绑"),
+                new CheatRow("ps:share", "—", "照片模式中拍照并保存 / 分享；本方案未绑定键盘键"),
+                new CheatRow("ps:ps", "—", "PS5 可兼容运行，但部分 PS4 功能可能缺失"))
+        };
+    }
+
+    // 完整速查表：沿用原来「两列六卡片 + 底部全宽红框」的结构，只是把窗口做宽、
+    // 去掉顶部标题，说明基本一行放下，争取一屏看全不用滚轮（用户定案 2026-11-05）。
+    // col 由调用方给，不写死 colRight。
+    int DrawCheatContent(Graphics g, Rectangle col, int y, int top, int bottom)
+    {
+        int x = col.X + S(12);
+        int w = col.Width - S(24);
+        int gap = S(6);
+        int cw = (w - gap) / 2;
+        int[] lh = new int[CheatCards.Length];
+        for (int i = 0; i < CheatCards.Length; i++) lh[i] = CheatCardHeight(g, CheatCards[i], cw);
+        // 两列行数配平（左 4+7+3=14 行，右 5+5+4=14 行），比原来 16/12 更矮更齐
+        int[] left = { 0, 1, 3 }, right = { 2, 4, 5 };
+        int ly = y, ry = y;
+        foreach (int i in left)
+        {
+            DrawCheatCard(g, CheatCards[i], x, ly, cw, top, bottom);
+            ly += lh[i] + gap;
+        }
+        foreach (int i in right)
+        {
+            DrawCheatCard(g, CheatCards[i], x + cw + gap, ry, cw, top, bottom);
+            ry += lh[i] + gap;
+        }
+        y = Math.Max(ly, ry) + S(2);
+        return y + DrawCheatNotes(g, x, y, w, top, bottom);
+    }
+
+    int CheatCardHeight(Graphics g, CheatCard card, int w)
+    {
+        // 间距收紧：详细窗口要一屏看全，靠加宽减少折行，不靠缩字号。
+        // 尾部 6px 是卡片下沿留白，别让最后一行说明压在缝线/高光线上
+        int h = S(20) + S(10) + S(6);
+        foreach (CheatRow r in card.Rows) h += CheatRowHeight(g, r, w);
+        return h;
+    }
+
+    // 统一版式：一行键帽 + 下面整卡宽度的说明。
+    // 多键组合行最多六个键帽，跟说明挤在同一行会把字压到卡片外，别再试那种排法。
+    int CheatRowHeight(Graphics g, CheatRow row, int w)
+    {
+        int lh = TextRenderer.MeasureText(g, "国", fBody).Height + S(2);
+        int n = WrapLines(g, row.Text, w - S(28), fBody).Length;
+        return S(21) + S(2) + n * lh + S(2);
+    }
+
+    void DrawCheatCard(Graphics g, CheatCard card, int x, int y, int w, int top, int bottom)
+    {
+        int pad = S(12), capH = S(21), headH = S(20);
+        int h = CheatCardHeight(g, card, w);
+        Rectangle box = new Rectangle(x, y, w, h);
+        Card(g, box);
+        using (SolidBrush b = new SolidBrush(card.Accent))
+            g.FillRectangle(b, x + S(10), y + S(10), S(3), S(15));
+        if (InViewport(y, headH, top, bottom))
+            TextRenderer.DrawText(g, card.Title, fHead, new Point(x + S(20), y + S(5)), GoldBright, Color.Transparent);
+
+        int ry = y + S(20) + S(10);
+        int lh = TextRenderer.MeasureText(g, "国", fBody).Height + S(2);
+        foreach (CheatRow row in card.Rows)
+        {
+            int rh = CheatRowHeight(g, row, w);
+            int gw = Keycaps.GroupWidth(g, row.Glyph, capH);
+            int capY = ry + S(1);
+            if (InViewport(capY, capH, top, bottom))
+            {
+                // 深棕 = 游戏画面上的手柄键，金色 = 玩家要按的键盘键；
+                // 两边都用同一套通用拟物键帽，一组多键就是多个独立键帽。
+                Keycaps.DrawGroup(g, row.Glyph, x + pad, capY, capH, false);
+                Keycaps.DrawGroup(g, row.Pc, x + pad + gw + S(6), capY, capH, true);
+            }
+            string[] lines = WrapLines(g, row.Text, w - S(28), fBody);
+            int ty = capY + capH + S(2);
+            foreach (string ln in lines)
+            {
+                if (InViewport(ty, lh, top, bottom))
+                    TextRenderer.DrawText(g, ln, fBody, new Point(x + pad, ty), Ink, Color.Transparent);
+                ty += lh;
+            }
+            ry += rh;
+        }
+    }
+
+    string[] WrapLines(Graphics g, string text, int width, Font font)
+    {
+        List<string> res = new List<string>();
+        foreach (string raw in text.Split('\n'))
+        {
+            string line = raw;
+            if (line.Length == 0) { res.Add(""); continue; }
+            while (line.Length > 0)
+            {
+                int take = line.Length;
+                while (take > 1 && TextRenderer.MeasureText(g, line.Substring(0, take), font).Width > width)
+                    take--;
+                res.Add(line.Substring(0, take));
+                line = line.Substring(take);
+            }
+        }
+        return res.ToArray();
+    }
+
+    int DrawCheatNotes(Graphics g, int x, int y, int w, int top, int bottom)
+    {
+        int pad = S(14), capH = S(21);
+        int lh = TextRenderer.MeasureText(g, "国", fBody).Height + S(2);
+        int h = S(22) + S(8) + S(6);
+        foreach (CheatRow r in CheatNotes) h += CheatRowHeight(g, r, w);
+        Rectangle box = new Rectangle(x, y, w, h);
+        Card(g, box);
+        using (GraphicsPath p = Round(box, S(12)))
+        using (Pen pen = new Pen(Color.FromArgb(170, Warn), 1.2f)) g.DrawPath(pen, p);
+        if (InViewport(y, S(22), top, bottom))
+            TextRenderer.DrawText(g, "最容易按错的三件事", fHead, new Point(x + pad, y + S(5)), Warn, Color.Transparent);
+        int ry = y + S(22);
+        foreach (CheatRow r in CheatNotes)
+        {
+            int rh = CheatRowHeight(g, r, w);
+            int capY = ry + S(1);
+            int gw = Keycaps.GroupWidth(g, r.Glyph, capH);
+            if (InViewport(capY, capH, top, bottom))
+            {
+                Keycaps.DrawGroup(g, r.Glyph, x + pad, capY, capH, false);
+                Keycaps.DrawGroup(g, r.Pc, x + pad + gw + S(6), capY, capH, true);
+            }
+            int ty = capY + capH + S(2);
+            foreach (string ln in WrapLines(g, r.Text, w - S(28), fBody))
+            {
+                if (InViewport(ty, lh, top, bottom))
+                    TextRenderer.DrawText(g, ln, fBody, new Point(x + pad, ty), Ink, Color.Transparent);
+                ty += lh;
+            }
+            ry += rh;
+        }
+        return h;
+    }
+
+    // 通用细滚动条：主窗口右栏不用了，独立详细按键窗口调用同一套画法
+    void DrawScrollBar(Graphics g, int x, int y, int h, int scroll, int max, int contentH, int viewport)
+    {
+        if (max <= 0) return;
         using (SolidBrush b = new SolidBrush(Color.FromArgb(45, Gold)))
-            g.FillRectangle(b, trackX, trackY, S(3), trackH);
-        using (GraphicsPath p = Round(new Rectangle(trackX - S(1), thumbY, S(5), thumbH), S(2)))
+            g.FillRectangle(b, x, y, S(3), h);
+        int thumbH = Math.Max(S(24), (int)((long)h * viewport / Math.Max(1, contentH)));
+        int thumbY = y + (int)((long)(h - thumbH) * scroll / Math.Max(1, max));
+        using (GraphicsPath p = Round(new Rectangle(x - S(1), thumbY, S(5), thumbH), S(2)))
         using (SolidBrush b = new SolidBrush(Color.FromArgb(160, Gold)))
             g.FillPath(b, p);
     }
@@ -558,11 +799,11 @@ class Launcher : Form
 
     void DrawFooter(Graphics g)
     {
-        int y = S(578);
+        int y = ClientSize.Height - S(42);
         using (Pen p = new Pen(GoldDim, 1f))
-            g.DrawLine(p, colLeft.X, S(566), ClientSize.Width - S(20), S(566));
+            g.DrawLine(p, colLeft.X, ClientSize.Height - S(54), ClientSize.Width - S(20), ClientSize.Height - S(54));
         using (Pen sh = new Pen(Color.FromArgb(90, 0, 0, 0), 1f))
-            g.DrawLine(sh, colLeft.X, S(567), ClientSize.Width - S(20), S(567));
+            g.DrawLine(sh, colLeft.X, ClientSize.Height - S(53), ClientSize.Width - S(20), ClientSize.Height - S(53));
         StatusDot(g, status, statusColor, colLeft.X, y);
         string hint = busy ? "关窗只是隐藏，游戏继续跑" : "游戏退出后本窗口自动关闭";
         Size sz = TextRenderer.MeasureText(g, hint, fMono);
@@ -642,36 +883,6 @@ class Launcher : Form
         if (focused) FocusRing(g, r);
     }
 
-    void Keycap(Graphics g, string label, int x, int y, int w, int h)
-    {
-        Rectangle r = new Rectangle(x, y, w, h);
-        using (GraphicsPath p = Round(r, S(5)))
-        {
-            using (LinearGradientBrush b = new LinearGradientBrush(r, CapFace, CapSide, LinearGradientMode.Vertical))
-                g.FillPath(b, p);
-            using (Pen edge = new Pen(PanelEdge, 1f)) g.DrawPath(edge, p);
-        }
-        using (Pen hi = new Pen(Color.FromArgb(95, CapTopHi), 1f))
-            g.DrawLine(hi, r.X + S(3), r.Y + S(2), r.Right - S(3), r.Y + S(2));
-        using (Pen sh = new Pen(Color.FromArgb(90, 0, 0, 0), 1f))
-            g.DrawLine(sh, r.X + S(3), r.Bottom - S(2), r.Right - S(3), r.Bottom - S(2));
-        Font f = CapFont(label);
-        TextRenderer.DrawText(g, label, f,
-            new Rectangle(r.X, r.Y - S(1), r.Width, r.Height), Ink, Color.Transparent,
-            TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-    }
-
-    Font CapFont(string label)
-    {
-        foreach (char c in label) if (c >= 0x3000) return fCapZh;
-        return fCap;
-    }
-
-    int CapWidth(Graphics g, string label)
-    {
-        return Math.Max(S(22), TextRenderer.MeasureText(g, label, CapFont(label)).Width + S(12));
-    }
-
     void StatusDot(Graphics g, string text, Color dot, int x, int y)
     {
         using (SolidBrush b = new SolidBrush(dot))
@@ -725,121 +936,10 @@ class Launcher : Form
         return y;
     }
 
-    // ---------- 键帽表（动作含义来自移植器「控制」页 + README，纯键盘一套） ----------
-    void RebuildLegend()
-    {
-        legend = new LegendItem[]
-        {
-            G("左摇杆", "移动", "W", "A", "S", "D"),
-            G("右摇杆", "前后左右翻滚", "↑", "↓", "←", "→"),
-            G("square", "轻攻击", "J"),
-            G("triangle", "重攻击", "K"),
-            G("cross", "跳跃", "空格"),
-            G("circle", "抓取 / 确认", "L"),
-            G("L1", "防御 / 弹反", "Q"),
-            G("R1", "投链刃", "E"),
-            G("L2", "瞄准", "R"),
-            G("R2", "斯巴达之怒", "T"),
-            G("方向键", "切换武器", "1", "2", "3", "4"),
-            G("右摇杆", "闪避", "左Shift"),
-            G("L1+○", "快捷抓取", "C"),
-            G("触摸板", "暂停", "Esc"),
-            G("移植器", "设置菜单", "Insert")
-        };
-    }
+    // 键帽全部走通用库 src\Keycaps.cs（PC / PS / Switch / Xbox 一套标准件），
+    // 本文件不再自带任何临时键帽画法。
 
-    static LegendItem Item(string caption, params string[] caps)
-    {
-        LegendItem it = new LegendItem();
-        it.Caption = caption;
-        it.Caps = caps;
-        return it;
-    }
-
-    static LegendItem G(string glyph, string caption, params string[] caps)
-    {
-        LegendItem it = Item(caption, caps);
-        it.Glyph = glyph;
-        return it;
-    }
-
-    int GlyphSize { get { return S(26); } }
-
-    int GlyphWidth(Graphics g, string sym)
-    {
-        if (IsFaceGlyph(sym)) return S(26);
-        if (IsLabelGlyph(sym)) return S(32);
-        return Math.Max(S(34), TextRenderer.MeasureText(g, sym, fCap).Width + S(10));
-    }
-
-    static bool IsFaceGlyph(string sym)
-    {
-        return sym == "square" || sym == "circle" || sym == "cross" || sym == "triangle";
-    }
-
-    static bool IsLabelGlyph(string sym)
-    {
-        return sym == "L1" || sym == "L2" || sym == "R1" || sym == "R2";
-    }
-
-    // 游戏画面上显示的手柄按键：□ △ ✕ ○ 用官方配色画符号，
-    // L1/L2/R2、摇杆、方向键这类画成同款拟物小帽写名字，玩家照着画面找键即可。
-    void PsGlyph(Graphics g, string sym, int x, int y, int w, int h)
-    {
-        Rectangle r = new Rectangle(x, y, w, h);
-        using (GraphicsPath p = Round(r, S(5)))
-        {
-            using (LinearGradientBrush b = new LinearGradientBrush(r, CapFace, CapSide, LinearGradientMode.Vertical))
-                g.FillPath(b, p);
-            using (Pen edge = new Pen(PanelEdge, 1f)) g.DrawPath(edge, p);
-        }
-        using (Pen hi = new Pen(Color.FromArgb(95, CapTopHi), 1f))
-            g.DrawLine(hi, r.X + S(3), r.Y + S(2), r.Right - S(3), r.Y + S(2));
-        if (!IsFaceGlyph(sym))
-        {
-            string label = sym;
-            Font f = fCap;
-            if (TextRenderer.MeasureText(g, label, f).Width > w - S(6)) f = fCapZh;
-            TextRenderer.DrawText(g, label, f,
-                new Rectangle(r.X, r.Y - S(1), r.Width, r.Height), Gold, Color.Transparent,
-                TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
-            return;
-        }
-        Color c;
-        switch (sym)
-        {
-            case "cross": c = Color.FromArgb(0x7C, 0xC3, 0xEE); break;
-            case "circle": c = Color.FromArgb(0xE8, 0x7B, 0x7B); break;
-            case "square": c = Color.FromArgb(0xEA, 0x9A, 0xC4); break;
-            default: c = Color.FromArgb(0x8F, 0xD9, 0xA6); break;
-        }
-        float cxp = r.X + r.Width / 2f, cyp = r.Y + r.Height / 2f;
-        float s = Math.Min(r.Width, r.Height) * 0.30f;
-        using (Pen pen = new Pen(c, Math.Max(1.4f, S(2) * 0.7f)))
-        {
-            pen.StartCap = LineCap.Round;
-            pen.EndCap = LineCap.Round;
-            if (sym == "square")
-                g.DrawRectangle(pen, cxp - s, cyp - s, s * 2f, s * 2f);
-            else if (sym == "circle")
-                g.DrawEllipse(pen, cxp - s, cyp - s, s * 2f, s * 2f);
-            else if (sym == "cross")
-            {
-                g.DrawLine(pen, cxp - s, cyp - s, cxp + s, cyp + s);
-                g.DrawLine(pen, cxp + s, cyp - s, cxp - s, cyp + s);
-            }
-            else
-            {
-                PointF[] tri = new PointF[]
-                {
-                    new PointF(cxp, cyp - s * 1.15f),
-                    new PointF(cxp + s * 1.15f, cyp + s * 0.85f),
-                    new PointF(cxp - s * 1.15f, cyp + s * 0.85f)
-                };
-                g.DrawPolygon(pen, tri);
-            }
-        }
-    }
+    // 键帽绘制只在通用库里，见 templates\Keycaps.cs
 
     // ---------- 输入 ----------
     int HitTest(Point pt)
@@ -848,12 +948,17 @@ class Launcher : Form
         if (!busy && rcFix.Contains(pt)) return 1;
         if (rcLog.Contains(pt)) return 2;
         if (rcExit.Contains(pt)) return 3;
+        if (rcCheats.Contains(pt)) return 5;
         return -1;
     }
 
     Rectangle ButtonsRect
     {
-        get { return Rectangle.Union(Rectangle.Union(Rectangle.Union(rcStart, rcFix), rcLog), rcExit); }
+        get
+        {
+            Rectangle r = Rectangle.Union(Rectangle.Union(Rectangle.Union(rcStart, rcFix), rcLog), rcExit);
+            return Rectangle.Union(r, rcCheats);
+        }
     }
 
     void RepaintControls()
@@ -983,19 +1088,6 @@ class Launcher : Form
         Activate(i);
     }
 
-    protected override void OnMouseWheel(MouseEventArgs e)
-    {
-        if (rightScrollMax > 0 && colRight.Contains(e.Location))
-        {
-            rightScroll -= e.Delta;
-            if (rightScroll < 0) rightScroll = 0;
-            if (rightScroll > rightScrollMax) rightScroll = rightScrollMax;
-            Invalidate(colRight);
-            return;
-        }
-        base.OnMouseWheel(e);
-    }
-
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
         switch (keyData)
@@ -1022,7 +1114,7 @@ class Launcher : Form
 
     void CycleFocus(int delta)
     {
-        int[] order = busy ? new int[] { 2, 3 } : new int[] { 4, 0, 1, 2, 3 };
+        int[] order = busy ? new int[] { 2, 3 } : new int[] { 4, 0, 1, 2, 3, 5 };
         int idx = Array.IndexOf(order, focus);
         if (idx < 0) idx = delta > 0 ? order.Length - 1 : 0;
         focus = order[((idx + delta) % order.Length + order.Length) % order.Length];
@@ -1032,10 +1124,24 @@ class Launcher : Form
     void Activate(int i)
     {
         if (i == 4) { ShowModeMenu(); return; }
+        if (i == 5) { OpenCheatSheet(); return; }
         if (i == 0) { StartGame(); return; }
         if (i == 1) { FixResolution(); return; }
         if (i == 2) { OpenLog(); return; }
         if (i == 3) { Close(); }
+    }
+
+    // 「详细按键」按钮：开一个普通窗口，不用 ShowDialog，主窗口照样能点、能关、能启动游戏
+    void OpenCheatSheet()
+    {
+        if (cheatSheet != null && !cheatSheet.IsDisposed)
+        {
+            cheatSheet.Activate();
+            return;
+        }
+        cheatSheet = new CheatSheetForm(this);
+        cheatSheet.Show();
+        Log("打开完整按键速查窗口（普通窗口，非模态，位置错开主窗口）");
     }
 
     // ---------- 启动逻辑 ----------
@@ -1329,6 +1435,7 @@ class Launcher : Form
                 case "gameargs": gameArgs = val; break;
                                 case "intro": intro = val; break;
                                 case "centernote": centerNote = val; break;
+                                case "combohint": comboHint = val; break;
             }
         }
     }
@@ -1345,6 +1452,11 @@ class Launcher : Form
         if (fMono != null) fMono.Dispose();
         if (fBrand != null) fBrand.Dispose();
         if (modeMenu != null) { modeMenu.Dispose(); modeMenu = null; }
+        if (cheatSheet != null)
+        {
+            try { cheatSheet.Close(); } catch { }
+            cheatSheet = null;
+        }
 
         base.OnFormClosed(e);
     }
@@ -1393,6 +1505,131 @@ class Launcher : Form
         {
             using (Pen p = new Pen(MenuEdge, 1f))
                 e.Graphics.DrawRectangle(p, 0, 0, e.ToolStrip.Width - 1, e.ToolStrip.Height - 1);
+        }
+    }
+
+    // ---------- 完整按键速查：独立普通窗口（用户定案 2026-11-05） ----------
+    // 主窗口回归规范三栏 900×620，长表搬到这里。用 Show() 不用 ShowDialog()：
+    // 非模态、主窗口照常能点；位置自动错开放在主窗口旁边，不盖住主窗口。
+    // 绘制、键帽、数据全部复用主窗口那套方法，不另抄一份，避免两边漂移。
+    class CheatSheetForm : Form
+    {
+        readonly Launcher owner;
+        readonly Point hostHome;
+        int scroll, scrollMax;
+        Size loggedSize;
+
+        public CheatSheetForm(Launcher host)
+        {
+            owner = host;
+            hostHome = host.Location;
+            Text = "战神III 重制版 · 完整按键速查";
+            DoubleBuffered = true;
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint
+                   | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+            AutoScaleMode = AutoScaleMode.None;
+            // 允许玩家最大化 / 拖边框放大（用户定案 2026-11-05）：绘制按 ClientSize 自适应重排两列，
+            // 放大后说明更容易一行放下，仍争取一屏看全。主窗口仍是 FixedDialog 不许放大。
+            FormBorderStyle = FormBorderStyle.Sizable;
+            MaximizeBox = true;
+            StartPosition = FormStartPosition.Manual;
+            BackColor = BgMid;
+            KeyPreview = true;
+            PlaceBesideHost();
+        }
+
+        // 两窗口并排：主窗口让位到工作区左侧，详细窗口占右侧全部剩余宽度。
+        // 这样详细窗口够宽（两列、说明一行、争取一屏看全），又完全不盖住主窗口。
+        void PlaceBesideHost()
+        {
+            Rectangle wa = Screen.PrimaryScreen.WorkingArea;
+            int gap = owner.S(12);
+            int hostW = owner.Bounds.Width;
+            int w = Math.Min(wa.Width - hostW - gap * 3, owner.S(1400));
+            int h = wa.Height - gap * 2;
+            if (w < owner.S(700))
+            {
+                // 屏幕太窄并排不下：退化为贴右的大窗口，仍是非模态普通窗口
+                w = Math.Min(owner.S(1400), wa.Width - gap * 2);
+                Size = new Size(w, h);
+                Location = new Point(wa.Right - w - gap, wa.Top + gap);
+                return;
+            }
+            Size = new Size(w, h);
+            owner.Location = new Point(wa.Left + gap, Math.Max(wa.Top, hostHome.Y));
+            Location = new Point(owner.Bounds.Right + gap, wa.Top + gap);
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+            PlaceBesideHost();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+            owner.DrawLeatherBg(g, new Rectangle(0, 0, ClientSize.Width, ClientSize.Height));
+            int pad = owner.S(8);
+            Rectangle col = new Rectangle(pad, pad, ClientSize.Width - pad * 2, ClientSize.Height - pad * 2);
+            owner.Card(g, col);
+            Region oldClip = g.Clip;
+            g.SetClip(Rectangle.Inflate(col, -owner.S(6), -owner.S(6)), CombineMode.Replace);
+            int top = col.Y + owner.S(6), bottom = col.Bottom - owner.S(6);
+            int startY = col.Y + owner.S(8) - scroll;
+            int endY = owner.DrawCheatContent(g, col, startY, top, bottom);
+            int contentH = endY - startY;
+            int viewport = col.Height - owner.S(8) - owner.S(8);
+            int max = Math.Max(0, contentH - viewport);
+            scrollMax = max;
+            // 尺寸变化（含玩家最大化 / 拖边框）都记一行，实机可确认放大后仍需滚动 0
+            if (loggedSize != ClientSize)
+            {
+                loggedSize = ClientSize;
+                Log("详细按键窗口：" + ClientSize.Width + "×" + ClientSize.Height +
+                    "，内容高 " + contentH + "，视口 " + viewport + "，需滚动 " + max + "px");
+            }
+            int clamped = Math.Max(0, Math.Min(scroll, max));
+            if (clamped != scroll) { scroll = clamped; Invalidate(); }
+            g.Clip = oldClip;
+            owner.DrawScrollBar(g, col.Right - owner.S(9), col.Y + owner.S(10),
+                col.Height - owner.S(20), scroll, max, contentH, viewport);
+        }
+
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            ScrollBy(-e.Delta);
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.PageDown: ScrollBy(ClientSize.Height - owner.S(90)); return true;
+                case Keys.PageUp: ScrollBy(-(ClientSize.Height - owner.S(90))); return true;
+                case Keys.Home: ScrollBy(-1000000); return true;
+                case Keys.End: ScrollBy(1000000); return true;
+                case Keys.Escape: Close(); return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        void ScrollBy(int delta)
+        {
+            int v = Math.Max(0, Math.Min(scroll + delta, scrollMax));
+            if (v == scroll) return;
+            scroll = v;
+            Invalidate();
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            base.OnFormClosed(e);
+            if (owner.cheatSheet == this) owner.cheatSheet = null;
+            // 详细窗口关掉后把主窗口放回原位（启动仍是规范要求的屏幕居中）
+            try { if (!owner.IsDisposed) owner.Location = hostHome; } catch { }
         }
     }
 
@@ -1477,8 +1714,8 @@ class Launcher : Form
             { "cross", "Space", "Space" },
             { "l1", "Q", "Q" },
             { "r1", "E", "E" },
-            { "l2", "R", "R" },
-            { "r2", "T", "Mouse Forward" },
+            { "l2", "U", "R" },
+            { "r2", "O", "Mouse Forward" },
             { "l3", "None", "None" },
             { "r3", "None", "None" },
             { "rage", "F", "F" },
@@ -1489,7 +1726,7 @@ class Launcher : Form
             { "down", "3", "3" },
             { "left", "4", "4" },
             { "right", "2", "2" },
-            { "grab", "C", "C" },
+            { "grab", "I", "C" },
             { "dodge", "Left Shift", "Mouse Back" },
             { "weapon_next", "None", "Wheel Up" },
             { "weapon_prev", "None", "Wheel Down" }
@@ -1588,7 +1825,7 @@ class Launcher : Form
                 {
                     Backup(path, dir);
                     File.WriteAllText(path, updated, new UTF8Encoding(false));
-                    message = "已写入按键方案：纯键盘（J 轻攻击 / K 重攻击 / L 抓取 / Q 防御 / T 射击 / 左Shift 闪避）";
+                    message = "已写入按键方案：纯键盘（J 轻击 / K 重击 / I 连招换武器 / Q 防御 / U 道具 / O 魔法）";
                 }
                 else message = "按键方案已是当前选择";
                 return true;

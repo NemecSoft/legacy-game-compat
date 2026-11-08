@@ -1,9 +1,15 @@
 param(
   [string]$GameDir = 'D:\YunGame\E\Heroes3',
-  [string]$EvidenceDir = (Join-Path $PSScriptRoot '..\evidence')
+  [string]$EvidenceDir = (Join-Path $PSScriptRoot '..\evidence'),
+  [switch]$AllowGameLaunch
 )
 
 $ErrorActionPreference = 'Stop'
+# 这个脚本要真开一次游戏才能送按键（AGENTS 规则 24 第 14 类：收尾不许顺手拉起游戏）
+if (-not $AllowGameLaunch) {
+  Write-Output '这个脚本会真启动一次游戏来送快捷键。确认要跑就加 -AllowGameLaunch（规则 24 第 14 条）。'
+  exit 90
+}
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type @"
@@ -15,6 +21,7 @@ public class HotkeyTest {
   [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
   [DllImport("user32.dll")] public static extern void keybd_event(byte vk, byte scan, uint flags, UIntPtr e);
   [DllImport("user32.dll")] public static extern int GetWindowLong(IntPtr h, int index);
+  [DllImport("user32.dll")] public static extern bool PrintWindow(IntPtr h, IntPtr dc, uint flags);
   public struct RECT { public int Left, Top, Right, Bottom; }
   public static void Tap(byte vk) {
     keybd_event(vk, 0, 0, UIntPtr.Zero);
@@ -34,11 +41,19 @@ public class HotkeyTest {
 "@
 
 function Shot([string]$name) {
-  $b = [System.Windows.Forms.SystemInformation]::VirtualScreen
-  $bmp = New-Object System.Drawing.Bitmap($b.Width, $b.Height)
-  $g = [System.Drawing.Graphics]::FromImage($bmp)
-  $g.CopyFromScreen($b.Left, $b.Top, 0, 0, $bmp.Size)
-  $g.Dispose()
+  # 只用 PrintWindow 抓游戏自己的窗口；CopyFromScreen 会把用户桌面上的别的东西一起带进证据（pitfalls 77）
+  $g = Get-Process -Name Heroes3 -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
+  if (-not $g) { return }
+  $r = New-Object HotkeyTest+RECT
+  [HotkeyTest]::GetWindowRect($g.MainWindowHandle, [ref]$r) | Out-Null
+  $w = $r.Right - $r.Left; $h = $r.Bottom - $r.Top
+  if ($w -le 0 -or $h -le 0 -or $w -gt 16384 -or $h -gt 16384) { return }
+  $bmp = New-Object System.Drawing.Bitmap($w, $h)
+  $gr = [System.Drawing.Graphics]::FromImage($bmp)
+  $hdc = $gr.GetHdc()
+  [HotkeyTest]::PrintWindow($g.MainWindowHandle, $hdc, 2) | Out-Null   # PW_RENDERFULLCONTENT
+  $gr.ReleaseHdc($hdc)
+  $gr.Dispose()
   $path = Join-Path $EvidenceDir $name
   $bmp.Save($path, [System.Drawing.Imaging.ImageFormat]::Png)
   $bmp.Dispose()

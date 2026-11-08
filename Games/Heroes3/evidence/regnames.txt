@@ -1,0 +1,12 @@
+7c7204 -> 7c75c4 'SOFTWARE\\New World Computing\\Heroes of Might and Magic\xae III\\1.0'
+
+7c7208 -> 7c75b4 'Walk Speed'
+
+7c7210 -> 7c758c 'Music Volume'
+
+7c7234 -> 7c74ec 'Window Scroll Speed'
+
+7c7238 -> 7c74d4 'Blackout Computer'
+
+7c7248 -> 7c7484 'First Time'
+

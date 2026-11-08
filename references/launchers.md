@@ -7,7 +7,7 @@ bat 用 `echo` 自己生成菜单，菜单项、顺序、默认值与 exe 完全
 （自检补层、恢复默认配置、阻塞等退出、回传退出码）。`/go` 参数在两边都表示「跳过界面/菜单，按默认项启动」。
 
 **固定文案与栏目顺序**见技能 `.qoder\skills\legacy-launcher-gui\SKILL.md` 的「文案规范」：
-左栏「关于这款游戏 / 玩不了或报错」，右栏「进游戏说明 → 操作说明 → 提示」，用词统一「管理员」；
+左栏「关于这款游戏 / 玩不了或报错」，右栏「进游戏说明 → 操作说明 → 提示」，用词统一「发给我们」（不写「管理员」）；
 秘技必须全文写在界面里，不许写“去某文件看”。
 
 ## 平台托管契约（GUI 替代 bat 的前提）
@@ -33,7 +33,7 @@ bat 用 `echo` 自己生成菜单，菜单项、顺序、默认值与 exe 完全
 | 文件 | `game_starter.bat` | `game_starter.exe` + `launcher.ini` |
 | 适合 | 控制台玩家；不想编译；平台只认脚本时用 `/go`；同一套选项做双入口 | 默认交付；键帽操作表；被平台托管 |
 | 依赖 | 系统 `cmd` | .NET Framework 4.x（Win10/11 自带） |
-| 体积 | 1 个文本文件 | 约 10–30 KB（自绘版实测 27.5 KB，红线 60 KB） |
+| 体积 | 1 个文本文件 | 约 30–70 KB（含通用键帽库实测 64 KB；上限 1 MB，2026-11-04 用户放宽） |
 | 主题 | 红底白字 `color 4f` + 菜单 | 拟物皮革：`#3A2015→#1C0F0A` + 黄铜金 `#E3C07A` / 烫金 `#F0D596` |
 
 ## 共同硬要求
@@ -160,7 +160,13 @@ exit /b %ERRORLEVEL%
 单文件 WinForms，零第三方依赖，用系统自带的 `csc.exe` 编译。
 
 **界面规范（配色令牌、三栏布局、键帽画法、键盘焦点、体积红线）见技能
-`.qoder\skills\legacy-launcher-gui\SKILL.md`**；参考实现是 `Games\RoadRash\src\Launcher.cs`
+`.qoder\skills\legacy-launcher-gui\SKILL.md`**；其中硬约束 19 要求：卡片说明、底部提醒、口诀里
+  凡提到手柄键名，都要紧跟对应键盘键或配一组「手柄键帽 + 金色 PC 键帽」，纯手柄功能写明
+「本方案未绑定键盘键」，别让玩家看着 `R2` / `○` 猜键盘。
+硬约束 20：长表放不下时主窗口仍保持 900×620 三栏，右栏只留极简常用键 +「详细按键」按钮，
+点开独立的普通窗口（非模态、默认与主窗口并排不遮挡、沿用两列结构、去掉顶部标题、一页看全）；
+这个独立窗口要 `Sizable` + `MaximizeBox=true`，玩家可以最大化，放大后按 ClientSize 重排仍一屏看全。
+参考实现是 `Games\RoadRash\src\Launcher.cs`
 （纯 GDI+ 自绘、零图片、game_starter.exe 24 KB）。`templates\Launcher.cs` 是最小可用版（Label + ComboBox），
 只适合不需要展示操作说明的极简场景。
 
@@ -186,7 +192,8 @@ btn.FlatAppearance.BorderColor = Color.FromArgb(0xB9, 0x8A, 0x55); // 黄铜描�
 统一启动器图标固定用**仓库资源 `assets\ico.ico`**（构建时 `-win32icon:` 嵌入，运行时取 exe 自身图标），
 不要写 `D:\ico.ico` 这种构建机路径，也不要从游戏 exe 抽图标；游戏目录与 src 仍不允许出现 ico。
 
-构建后跑一次体积/资源检查（红线 60 KB，游戏目录与 src 不许出现图片/图标/resx）：
+构建后跑一次体积/资源检查（exe ≤ 1 MB，游戏目录与 src 不许出现图片/图标/resx；
+早期 60 KB 经验值已于 2026-11-04 作废，见 `.qoder\skills\legacy-launcher-gui\references\keycaps.md` §5）：
 
 ```bat
 pwsh -File .qoder\skills\legacy-launcher-gui\scripts\check-launcher.ps1 -Exe out\game_starter.exe -SrcDir Games\<游戏>\src
@@ -213,7 +220,7 @@ FixTips=...\n...                    ; 自绘版右栏故障说明
 
 - `GameExe`：直接启动的游戏 exe。
 - `LayerDll` / `LayerIni` / `LayerBackupDir`：自检和恢复用；默认启动时从备份目录恢复 `LayerIni`。
-- `RegFile64` / `RegFile32`：按 `Environment.Is64BitOperatingSystem` 选择导入；没有管理员权限时静默跳过。
+- `RegFile64` / `RegFile32`：按 `Environment.Is64BitOperatingSystem` 选择导入；写不进就静默跳过并记日志。
 - 外挂型游戏可另加 `LoaderExe` / `GameProcess`，行为见 `templates/Launcher.cs`。
 - 界面文案（介绍 / 菜单 / 故障）能从 ini 覆盖，换游戏不改代码；行首 `# ` 是栏内小标题。
 
@@ -232,6 +239,10 @@ FixTips=...\n...                    ; 自绘版右栏故障说明
 - 自绘版基准尺寸 900×620（三栏），模板版约 600×380；统一拟物皮革（深棕皮革底 + 黄铜金 / 烫金标题）。
 - 启动方式下拉只给两个玩家能懂的结果：`游戏自动检测（推荐）` / `画面异常时（固定桌面分辨率）`；
   不要写「备份 / 直接启动 / 自动检测（重置）/ config」。默认游戏自动检测，画面不对再选固定桌面分辨率。
+  **下拉框上方必须写清用途**（「启动选项」标签与框之间、紧贴框）：
+  「本下拉框的作用是：如果有闪退等异常，换另一种模式，再启动游戏试试。」
+  前缀不许省，不许挪到框下或并到「启动说明」标题下。
+  （2026-11-05 定案，见 `.qoder\skills\legacy-launcher-gui\SKILL.md` 硬约束 18；已交付的不返工）。
 - 确实需要下拉框时：不要半自绘原生 ComboBox（`OwnerDrawFixed` + `FlatStyle.Flat` 容易闪）；
   用自绘双缓冲 `Panel` + `ContextMenuStrip`，或接受系统外观的原生 ComboBox；
   父窗体 hover/选中只刷按钮区，不整窗 `Invalidate()`。
@@ -265,7 +276,9 @@ FixTips=...\n...                    ; 自绘版右栏故障说明
 - **启动选项只用一个下拉框**，选项文字直接描述（`桌面分辨率（推荐）`、`直接启动（不改设置）`）；
   不单独显示「画面/分辨率」信息块；修复按钮写明修复对象（`修复分辨率`），不要用「修复画面」；
   状态栏默认只写「已就绪」，不重复显示分辨率。中栏标题用「启动说明」，说明文字、下拉框、
-  启动按钮紧挨着排，不要上下拉出大段空白。
+  启动按钮紧挨着排，不要上下拉出大段空白。**下拉框上方要有一句用途说明**
+  （「本下拉框的作用是：如果有闪退等异常，换另一种模式，再启动游戏试试。」，
+  紧贴框、放在「启动选项」标签与框之间，见 SKILL.md 硬约束 18）。
 
 ## 目录布局（交付时）
 

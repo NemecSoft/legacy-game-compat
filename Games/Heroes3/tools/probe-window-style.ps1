@@ -1,4 +1,9 @@
-param([int]$Mode = 6, [int]$WaitSec = 26)
+param([int]$Mode = 6, [int]$WaitSec = 26, [switch]$AllowGameLaunch)
+# 这个脚本用 /go /mode 零交互启动，会把游戏真拉起来一次（AGENTS 规则 24 第 14 类：收尾不许顺手起游戏）
+if (-not $AllowGameLaunch) {
+  Write-Output '这个脚本会真启动一次游戏（/go /mode=…）。确认要跑就加 -AllowGameLaunch（规则 24 第 14 条）。'
+  exit 90
+}
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type @'
 using System; using System.Text; using System.Runtime.InteropServices;

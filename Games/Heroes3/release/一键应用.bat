@@ -1,5 +1,9 @@
 @echo off&color 4f
 setlocal EnableExtensions EnableDelayedExpansion
+rem 本文件是 GBK；从 UTF-8 控制台（例如 pwsh 7）调用时 cmd 会按 65001 解码，中文全乱码、
+rem 连「交付记录.txt」都会写成乱码文件名，下一次撤回就找不到记录。这里把代码页钉死成 936，
+rem 不管谁怎么调用都走同一条路（AGENTS 规则 24 第 10 类、规则 37）。
+chcp 936 >nul
 set "tl=一键应用 - 英雄无敌3：死亡阴影"
 title %tl%
 mode con: lines=36 cols=100 >nul 2>&1

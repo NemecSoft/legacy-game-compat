@@ -3,11 +3,13 @@ game_starter.bat
 launcher.ini
 ºÊ»›–ﬁ∏¥.bat
 ddraw.dll
+ipxwrapper.dll
+dpwsockx.dll
+mswsock.dll
+wsock32.dll
+dplay-setup.exe
 dgVoodoo.conf
 ddraw.ini
-ddraw-43.ini
-ddraw-window.ini
-ddraw-640.ini
 _presets\ddraw.ini
 _presets\ddraw-43.ini
 _presets\ddraw-window.ini

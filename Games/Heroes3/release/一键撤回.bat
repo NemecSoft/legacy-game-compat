@@ -1,5 +1,8 @@
 @echo off&color 4f
 setlocal EnableExtensions EnableDelayedExpansion
+rem 代码页钉死 936：从 UTF-8 控制台（pwsh 7）调用时 cmd 会按 65001 解码 GBK 字节，
+rem 连「交付记录.txt」都会写成乱码文件名，撤回就找不到记录（和 一键应用.bat 同一处理）。
+chcp 936 >nul
 set "tl=一键撤回 - 英雄无敌3：死亡阴影"
 title %tl%
 mode con: lines=36 cols=100 >nul 2>&1

@@ -22,13 +22,16 @@ if (Test-Path $oldIco) { Remove-Item $oldIco -Force }
 
 $cscArgs = @('-nologo', '-target:winexe', '-optimize+', '-platform:anycpu', '-codepage:65001',
   '-r:System.Windows.Forms.dll', '-r:System.Drawing.dll', ('-out:' + $exe), ('-win32icon:' + $icon))
+# 通用拟物键帽库（templates\Keycaps.cs 的整份拷贝，所有平台共用一套标准件）
+$cscArgs += (Join-Path $Src 'Keycaps.cs')
 $cscArgs += (Join-Path $Src 'Launcher.cs')
 & $csc @cscArgs
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path $exe)) { throw '编译失败' }
 Write-Host "已编译 $exe"
 $check = Join-Path $Repo '.qoder\skills\legacy-launcher-gui\scripts\check-launcher.ps1'
 if (Test-Path $check) {
-  & $check -Exe $exe -SrcDir $Src -MaxKB 60
+  # 2026-11-04 用户放宽：exe ≤ 1 MB 即可（通用键帽库等标准件进来后 60KB 太紧）
+  & $check -Exe $exe -SrcDir $Src -MaxKB 1024
   if ($LASTEXITCODE -ne 0) { throw '启动器 GUI 规范检查未通过' }
 }
 
