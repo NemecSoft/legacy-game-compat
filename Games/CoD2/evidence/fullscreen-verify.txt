@@ -1,0 +1,15 @@
+INFO 启动前初始档：r_fullscreen=1 r_mode=1920x1080
+PASS 启动器把游戏拉起来了（pid 20644）
+PASS 全程没有对话框（#32770 没出现）
+PASS 游戏主窗口出现（标题：Call of Duty 2）
+PASS 窗口铺满桌面 1920x1080 于 0,0（桌面 1920x1080）
+INFO 全屏实拍：D:\AI\legacy-game-compat\Games\CoD2\tools\..\evidence\shot-fullscreen-default.png（CopyFromScreen 游戏窗口自身矩形，坑 91 口径）
+PASS 关窗后游戏和启动器都退了（干净退出或看门狗兜底）
+PASS 启动器原样回传退出码 0（实际 0）
+PASS 本次是干净退出（没借助看门狗杀进程）
+PASS 退出后 config 仍是全屏（1）
+PASS r_mode = 本机桌面 1920x1080
+PASS 账本 display.state 记了这次归属
+PASS 正常退出没留安全模式标记
+PASS 开场视频标记保持已播（关窗挂起诱因直接消掉）
+PASS 日志记了画面默认值的处理（首次规范或已是全屏只记账）

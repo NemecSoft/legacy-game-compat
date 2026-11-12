@@ -1,0 +1,222 @@
+===== default.cfg (iw_00.iwd, 917 bytes)
+// Hello Dave, Would you like to play a game?
+
+unbindall
+
+
+
+// Movement
+
+bind w	"+forward"
+
+bind s	"+back"
+
+bind a	"+moveleft"
+
+bind d	"+moveright"
+
+
+
+// Lean
+
+bind q	"+leanleft"
+
+bind e	"+leanright"
+
+
+
+// Weapon Controls
+
+bind SHIFT	"+melee_breath"
+
+bind MOUSE1	"+attack"
+
+bind MOUSE2	"toggleads"
+
+
+
+// Weapon Slots
+
+bind 1	"weapnext"
+
+bind 2	"weapnext"
+
+
+
+// Inventory
+
+bind MOUSE3	"+frag"
+
+bind g		"+frag"
+
+bind 4		"+smoke"
+
+bind b		"+binoculars"
+
+
+
+// Interaction
+
+bind f		"+activate"
+
+bind r		"+reload"
+
+bind TAB	"+scores"
+
+
+
+// Stance
+
+bind SPACE	"+gostand"
+
+bind CTRL	"goprone"
+
+bind c		"gocrouch"
+
+
+
+// Mouse movement cvars
+
+set sensitivity		"5"
+
+set cl_freelook		"1"
+
+set ui_mousePitch	"0"
+
+set m_pitch			"0.022"
+
+set m_filter		"0"
+
+set cl_mouseAccel	"0"
+
+
+
+// Menus
+
+bind PAUSE		"toggle cl_paused"
+
+bind ESCAPE		"togglemenu"
+
+bind ~			"toggleconsole"
+
+bind `			"toggleconsole"
+
+
+
+bind F12	"screenshotJPEG"
+
+
+===== safemode.cfg (iw_00.iwd, 514 bytes)
+set r_mode 640x480
+
+set r_displayRefresh 60
+
+set r_aspectRatio auto
+
+set r_textureMode bilinear
+
+set r_aaSamples 1
+
+set r_rendererPreference dx7
+
+set r_gamma 1
+
+set r_swapInterval 0
+
+set r_multiGpu 1
+
+set r_dlightLimit 0
+
+set r_lodScale 1
+
+set r_lodBias 0
+
+set r_zfeather 0
+
+set r_depthPrepassModels 0
+
+set sc_enable 0
+
+set ai_corpseCount 10
+
+set snd_volume 0.8
+
+set snd_khz 22
+
+set mss_3d_provider "Miles Fast 2D Positional Audio"
+
+set cg_subtitles 1
+
+set cg_drawcrosshair 1
+
+set monkeytoy 1
+
+set loc_language 0
+
+
+===== configure.cfg (iw_00.iwd, 142 bytes)
+set r_aspectRatio "auto"
+
+set r_gamma "1"
+
+set r_picmip_manual "0"
+
+set r_swapInterval "0"
+
+set r_textureMode "bilinear"
+
+set r_multiGpu "0"
+
+
+===== ui/options_graphics.cfg (iw_06.iwd, 562 bytes)
+setfromdvar ui_r_mode		r_mode
+
+setfromdvar ui_r_picmip		r_picmip
+
+setfromdvar ui_r_picmip_bump	r_picmip_bump
+
+setfromdvar ui_r_picmip_spec	r_picmip_spec
+
+setfromdvar ui_r_texturemode	r_texturemode
+
+setfromdvar ui_r_texturebits	r_texturebits
+
+setfromdvar ui_r_aspectratio	r_aspectratio
+
+setfromdvar ui_r_rendererpreference	r_rendererpreference
+
+setfromdvar ui_r_picmip_manual	r_picmip_manual
+
+setfromdvar ui_r_swapinterval	r_swapinterval
+
+setfromdvar ui_r_aasamples	r_aasamples
+
+setfromdvar ui_sc_enable	sc_enable
+
+setfromdvar ui_r_displayrefresh	r_displayrefresh
+===== ui/options_graphics_set.cfg (iw_06.iwd, 562 bytes)
+setfromdvar r_mode		ui_r_mode
+
+setfromdvar r_picmip		ui_r_picmip
+
+setfromdvar r_picmip_bump	ui_r_picmip_bump
+
+setfromdvar r_picmip_spec	ui_r_picmip_spec
+
+setfromdvar r_texturemode	ui_r_texturemode
+
+setfromdvar r_texturebits	ui_r_texturebits
+
+setfromdvar r_aspectratio	ui_r_aspectratio
+
+setfromdvar r_rendererpreference	ui_r_rendererpreference
+
+setfromdvar r_picmip_manual	ui_r_picmip_manual
+
+setfromdvar r_swapinterval	ui_r_swapinterval
+
+setfromdvar r_aasamples	ui_r_aasamples
+
+setfromdvar sc_enable	ui_sc_enable
+
+setfromdvar r_displayrefresh	ui_r_displayrefresh

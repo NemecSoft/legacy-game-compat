@@ -93,6 +93,10 @@ class Launcher : Form
     string layerDll = "ddraw.dll";
     string layerIni = "ddraw.ini";
     string layerBackupDir = "_cnc-ddraw";
+    // 启动门禁：只在本进程树里给游戏注入暗号，代理 DLL 校验通过才放行；双击游戏没有暗号就起不来。
+    // 值要和 gate\gate.c 里的 GATE_ENV / GATE_VAL 完全一致；GateEnv= 留空表示不做门禁（回滚/自检用）。
+    string gateEnv = "YUN_GATE_RR";
+    string gateVal = "RR-GATE-OK";
     string intro =
         "《暴力摩托》出自 EA 的 Road Rash 系列，1999 年前后发行，玩家扮飞车党在公路上竞速、互殴、躲警察。\n" +
         "\n" +
@@ -134,6 +138,14 @@ class Launcher : Form
     NotifyIcon tray;                    // 游戏运行期间关窗 = 隐藏陪跑
     bool autoStart;                     // game_starter.exe /go：零交互直接开
 
+    // ---------- 门店广告（黄金版开、钻石版关）----------
+    // 开关走命令行参数：/ad 开、/noad 关（默认关）。网址放 launcher.ini 的 AdUrl，改网址不用重编。
+    // /ad=<网址> 可临时覆盖 ini 里的网址，方便门店快捷方式直接写死一个落地页。
+    bool adEnabled;                     // 本次点「启动游戏」是否先弹广告网页
+    string adUrlOverride;               // /ad=<网址> 带来的覆盖网址，null 表示用 ini
+    string adUrl = "";                  // launcher.ini 的 AdUrl
+    int adDelaySec = 0;                 // 广告打开后停留秒数再启动游戏（默认 0，ini 可配）
+
     // ---------- 字体（按 DPI 建一次） ----------
     Font fTitle, fHead, fRowSel, fRow, fBody, fCap, fCapZh, fMono, fBrand;
     float dpi = 1f;
@@ -159,11 +171,24 @@ class Launcher : Form
         Application.EnableVisualStyles();
         Launcher l = new Launcher();
         foreach (string a in args)
+        {
             if (a == "/go" || a == "-go" || a == "--go" || a == "/auto") l.autoStart = true;
+            // 门店广告开关：/ad 开（用 ini 的 AdUrl），/ad=<网址> 开并覆盖网址，/noad 关。默认关。
+            if (a == "/ad" || a == "-ad" || a == "--ad") { l.adEnabled = true; }
+            else if (a.StartsWith("/ad=", StringComparison.OrdinalIgnoreCase) ||
+                     a.StartsWith("-ad=", StringComparison.OrdinalIgnoreCase) ||
+                     a.StartsWith("--ad=", StringComparison.OrdinalIgnoreCase))
+            {
+                int eq = a.IndexOf('=');
+                if (eq >= 0 && a.Length > eq + 1) { l.adEnabled = true; l.adUrlOverride = a.Substring(eq + 1); }
+            }
+            else if (a == "/noad" || a == "-noad" || a == "--noad") { l.adEnabled = false; }
+        }
         string parentName = ParentProcessName();
         Log("启动参数：" + (args.Length == 0 ? "（无）" : string.Join(" ", args)) +
             "；父进程：" + (parentName.Length == 0 ? "未知" : parentName) +
-            "；零交互：" + (l.autoStart ? "是" : "否"));
+            "；零交互：" + (l.autoStart ? "是" : "否") +
+            "；广告：" + (l.adEnabled ? "开" : "关"));
         if (!BrandGuard.Verify())
         {
             MessageBox.Show("启动器文件被修改，请重新解压。", "启动器");
@@ -1219,7 +1244,9 @@ class Launcher : Form
                 string args = (autoSaveFile == null || !autoLoadSave) ? gameArgs
                     : (gameArgs.Length == 0 ? autoSaveFile : gameArgs + " " + autoSaveFile);
                 Log("交给游戏的启动参数：" + (args.Length == 0 ? "（无）" : args));
-                int code = RunAndWait(AppDir(), exePath, args);
+                Log("启动门禁：" + (gateEnv.Length > 0 ? "已注入暗号 " + gateEnv : "未启用（GateEnv 为空）"));
+                if (adEnabled) ShowAd();   // 黄金版：先弹广告网页、停留几秒，再启动游戏
+                int code = RunAndWait(AppDir(), exePath, args, gateEnv, gateVal);
                 Log("游戏进程退出，退出码 0x" + ((uint)code).ToString("X8") + "，启动器随之退出");
                 RestoreDefaultMode();
                 // 游戏一退出就跟着退出，并把游戏的退出码原样交回启动平台（崩溃码要能被认出来）
@@ -1249,6 +1276,35 @@ class Launcher : Form
         });
         t.IsBackground = true;
         t.Start();
+    }
+
+    // 门店广告：用系统默认浏览器打开广告网页，停留 AdDelaySec 秒再让游戏启动。
+    // 这是给黄金版门店看的；钻石版不带 /ad 参数就不走这里。
+    // 广告打不开（没网址、没浏览器、用户关掉）都不能挡住游戏启动，所以全程吞异常。
+    void ShowAd()
+    {
+        string url = (adUrlOverride != null && adUrlOverride.Length > 0) ? adUrlOverride : adUrl;
+        if (url == null || url.Trim().Length == 0)
+        {
+            Log("广告：已开（/ad）但没配网址，跳过");
+            return;
+        }
+        url = url.Trim();
+        try
+        {
+            // UseShellExecute=true 交给系统默认程序打开网址；走这条不会碰 EnvironmentVariables，
+            // 避开本机 HTTPS_PROXY/https_proxy 大小写重复导致 .NET 字典抛异常的坑。
+            ProcessStartInfo psi = new ProcessStartInfo(url);
+            psi.UseShellExecute = true;
+            Process.Start(psi);
+            Log("广告：已打开网页 " + url + "，停留 " + adDelaySec + " 秒后启动游戏");
+        }
+        catch (Exception ex)
+        {
+            Log("广告：打开失败（不影响游戏）：" + ex.Message);
+            return;
+        }
+        if (adDelaySec > 0) Thread.Sleep(adDelaySec * 1000);
     }
 
     void FinishWith(int code)
@@ -1381,15 +1437,30 @@ class Launcher : Form
         return true;
     }
 
-    static int RunAndWait(string dir, string file, string args)
+    static int RunAndWait(string dir, string file, string args, string gateEnvName = null, string gateValValue = null)
     {
         ProcessStartInfo psi = new ProcessStartInfo(file, args ?? "");
         psi.WorkingDirectory = dir;
         psi.UseShellExecute = false;      // 必须：游戏要挂在 game_starter.exe 名下，平台按进程树认
-        using (Process p = Process.Start(psi))
+        // 启动门禁暗号：只在启动真游戏时传进来。
+        // 不用 psi.EnvironmentVariables：本机同时存在 HTTPS_PROXY / https_proxy（仅大小写不同），
+        // .NET Framework 构造那个字典时会抛「已添加项」，导致游戏根本起不来。
+        // 改成临时写本进程环境变量 -> Process.Start 时子进程继承 -> 立刻恢复原值，try/finally 兜底。
+        // 暗号只活在这条进程树里，游戏一退就没了，不写系统、不影响玩家双击。
+        bool gateOn = gateEnvName != null && gateEnvName.Length > 0 && gateValValue != null && gateValValue.Length > 0;
+        string oldVal = gateOn ? Environment.GetEnvironmentVariable(gateEnvName) : null;
+        if (gateOn) Environment.SetEnvironmentVariable(gateEnvName, gateValValue);
+        try
         {
-            p.WaitForExit();
-            return p.ExitCode;
+            using (Process p = Process.Start(psi))
+            {
+                p.WaitForExit();
+                return p.ExitCode;
+            }
+        }
+        finally
+        {
+            if (gateOn) Environment.SetEnvironmentVariable(gateEnvName, oldVal);
         }
     }
 
@@ -1560,6 +1631,10 @@ class Launcher : Form
                 case "layerbackupdir": layerBackupDir = val; break;
                 case "savesdir": savesDir = val; break;
                 case "saveprefix": savePrefix = val; break;
+                case "gateenv": gateEnv = val; break;
+                case "gateval": gateVal = val; break;
+                case "adurl": adUrl = val; break;
+                case "addelay": int d; if (int.TryParse(val, out d) && d >= 0 && d <= 600) adDelaySec = d; break;
                 case "intro": intro = val; break;
                 case "cheats": cheats = val; break;
             }

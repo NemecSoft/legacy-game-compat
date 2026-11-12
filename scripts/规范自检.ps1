@@ -145,6 +145,9 @@ foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
 # ---------- 9) 已判死的方案不许重新引进（references\do-not-retry.md） ----------
 $doNotRetry = @{
   'Heroes3' = @('dgVoodoo-full', 'renderer\s*=\s*opengl', 'renderer\s*=\s*auto')
+  # CoD4Remastered：2026-11-12 实测判死「改 ini / 注册表 / 环境变量 / 命令行切语言」，
+  # 这台整合包是简体中文固化版。重新往启动器里引进语言开关代码就报红（规则 33）。
+  'CoD4Remastered' = @('steam_emu', 'CONFIG\.ini', 'Valve\\Steam', 'tchinese|traditional_chinese|schinese')
 }
 foreach ($g in $doNotRetry.Keys) {
   $dir = Join-Path (Join-Path (Join-Path $root 'Games') $g) 'src'
@@ -390,6 +393,94 @@ foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
       if ($t -match '"[AB]:\\' -and $t -notmatch 'GetDriveType') {
         Add-Issue '按盘符猜设备' $f.FullName '枚举了 A:/B: 却没问 GetDriveType：盘符推不出设备类型，读数会误导排查'
       }
+    }
+  }
+}
+
+# ---------- 20) 验证脚本不许在 Bash 里直传斜杠开关（AGENTS 规则 41 / pitfalls 98） ----------
+# Git Bash（MSYS）会把 /go 转成 C:/.../go，启动器收不到开关 → 弹菜单等点击 → 测试假通过。
+# 验证一律走 pwsh 的 Start-Process -ArgumentList '/go'；这里只扫留在仓库里的验证脚本，
+# 把「./game_starter.exe /go」这种写法钉死，临时目录里的脚本靠运行日志的自证行兜住。
+foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
+  foreach ($sub in @('tools')) {
+    $dir = Join-Path $g.FullName $sub
+    if (-not (Test-Path $dir)) { continue }
+    foreach ($f in (Get-ChildItem $dir -File -Include *.ps1, *.py, *.bat -Recurse)) {
+      $t = [IO.File]::ReadAllText($f.FullName, [Text.Encoding]::UTF8)
+      $lines = $t -split "`r`n|`n"
+      for ($n = 0; $n -lt $lines.Count; $n++) {
+        $ln = $lines[$n]
+        $trim = $ln.TrimStart()
+        if ($trim.StartsWith('#') -or $trim.StartsWith('::') -or $trim -match '^rem\s') { continue }
+        # 只认「真会执行且带斜杠开关」的两种写法：① 行首 ./game_starter.exe /go（Bash 风格）；
+        # ② Start-Process 里把 /go 当位置参数（没用 -ArgumentList 数组）。
+        # 不带开关的 Start-Process（启菜单做截图/焦点测试）、提示文案、按钮文字、日志字符串一律不报。
+        $direct = $ln -match '(?i)^\s*\./game_starter\.(exe|bat)\s+(?:/|--)[a-z]'
+        $badSp = $ln -match '(?i)Start-Process' -and
+                 $ln -match '(?i)game_starter\.(exe|bat)' -and
+                 $ln -notmatch '(?i)ArgumentList' -and
+                 $ln -match '(?i)\s+(?:/|--)[a-z]'
+        if ($direct -or $badSp) {
+          Add-Issue '验证通道错' $f.FullName ("L" + ($n + 1) + "：Bash 直传斜杠开关会被 MSYS 转成路径，" +
+            "启动器收不到 /go；验证要走 pwsh 的 Start-Process -ArgumentList，并核对运行日志「零交互：是」（规则 41）")
+        }
+      }
+    }
+  }
+}
+
+# ---------- 21) 交付持久文件不许有盘符绝对路径（AGENTS 规则 43 / pitfalls 108） ----------
+# 绿色原则：客户机任意盘符任意路径，账本/ini/交付清单里的键或引用一律相对路径。
+# 运行日志是排障产物、不在交付契约内，不扫；仓库源码里合法出现 D:\ 的（build.ps1 默认
+# 部署目标、文档案例）也不算——只扫两类真会跟着游戏目录走的持久文件：
+#   ① 游戏目录里的 display.state / launcher.ini；② Games\<游戏>\release\payload 里的文本文件。
+$driveRe = '[A-Za-z]:\\'
+foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
+  foreach ($sub in @('display.state', 'launcher.ini')) {
+    $p = Join-Path $g.FullName $sub
+    if (-not (Test-Path $p)) { continue }
+    foreach ($ln in ([IO.File]::ReadAllLines($p))) {
+      if ($ln -match $driveRe) {
+        Add-Issue '绿色违规' $p ("持久文件出现盘符绝对路径（坑 108）：客户机换盘就失效，" +
+          "键一律用相对 exe 所在目录的路径（规则 43.1）——内容行： " + $ln.Trim())
+      }
+    }
+  }
+  $pay = Join-Path $g.FullName 'release\payload'
+  if (Test-Path $pay) {
+    foreach ($f in (Get-ChildItem $pay -File)) {
+      if ($f.Extension -notin @('.txt', '.ini', '.cfg', '.state', '.conf', '.sha256')) { continue }
+      foreach ($ln in ([IO.File]::ReadAllLines($f.FullName))) {
+        if ($ln -match $driveRe) {
+          Add-Issue '绿色违规' $f.FullName ("交付清单/持久文件出现盘符绝对路径（规则 43.1）： " + $ln.Trim())
+        }
+      }
+    }
+  }
+}
+
+# ---------- 22) 点「启动游戏」后窗口必须保留（2026-11-12 用户定案） ----------
+# 右栏操作说明要一直留给玩家看：点启动后只许改按钮态/状态栏，不许 Hide/托盘化。
+# Hide 只许出现在「玩家主动关窗」路径（OnFormClosing / GoToTray / GoToTray 类方法）。
+foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
+  $cs = Join-Path $g.FullName 'src\Launcher.cs'
+  if (-not (Test-Path $cs)) { continue }
+  $lines = [IO.File]::ReadAllLines($cs, [Text.Encoding]::UTF8)
+  $startLine = -1
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    if ($lines[$i] -match 'void\s+StartGame\s*\(') { $startLine = $i; break }
+  }
+  if ($startLine -lt 0) { continue }
+  $end = $lines.Count
+  for ($i = $startLine + 1; $i -lt $lines.Count; $i++) {
+    if ($lines[$i] -match '^    (void|int|bool|string|static|protected|public|private|internal)\b') { $end = $i; break }
+  }
+  for ($i = $startLine; $i -lt $end; $i++) {
+    $s = $lines[$i].TrimStart()
+    if ($s.StartsWith('//')) { continue }        # 注释里提到 Hide 是留档说明，不算违规
+    if ($s -match '\bHide\s*\(\s*\)') {
+      Add-Issue '启动后藏窗' $cs ("StartGame 里出现 Hide()（第 " + ($i + 1) + " 行）：点「启动游戏」后窗口必须保留可见，" +
+        "操作说明要一直留着（2026-11-12 用户定案）；只有玩家主动关窗才转托盘（OnFormClosing/GoToTray）")
     }
   }
 }

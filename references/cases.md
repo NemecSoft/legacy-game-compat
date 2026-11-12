@@ -555,3 +555,45 @@ oadrash-launcher.png`、`roadrash-launcher-scrolled.png`。
 `HKCU\Software\UserJoy` 在游戏退出后不存在）；我们无法给游戏传命令行（进程不是我们创建的），
 所以不做「固定桌面分辨率」这种控制不了的选项；本包按用户要求保留原版界面，没有我们的三栏皮革 GUI，
 也就没有 YunGame 页脚与品牌自校验（已在 `适配过程分析.md` 写明偏差）。
+
+## 17. 使命召唤 2（CoD2 3dm 繁体中文 1.3）—— DXVK 双档 + 乱码安全模式询问框根除（2026-11-09）
+
+**症状/需求**：用户点名给 `D:\YunGame\CoD\CoD2` 打「兼容、绿色、通用」补丁，「据说 dxvk 效果好一些」；
+追加「修改一下，从网上找一下方案，不要显示那个乱码提示了」。
+
+**现场**：3dm 繁体中文发行 pc_1.3_1_1；单人 `CoD2SP_s.exe`（x86，D3D9）；`CoD2MP_s.exe` 带 PunkBuster
+反作弊 → 规则 7 不接，启动器只认单人版。本机原生 D3D9 已修好，DXVK 按用户指定做默认档、
+原生 D3D9 留作无 Vulkan 机器的第二档。
+
+**乱码框的来历（网上方案 + 反汇编证明）**：游戏启动时在目录根写 4 字节 PID 标记 `__CoD2SP_s`，
+正常退出删掉；崩溃/强杀留下标记且 PID 不是自己 → 下次启动弹 Big5 编码的「以安全模式執行遊戲？」，
+简体系统上是乱码，选「是」还 exec safemode.cfg 把画面降回 640×480。网上口径一致是「启动前删标记」
+（Steam 社区 / 5mouse / PCGamingWiki），**没有公开 cvar 或命令行开关**；删标记只覆盖「走启动器」这条路。
+Ghidra 定位：FUN_00450700（文件偏移 0x50700，本 PE RVA==偏移）= 标记检查 + MessageBox + 写标记；
+调用点 0x45096A 是 `call; test eax,eax; jnz 继续` → 返回 1 = 正常启动。
+
+**最终方案（两层，玩家零操作）**：
+1. 主程序 6 字节补丁：偏移 0x50700 处 `A0 F0 6F 82 00 83` → `B8 01 00 00 00 C3`（MOV EAX,1; RET）——
+   **任何启动路径**（含直接双击 exe）都不弹框、不降安全模式、不再写标记；补丁跟着目录走，换机器即用；
+2. 启动器 `game_starter.exe` 启动前仍静默删标记兜底（/clearmark 有自检）。
+回滚三件套：双备份（游戏目录 `_orig\CoD2SP_s.exe` + 仓库 `Games\CoD2\backup\CoD2SP_s.exe.orig`）、
+`game_starter.exe /restore-exe`、`tools\patch-safemode.ps1 -Restore`；收尾自检 3c 每次做
+「补丁在位 → 回滚 → 重打」全往返哈希断言。哈希：原版 `2be375ec…fa386`，补丁 `8d997ffa…e9827`。
+
+**兼容层**：DXVK 2.5.3 x86（仓库 `tools\dxvk\x86` 的 d3d9.dll+dxgi.dll），`_dxvk\` 留底 + 缺失自愈 +
+多余原生档挪 `_dxvk\禁用\` 再自动清重复；`dxvk.conf` 交付只开 `dxvk.hud = fps`（规则 11）。
+DXVK 2.5.3 **没有 logLevel 的 conf 键** → 启动器只对本次游戏进程设 `DXVK_LOG_LEVEL=error`（不写系统环境变量）。
+
+**启动器**：皮革三栏 900×620、CenterScreen、下拉弹层只加宽、两行模式名框高 48px；
+平台托管契约齐（直接子进程/陪跑/退出码原样回传/关窗不杀游戏）；
+开关 `/go /mode= /hideparent /readings /clearmark /layer= /wer /selftest /dxlog= /restore-exe`。
+
+**验证**：两档都实起动过并有截图/FPS 证据（`evidence\shot-*`、`运行日志` 快照）；
+`tools\patch-verify.ps1 -AllowGameLaunch` 单次闸门启动：种外来 PID 标记 → **直接**拉 CoD2SP_s.exe →
+`#32770` 全程没出现、CoD2 窗口第 3s 出现、WM_CLOSE 正常退 exit=0、标记被游戏自己删掉
+（`evidence\patch-verify.txt`）；`tools\收尾自检.ps1` 与 `tools\界面自检.ps1` 全 PASS、全程不再启动游戏。
+
+**自净（规则 38 四件）**：① 检查 = 收尾自检 3c 补丁往返 + `patch-verify.ps1` 默认拒绝门禁；
+② 规范 = pitfalls 89（乱码询问框：删标记只盖一条路，字节补丁才是所有路，补丁必须带双备份/回滚开关/往返断言）；
+③ 实现 = `tools\patch-safemode.ps1` + `/restore-exe`；④ 下次省掉 = 不再需要「删标记后首启验证弹框没弹」
+这一步人工确认，静态调用点断言 + 一次闸门启动即可定案。

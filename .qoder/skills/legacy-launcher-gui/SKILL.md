@@ -189,7 +189,7 @@ description: 老游戏启动器 game_starter.exe 的 GUI 设计规范与实现�
 | # | 平台依赖的性质 | GUI 必须怎么做 |
 |---|---|---|
 | 1 | 游戏在启动器的**进程树**里 | 用 `Process.Start` + `UseShellExecute=false` 直接起游戏，游戏是 game_starter.exe 的子进程；**不要**用 `shell:"<exe>"`、`explorer.exe`、`cmd /c start` 这类会换父进程的方式 |
-| 2 | 启动器活着 = 会话活着 | 游戏运行期间 game_starter.exe 不退出（后台线程 `WaitForExit`），玩家可随时 Alt+Tab 回来看操作说明 |
+| 2 | 启动器活着 = 会话活着 | 游戏运行期间 game_starter.exe 不退出（后台线程 `WaitForExit`），且**主窗口保持可见**（2026-11-12 用户定案：右栏操作说明要一直留着，除非玩家自己点退出）：点「启动游戏」后只改按钮态和状态栏，**不许 Hide / 托盘化**；只有玩家主动关窗（×/退出/Esc）才隐藏到托盘陪跑 |
 | 3 | 游戏退出码能回传 | 游戏一退出，game_starter.exe 立刻退出并 `return 游戏退出码`；平台靠 `0xC0000xxx` 这类码判异常。**吞掉退出码 = 崩溃查不到** |
 | 4 | 关启动器不杀游戏，且**游戏退出码不能丢** | 关窗 = **隐藏到后台陪跑**（托盘图标双击唤回，图标用 GDI+ 现画，不引图片资源）；游戏退出后 game_starter.exe 才结束并回传游戏码。玩家要是把 game_starter.exe 整个杀掉，游戏仍带着它的父 pid，平台按 pid 自己读游戏退出码（这条路径 game_starter.exe 自身回 -1，不能拿来判异常） |
 

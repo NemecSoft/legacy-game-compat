@@ -1,0 +1,320 @@
+﻿运行日志：出问题时把这个文件发给我们
+2026-11-09 18:16:08  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:16:08  启动参数：C:/Program Files/Git/readings；父进程：bash；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:16:08  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:16:08  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:16:08  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:16:08  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:16:08  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:16:08  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:16:08  启动参数：/readings；父进程：未知；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:16:08  现场快照：显示 1920×1080 刷新率=59 DPI=96/96 屏幕数=1；当前模式读数 1920×1080@59（DEVMODEW 220 字节，结构大小对）；游戏盘 D:\（本地硬盘） 每扇区字节=512 每簇扇区=8 簇 总488377599/可用67029204
+2026-11-09 18:16:08  读数校验：全部合理
+2026-11-09 18:16:08  DXVK 日志级别=error（只对本次启动的游戏进程生效，不写系统环境变量）
+2026-11-09 18:16:08  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:17:02  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:17:02  原生画面档：已把 d3d9.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:17:02  原生画面档：已把 dxgi.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:17:02  层自检（/layer=2）：2  原生 Direct3D 9（没有 Vulkan 的机器） → 已就绪
+2026-11-09 18:17:03  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:17:03  兼容层自检：d3d9.dll 根目录缺失，从 _dxvk 复制上来
+2026-11-09 18:17:03  兼容层自检：已复制 _dxvk\d3d9.dll → d3d9.dll
+2026-11-09 18:17:03  兼容层自检：dxgi.dll 根目录缺失，从 _dxvk 复制上来
+2026-11-09 18:17:03  兼容层自检：已复制 _dxvk\dxgi.dll → dxgi.dll
+2026-11-09 18:17:03  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:17:03  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 18:21:24  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:24  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:21:24  兼容层自检：删掉 _dxvk\禁用\d3d9.dll（与留底同一份，不留重复）
+2026-11-09 18:21:24  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:21:24  兼容层自检：删掉 _dxvk\禁用\dxgi.dll（与留底同一份，不留重复）
+2026-11-09 18:21:24  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:21:24  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 18:21:25  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:25  启动参数：/readings；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:25  现场快照：显示 1920×1080 刷新率=59 DPI=96/96 屏幕数=1；当前模式读数 1920×1080@59（DEVMODEW 220 字节，结构大小对）；游戏盘 D:\（本地硬盘） 每扇区字节=512 每簇扇区=8 簇 总488377599/可用67028911
+2026-11-09 18:21:25  读数校验：全部合理
+2026-11-09 18:21:25  DXVK 日志级别=error（只对本次启动的游戏进程生效，不写系统环境变量）
+2026-11-09 18:21:26  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:26  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\zh.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\out-f65391.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:26  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:27  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\en.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\out-7c5e43.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:27  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:27  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\ver.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\out-229497.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:28  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:28  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\junk.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\out-6f0040.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:29  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:29  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_23757bda-a76c-46b3-9de1-7c3a9cbd1afc\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\out-6b0910.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:29  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:30  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_fbb0524c-9d68-4de4-a1c0-791505e28d41\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\out-6a4526.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:30  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:30  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_ee64e4ab714595bb1bc269ad31e02bccad6fdf_eb4ecd87_1acbcf2e-b6aa-48cf-acfa-888dd14113f9\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-39b3f7590378435aad9d18f6a76b8271\out-6a4507.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:31  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:31  启动参数：/selftest cmd.exe /c exit 7；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:21:32  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:21:32  启动参数：/selftest cmd.exe /c exit 0；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:22:47  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:22:47  启动参数：（无）；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:22:47  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:22:47  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:22:47  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:22:47  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:22:47  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:22:47  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:22:51  下拉宽度自检：框宽=264，最长项文字宽=287，弹层宽=333，能装下=True
+2026-11-09 18:22:51  下拉高度自检：项数=2 行高=30，弹层高=64，能装下=True
+2026-11-09 18:22:51  选择框文字自检：框宽=264 文字可用=230 最长项=287，预计占 2 行，框高=40，装得下=False
+2026-11-09 18:25:10  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:25:10  启动参数：（无）；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:25:10  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:25:10  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:25:10  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:25:10  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:25:10  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:25:10  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:25:14  下拉宽度自检：框宽=264，最长项文字宽=287，弹层宽=333，能装下=True
+2026-11-09 18:25:14  下拉高度自检：项数=2 行高=30，弹层高=64，能装下=True
+2026-11-09 18:25:14  选择框文字自检：框宽=264 文字可用=230 最长项=287，预计占 2 行，框高=40，装得下=False
+2026-11-09 18:26:17  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:17  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:26:17  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:26:17  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:26:17  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 18:26:18  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:18  启动参数：/readings；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:18  现场快照：显示 1920×1080 刷新率=59 DPI=96/96 屏幕数=1；当前模式读数 1920×1080@59（DEVMODEW 220 字节，结构大小对）；游戏盘 D:\（本地硬盘） 每扇区字节=512 每簇扇区=8 簇 总488377599/可用67028510
+2026-11-09 18:26:18  读数校验：全部合理
+2026-11-09 18:26:18  DXVK 日志级别=error（只对本次启动的游戏进程生效，不写系统环境变量）
+2026-11-09 18:26:18  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:18  启动参数：/clearmark；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:18  安全模式标记：已静默删掉 __CoD2SP_s（上次没正常退出留下的，不会再弹那个繁体询问框，也不会降回 640×480）
+2026-11-09 18:26:19  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:19  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\zh.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\out-4f4ce3.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:20  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:20  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\en.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\out-4bb01e.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:20  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:21  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\ver.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\out-361a88.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:21  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:21  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\junk.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\out-59d4dc.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:22  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:22  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_23757bda-a76c-46b3-9de1-7c3a9cbd1afc\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\out-3d0bd3.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:23  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:23  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_fbb0524c-9d68-4de4-a1c0-791505e28d41\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\out-331b0a.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:23  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:23  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_ee64e4ab714595bb1bc269ad31e02bccad6fdf_eb4ecd87_1acbcf2e-b6aa-48cf-acfa-888dd14113f9\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-dbbe473132704e09af21074b97ddc726\out-e5426a.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:24  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:24  启动参数：/selftest cmd.exe /c exit 7；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:26:25  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:26:25  启动参数：/selftest cmd.exe /c exit 0；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:27:59  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:28:00  启动参数：（无）；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:28:00  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:28:00  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:28:00  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:28:00  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:28:00  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:28:00  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:29:22  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:22  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:29:22  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:29:22  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:29:22  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 18:29:23  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:23  启动参数：/readings；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:23  现场快照：显示 1920×1080 刷新率=59 DPI=96/96 屏幕数=1；当前模式读数 1920×1080@59（DEVMODEW 220 字节，结构大小对）；游戏盘 D:\（本地硬盘） 每扇区字节=512 每簇扇区=8 簇 总488377599/可用67028407
+2026-11-09 18:29:23  读数校验：全部合理
+2026-11-09 18:29:23  DXVK 日志级别=error（只对本次启动的游戏进程生效，不写系统环境变量）
+2026-11-09 18:29:24  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:24  启动参数：/clearmark；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:24  安全模式标记：已静默删掉 __CoD2SP_s（上次没正常退出留下的，不会再弹那个繁体询问框，也不会降回 640×480）
+2026-11-09 18:29:24  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:25  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\zh.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\out-39dbfd.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:25  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:25  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\en.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\out-1e660a.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:26  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:26  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\ver.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\out-5ab29f.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:27  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:27  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\junk.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\out-15a2d1.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:27  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:28  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_23757bda-a76c-46b3-9de1-7c3a9cbd1afc\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\out-deb25f.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:28  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:28  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_fbb0524c-9d68-4de4-a1c0-791505e28d41\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\out-25677e.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:29  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:29  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_ee64e4ab714595bb1bc269ad31e02bccad6fdf_eb4ecd87_1acbcf2e-b6aa-48cf-acfa-888dd14113f9\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-877490efd3364fc2a44e30bfa687d345\out-d916be.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:30  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:30  启动参数：/selftest cmd.exe /c exit 7；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:29:30  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:29:30  启动参数：/selftest cmd.exe /c exit 0；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:30:45  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:30:45  原生画面档：已把 d3d9.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:30:45  原生画面档：已把 dxgi.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:30:45  层自检（/layer=2）：2  原生 Direct3D 9（没有 Vulkan 的机器） → 已就绪
+2026-11-09 18:30:46  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:30:46  兼容层自检：d3d9.dll 根目录缺失，从 _dxvk 复制上来
+2026-11-09 18:30:46  兼容层自检：已复制 _dxvk\d3d9.dll → d3d9.dll
+2026-11-09 18:30:46  兼容层自检：删掉 _dxvk\禁用\d3d9.dll（与留底同一份，不留重复）
+2026-11-09 18:30:46  兼容层自检：dxgi.dll 根目录缺失，从 _dxvk 复制上来
+2026-11-09 18:30:46  兼容层自检：已复制 _dxvk\dxgi.dll → dxgi.dll
+2026-11-09 18:30:46  兼容层自检：删掉 _dxvk\禁用\dxgi.dll（与留底同一份，不留重复）
+2026-11-09 18:30:46  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:30:46  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 18:30:47  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:30:47  原生画面档：已把 d3d9.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:30:47  原生画面档：已把 dxgi.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:30:47  层自检（/layer=2）：2  原生 Direct3D 9（没有 Vulkan 的机器） → 已就绪
+2026-11-09 18:30:47  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:30:47  兼容层自检：d3d9.dll 根目录缺失，从 _dxvk 复制上来
+2026-11-09 18:30:47  兼容层自检：已复制 _dxvk\d3d9.dll → d3d9.dll
+2026-11-09 18:30:47  兼容层自检：删掉 _dxvk\禁用\d3d9.dll（与留底同一份，不留重复）
+2026-11-09 18:30:47  兼容层自检：dxgi.dll 根目录缺失，从 _dxvk 复制上来
+2026-11-09 18:30:47  兼容层自检：已复制 _dxvk\dxgi.dll → dxgi.dll
+2026-11-09 18:30:47  兼容层自检：删掉 _dxvk\禁用\dxgi.dll（与留底同一份，不留重复）
+2026-11-09 18:30:47  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:30:48  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 18:31:43  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:43  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:31:43  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:31:43  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:31:43  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 18:31:44  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:44  启动参数：/readings；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:44  现场快照：显示 1920×1080 刷新率=59 DPI=96/96 屏幕数=1；当前模式读数 1920×1080@59（DEVMODEW 220 字节，结构大小对）；游戏盘 D:\（本地硬盘） 每扇区字节=512 每簇扇区=8 簇 总488377599/可用67027983
+2026-11-09 18:31:44  读数校验：全部合理
+2026-11-09 18:31:44  DXVK 日志级别=error（只对本次启动的游戏进程生效，不写系统环境变量）
+2026-11-09 18:31:44  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:45  启动参数：/clearmark；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:45  安全模式标记：已静默删掉 __CoD2SP_s（上次没正常退出留下的，不会再弹那个繁体询问框，也不会降回 640×480）
+2026-11-09 18:31:45  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:45  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\zh.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\out-2b76a0.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:46  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:46  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\en.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\out-9858a4.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:47  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:47  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\ver.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\out-655daa.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:47  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:47  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\junk.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\out-a0df8b.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:48  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:48  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_23757bda-a76c-46b3-9de1-7c3a9cbd1afc\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\out-ef4bbc.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:49  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:49  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_fbb0524c-9d68-4de4-a1c0-791505e28d41\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\out-dcd0da.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:49  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:50  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_ee64e4ab714595bb1bc269ad31e02bccad6fdf_eb4ecd87_1acbcf2e-b6aa-48cf-acfa-888dd14113f9\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-fb9494a5e15c4cf28cbc5f32c9907af7\out-aba1cf.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:50  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:50  启动参数：/selftest cmd.exe /c exit 7；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:31:51  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:31:51  启动参数：/selftest cmd.exe /c exit 0；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:32:01  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:32:02  启动参数：（无）；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:32:02  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:32:02  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:32:02  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:32:02  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:32:02  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:32:02  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:32:05  下拉宽度自检：框宽=264，最长项文字宽=287，弹层宽=333，能装下=True
+2026-11-09 18:32:05  下拉高度自检：项数=2 行高=30，弹层高=64，能装下=True
+2026-11-09 18:32:05  选择框文字自检：框宽=264 文字可用=230 最长项=287，预计占 2 行，框高=40，装得下=False
+2026-11-09 18:33:34  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:33:34  启动参数：（无）；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:33:34  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:33:34  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:33:34  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:33:34  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:33:34  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:33:34  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:33:38  下拉宽度自检：框宽=264，最长项文字宽=287，弹层宽=333，能装下=True
+2026-11-09 18:33:38  下拉高度自检：项数=2 行高=30，弹层高=64，能装下=True
+2026-11-09 18:33:38  选择框文字自检：框宽=264 文字可用=230 最长项=287，预计占 2 行，框高=40，装得下=False
+2026-11-09 18:34:31  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:34:31  启动参数：/mode=2；父进程：pwsh；零交互：否；档位：2  原生 Direct3D 9（没有 Vulkan 的机器）
+2026-11-09 18:34:31  原生画面档：已把 d3d9.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:34:31  原生画面档：已把 dxgi.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:34:31  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:34:31  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:34:32  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:34:59  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:34:59  启动参数：/mode=2；父进程：pwsh；零交互：否；档位：2  原生 Direct3D 9（没有 Vulkan 的机器）
+2026-11-09 18:34:59  原生画面档：已把 d3d9.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:34:59  原生画面档：已把 dxgi.dll 移进 _dxvk\禁用\，这次由系统自己的 d3d9 接手
+2026-11-09 18:34:59  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:34:59  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:34:59  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:39:49  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:49  兼容层自检：d3d9.dll 根目录缺失，从 _dxvk 复制上来
+2026-11-09 18:39:49  兼容层自检：已复制 _dxvk\d3d9.dll → d3d9.dll
+2026-11-09 18:39:50  兼容层自检：删掉 _dxvk\禁用\d3d9.dll（与留底同一份，不留重复）
+2026-11-09 18:39:50  兼容层自检：dxgi.dll 根目录缺失，从 _dxvk 复制上来
+2026-11-09 18:39:50  兼容层自检：已复制 _dxvk\dxgi.dll → dxgi.dll
+2026-11-09 18:39:50  兼容层自检：删掉 _dxvk\禁用\dxgi.dll（与留底同一份，不留重复）
+2026-11-09 18:39:50  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:39:50  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 18:39:50  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:50  启动参数：/readings；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:50  现场快照：显示 1920×1080 刷新率=59 DPI=96/96 屏幕数=1；当前模式读数 1920×1080@59（DEVMODEW 220 字节，结构大小对）；游戏盘 D:\（本地硬盘） 每扇区字节=512 每簇扇区=8 簇 总488377599/可用67027627
+2026-11-09 18:39:50  读数校验：全部合理
+2026-11-09 18:39:50  DXVK 日志级别=error（只对本次启动的游戏进程生效，不写系统环境变量）
+2026-11-09 18:39:51  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:51  启动参数：/clearmark；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:51  安全模式标记：已静默删掉 __CoD2SP_s（上次没正常退出留下的，不会再弹那个繁体询问框，也不会降回 640×480）
+2026-11-09 18:39:52  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:52  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\zh.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\out-443683.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:52  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:53  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\en.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\out-8eeb3f.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:53  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:53  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\ver.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\out-8ee6ce.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:54  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:54  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\junk.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\out-276b8a.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:55  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:55  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_23757bda-a76c-46b3-9de1-7c3a9cbd1afc\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\out-aad64b.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:55  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:56  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_fbb0524c-9d68-4de4-a1c0-791505e28d41\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\out-46f6cd.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:56  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:56  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_ee64e4ab714595bb1bc269ad31e02bccad6fdf_eb4ecd87_1acbcf2e-b6aa-48cf-acfa-888dd14113f9\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-00bf767940c540ec9c1ab4a9950bb1b2\out-86d42b.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:57  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:57  启动参数：/selftest cmd.exe /c exit 7；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:39:58  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:39:58  启动参数：/selftest cmd.exe /c exit 0；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:41:26  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 18:41:26  启动参数：（无）；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 18:41:26  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 18:41:26  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 18:41:26  兼容层自检：dxvk.conf 已就位
+2026-11-09 18:41:26  窗口图标：取 exe 自身内嵌图标成功
+2026-11-09 18:41:26  界面 DPI 缩放=1（DpiX=96），窗口客户区 900×620
+2026-11-09 18:41:27  右栏按键表自检：行数=19 内容高=442 视口高=450 需要滚动=False
+2026-11-09 18:41:30  下拉宽度自检：框宽=264，最长项文字宽=287，弹层宽=333，能装下=True
+2026-11-09 18:41:30  下拉高度自检：项数=2 行高=30，弹层高=64，能装下=True
+2026-11-09 18:41:30  选择框文字自检：框宽=264 文字可用=230 最长项=287，预计占 2 行，框高=48，装得下=True
+2026-11-09 19:04:27  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:27  兼容层自检：d3d9.dll 已就位（与 _dxvk 留底同大小 4284430）
+2026-11-09 19:04:27  兼容层自检：dxgi.dll 已就位（与 _dxvk 留底同大小 3014670）
+2026-11-09 19:04:27  兼容层自检：dxvk.conf 已就位
+2026-11-09 19:04:27  层自检（/layer=1）：1  DXVK（Vulkan 画面，默认） → 已就绪
+2026-11-09 19:04:28  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:28  启动参数：/readings；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:28  现场快照：显示 1920×1080 刷新率=59 DPI=96/96 屏幕数=1；当前模式读数 1920×1080@59（DEVMODEW 220 字节，结构大小对）；游戏盘 D:\（本地硬盘） 每扇区字节=512 每簇扇区=8 簇 总488377599/可用74588704
+2026-11-09 19:04:28  读数校验：全部合理
+2026-11-09 19:04:28  DXVK 日志级别=error（只对本次启动的游戏进程生效，不写系统环境变量）
+2026-11-09 19:04:29  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:29  启动参数：/clearmark；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:29  安全模式标记：已静默删掉 __CoD2SP_s（上次没正常退出留下的，不会再弹那个繁体询问框，也不会降回 640×480）
+2026-11-09 19:04:30  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:30  启动参数：/restore-exe；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:30  回滚：已从 _orig 恢复原版主程序（安全模式询问框恢复原版行为）
+2026-11-09 19:04:32  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:32  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\zh.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\out-493b4a.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:33  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:33  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\en.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\out-803bff.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:33  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:34  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\ver.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\out-fbf83d.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:35  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:35  启动参数：/wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\junk.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\out-1581c7.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:36  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:36  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_23757bda-a76c-46b3-9de1-7c3a9cbd1afc\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\out-d7df34.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:37  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:37  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_7b8057f2bea92d64558ed65366b342e5a0819b_eb4ecd87_fbb0524c-9d68-4de4-a1c0-791505e28d41\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\out-ef1fff.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:37  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:38  启动参数：/wer C:\ProgramData\Microsoft\Windows\WER\ReportArchive\AppCrash_波斯王子汉化版.exe_ee64e4ab714595bb1bc269ad31e02bccad6fdf_eb4ecd87_1acbcf2e-b6aa-48cf-acfa-888dd14113f9\Report.wer C:\Users\ADMINI~1\AppData\Local\Temp\cod2-wer-47d61f98d4f5420fa4339b1d6071cf09\out-159ab6.txt；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:38  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:38  启动参数：/selftest cmd.exe /c exit 7；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）
+2026-11-09 19:04:39  launcher.ini 覆盖了 2 个启动方式名字
+2026-11-09 19:04:39  启动参数：/selftest cmd.exe /c exit 0；父进程：pwsh；零交互：否；档位：1  DXVK（Vulkan 画面，默认）

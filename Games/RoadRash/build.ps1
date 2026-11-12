@@ -109,6 +109,28 @@ Remove-Item (Join-Path $GameDir '_tools\nircmd') -Recurse -Force -ErrorAction Si
 Remove-Item (Join-Path $GameDir 'go.exe') -Force -ErrorAction SilentlyContinue
 Write-Host "已部署 game_starter.exe / launcher.ini（并清掉 _tools\keymap.exe、_tools\nircmd、旧名 go.exe）"
 
+# 5b. 启动门禁（可选）：代理 AWEMan32.dll 顶替原版，只有启动器注入的暗号才能放行。
+#     用 gate\ 里编译好的制品，不依赖本机装 VS；首次部署先把 1995 年原版改名留底。
+$gateDir = Join-Path $PSScriptRoot 'gate'
+$proxy   = Join-Path $gateDir 'AWEMan32.dll'
+if (Test-Path $proxy) {
+  $gameProxy = Join-Path $GameDir 'AWEMan32.dll'
+  $gameReal  = Join-Path $GameDir 'AWEMan32_real.dll'
+  if (-not (Test-Path $gameReal) -and (Test-Path $gameProxy)) {
+    Copy-Item $gameProxy $gameReal -Force          # 原版（只读）复制留底
+    (Get-Item $gameReal).IsReadOnly = $false
+    Write-Host "首次部署门禁：原始 AWEMan32.dll 已留底为 AWEMan32_real.dll"
+  }
+  if (Test-Path $gameReal) {
+    if (Test-Path $gameProxy) { (Get-Item $gameProxy).IsReadOnly = $false }
+    Copy-Item $proxy $gameProxy -Force              # 代理顶上原名
+    Write-Host "已部署启动门禁代理 AWEMan32.dll（一次性，无需 VS）"
+    Deploy-Bat '门禁-撤回.bat'                      # 一键回滚脚本
+  } else {
+    Write-Host "警告：游戏目录找不到 AWEMan32.dll / AWEMan32_real.dll，跳过门禁部署"
+  }
+}
+
 # 6. 自检：目标目录不许有 .cs
 $cs = Get-ChildItem $GameDir -Filter *.cs -Recurse -ErrorAction SilentlyContinue
 if ($cs) { throw ("目标目录出现 .cs 源文件：" + ($cs.FullName -join ', ')) }

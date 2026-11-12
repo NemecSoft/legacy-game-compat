@@ -14,6 +14,8 @@
 | 英雄无敌3 | **调试器方式抓崩溃**（`DEBUG_ONLY_THIS_PROCESS` 拉起游戏 + minidump） | 游戏窗口根本不出现，玩家看着像没启动；远程一改就"起不来"，比原来的崩溃更糟 | 2026-11-07 | 用户两次点名「你看你又跑这个！」「又搞什么，现在游戏又不出界面了！」；代码已删，改成读系统自动生成的 WER 报告（`game_starter.exe /wer` + `tools\wer-test.ps1`） |
 | 英雄无敌3 | **WER LocalDumps 注册表**（`HKLM\...\WER\LocalDumps`）开自动转储 | 要写 HKLM、要"以管理员身份运行"，客户机上根本没有这一步，交付就不该有这个前提 | 2026-11-07 | 用户定案「哪里有什么管理员？我们只能给用户这个游戏目录」（AGENTS 规则 36）；现方案只读 `%ProgramData%\Microsoft\Windows\WER\Report*`，不动系统 |
 | 三国群英传8 | **复刻离线 Steam 模拟**（MiniPipeDll / 私有 Hive） | 受保护机制，属合规红线 | 2026-11-04 | `Games\KingdomHeroes8\适配过程分析.md` §7 || 鬼泣/战神3 等移植器 | **反编译后重新打包** | 不需要，运行时取证已足够 | 2026-11-04 | 各游戏适配分析 |
+| 使命召唤4 重制版 | **改 `steam_emu.ini` / `CONFIG.ini` 的 `Language=`、改 `HKCU\Software\Valve\Steam` 的 `Language`、进程环境变量、命令行 `+set language` 来切语言**（只判死这台整合包的这几个开关，不是说游戏本体不支持别的语言） | 11 组对照实验全部照旧进简体中文主菜单（战役／新游戏／任务选择／选项）；把 `simplified_chinese` 目录藏起来，游戏直接起不来 | 2026-11-12 | `Games\CoD4Remastered\evidence\probe-*.png`、`probe2-*.png`、`probe3-*.png`，`适配过程分析.md` §2 |
+| 使命召唤4 重制版 | **给这台整合包加「繁体中文」选项** | 主 exe 里虽有 `traditional_chinese` / `tchinese` 字样，但游戏目录只装了 `english` 和 `simplified_chinese` 两个语言包，没有繁体包；用户最终定案「不切语言了」 | 2026-11-12 | 目录清单 + 实测截图，`适配过程分析.md` §2 |
 
 ## 为什么写死这条
 

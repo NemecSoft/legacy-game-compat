@@ -1,0 +1,10 @@
+game_starter.exe
+game_starter.sha256
+launcher.ini
+dxvk.conf
+d3d9.dll
+dxgi.dll
+_dxvk\d3d9.dll
+_dxvk\dxgi.dll
+_dxvk\dxvk.conf
+manifest.txt

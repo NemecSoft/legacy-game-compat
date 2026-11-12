@@ -1,0 +1,11 @@
+窗口 vis=True @0,0 1920x1080 D3DProxyWindow | D3DProxyWindow  ANSI[44 33 44 50 72 6F 78 79 57 69 6E 64 6F 77]
+窗口 vis=True @0,0 1920x1080 CoD2 | Call of Duty 2  ANSI[43 61 6C 6C 20 6F 66 20 44 75 74 79 20 32]
+窗口 vis=False @639,271 642x482 CoD Splash Screen | Call of Duty 2  ANSI[43 61 6C 6C 20 6F 66 20 44 75 74 79 20 32]
+    Static |  @640,272 640x480
+窗口 vis=False @660,315 627x480 Call of Duty 2 WinConsole | Call of Duty 2 Console  ANSI[43 61 6C 6C 20 6F 66 20 44 75 74 79 20 32 20 43 6F 6E 73 6F 6C 65]
+    Static |  @668,346 610x60
+    Edit |  @669,741 608x20
+    Edit |  @669,411 606x324
+窗口 vis=False @0,0 0x0 IME | Default IME  ANSI[44 65 66 61 75 6C 74 20 49 4D 45]
+窗口 vis=False @0,0 0x0 MSCTFIME UI | MSCTFIME UI  ANSI[4D 53 43 54 46 49 4D 45 20 55 49]
+窗口 vis=False @0,0 0x0 IME | Default IME  ANSI[44 65 66 61 75 6C 74 20 49 4D 45]

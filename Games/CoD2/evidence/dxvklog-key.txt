@@ -1,0 +1,11 @@
+info:  Game: CoD2SP_s.exe
+info:  DXVK: v2.5.3
+info:  Game: CoD2SP_s.exe
+info:  DXVK: v2.5.3
+info:    VK_KHR_swapchain
+info:    fillModeNonSolid                       : 1
+info:    vulkanMemoryModel                      : 1
+info:    customBorderColorWithoutFormat         : 1
+info:    leastRepresentableValueForceUnormRepresentation : 0
+info:    floatRepresentation                    : 0
+info:    extDynamicState3LineRasterizationMode  : 1

@@ -1,0 +1,6 @@
+LIBRARY AWEMan32
+EXPORTS
+    stub_2 @2
+    stub_3 @3
+    stub_4 @4
+    stub_5 @5
