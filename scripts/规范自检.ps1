@@ -1,4 +1,4 @@
-# 规范自检：把「靠人记住」的坑变成能跑的检查
+﻿# 规范自检：把「靠人记住」的坑变成能跑的检查
 # 用法：pwsh -NoProfile -File scripts\规范自检.ps1        （只报问题）
 #      pwsh -NoProfile -File scripts\规范自检.ps1 -Quiet  （CI 风格，全过就一行）
 param([switch]$Quiet)
@@ -319,7 +319,7 @@ foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
 # 已交付的其它游戏按规则 25 不返工，先进豁免名单；重做某个游戏时把它从名单里删掉。
 $grandfatheredGameLaunch = 'CS16', 'DFBHD', 'FiveStar', 'FutureSoldier', 'GodofWarIII', 'JustCause',
                             'KingdomHeroes8', 'OnimushaWotS', 'Prototype1', 'Prototype2',
-                            'RoadRash', 'TheSaboteur', 'War3'
+                            'Raiden4', 'RoadRash', 'TheSaboteur', 'War3'
 foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
   $tdir = Join-Path $g.FullName 'tools'
   if (-not (Test-Path $tdir)) { continue }
@@ -481,6 +481,46 @@ foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
     if ($s -match '\bHide\s*\(\s*\)') {
       Add-Issue '启动后藏窗' $cs ("StartGame 里出现 Hide()（第 " + ($i + 1) + " 行）：点「启动游戏」后窗口必须保留可见，" +
         "操作说明要一直留着（2026-11-12 用户定案）；只有玩家主动关窗才转托盘（OnFormClosing/GoToTray）")
+    }
+  }
+}
+
+# ---------- 23) 测试脚本数组元素的复合条件必须整体加括号（2026-11-20 宝可梦朱紫踩过） ----------
+# PowerShell 逗号优先级高于 -and：@('名', $a.Contains(x) -and $b.Contains(y)) 会被解析成
+# @( ('名', $a.Contains(x)) -and ... )，元素变成一个布尔值，断言名丢失、条件静默失效
+# （输出「FAIL True」这种看不懂的行）。复合条件一律写成 @('名', ($a -and $b))。
+$psDirs = @((Join-Path $root 'scripts'))
+foreach ($g in (Get-ChildItem (Join-Path $root 'Games') -Directory)) {
+  $tdir = Join-Path $g.FullName 'tools'
+  if (Test-Path $tdir) { $psDirs += $tdir }
+}
+foreach ($dir in $psDirs) {
+  foreach ($f in (Get-ChildItem $dir -File -Filter *.ps1)) {
+    $lines = [IO.File]::ReadAllLines($f.FullName, [Text.Encoding]::UTF8)
+    for ($n = 0; $n -lt $lines.Count; $n++) {
+      if ($lines[$n].TrimStart().StartsWith('#')) { continue }   # 注释里的示例写法不算违规
+      if ($lines[$n] -match "@\('[^']+',\s*\`$[\w\.]+\s+-and\s" -or
+          $lines[$n] -match "@\('[^']+',\s*\`$[\w\.]+\([^)]*\)\s+-and\s") {
+        Add-Issue '数组条件没加括号' $f.FullName ("L" + ($n + 1) + "：@('名', 条件 -and 条件) 的逗号优先级高于 -and，" +
+          "元素会被解析成布尔值、断言静默失效；复合条件整体加括号：@('名', (条件 -and 条件))")
+      }
+    }
+  }
+}
+
+# ---------- 24) 键断言不许用 SendMessage 注入 WM_KEYDOWN（2026-11-20 红警1复刻版踩过，坑 123） ----------
+# WinForms 的 ProcessCmdKey 只在消息循环 PreTranslateMessage 里走；SendMessage 直入 WndProc
+# 绕过它，Esc/Tab/Enter 断言静默失效。keybd_event 依赖前台、后台脚本抢前台被锁拒绝。
+# 可靠路线：PostMessageW 进目标窗口线程队列（leather-recipes §9）。
+foreach ($dir in $psDirs) {
+  foreach ($f in (Get-ChildItem $dir -File -Filter *.ps1)) {
+    $lines = [IO.File]::ReadAllLines($f.FullName, [Text.Encoding]::UTF8)
+    for ($n = 0; $n -lt $lines.Count; $n++) {
+      if ($lines[$n].TrimStart().StartsWith('#')) { continue }
+      if ($lines[$n] -match 'SendMessageW?\s*\(' -and $lines[$n] -match '0x010[01]') {
+        Add-Issue '键注入路线错' $f.FullName ("L" + ($n + 1) + "：SendMessage WM_KEYDOWN/UP 直入 WndProc、绕过 WinForms ProcessCmdKey，" +
+          "键断言静默失效；改 PostMessageW 进目标窗口线程队列（leather-recipes §9，坑 123）")
+      }
     }
   }
 }

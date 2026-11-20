@@ -1,0 +1,32 @@
+[14:32:36.947] 实验 desktop-dxvk / 层=dxvk / 桌面=keep / 参数=-windows
+[14:32:36.958] 原始桌面 1920x1080 @ 60Hz
+[14:32:37.011] 放入层文件：d3d8.dll, d3d9.dll, dxgi.dll, dxvk.conf
+[14:32:37.087] 已启动游戏 pid=19808
+[14:32:53.098] 16 秒后进程存活=True
+[14:32:53.106] 主窗口句柄=0xF40FEE 标题='血战上海滩'
+[14:32:53.128] 进程 CPU=26.16s 线程=25 内存=137.1MB
+[14:32:53.170] 游戏运行时桌面 1920x1080 @ 60Hz
+[14:32:53.173] ---- Logs\A3D.log (尾部) ----
+[14:32:53.181]   
+[14:32:53.183]   [14:32:37] A3DEngine::Init, Init Angelica Imm Wrapper Fail!
+[14:32:53.184]   [14:32:37] Chosen Device Format: BackBuffer [X8R8G8B8], DepthStencil [D24X8]
+[14:32:53.186]   [14:32:37] A3DDevice::Init(), Chosen T&L Device...
+[14:32:53.188]   [14:32:37] A3DDevice::Init(), Create device 800x600x16
+[14:32:53.191]   [14:32:37] A3DGFXMan::Init() Can not open gfxlist.txt
+[14:32:53.193]   [14:32:37] A3DSurfaceMan::LoadSurfaceFromFile CreateImageSurface Fail!
+[14:32:53.195]   [14:32:37] A2DSprite::Init LoadSurfaceFromFile Fail!
+[14:32:53.198] ---- Logs\Errors.log (尾部) ----
+[14:32:53.201]   [11 15 14:32:37] A3DEngine has been Inited
+[14:32:53.208]   [11 15 14:32:37] AGame Init Ok
+[14:32:53.209]   [11 15 14:32:37] Succeed Init AEnyaWC
+[14:32:53.211]   [11 15 14:32:37] AGame Init ok
+[14:32:53.213]   [11 15 14:32:37] E:\dev\ABASE\AWndSprite.cpp(110) : 
+[14:32:53.215]   [11 15 14:32:37] Cannot load sprite <interface\out_main_menu\ս��ͬ��.bmp>.
+[14:32:53.216]   [11 15 14:32:37] E:\dev\Enya\AEnyaButton.cpp(35) : 
+[14:32:53.218]   [11 15 14:32:37] Cannot load image <interface\out_main_menu\ս��ͬ��.bmp>
+[14:32:54.883] 截图: saved=D:\AI\legacy-game-compat\Games\Shanghai\evidence\probe-desktop-dxvk.png size=800x600 rect=0,0
+[14:32:55.370] setres: Display mode change requested and Windows replied...	
+[14:32:55.372] setres: The settings change was successful
+[14:32:56.338] 还原后桌面 1920x1080 @ 60Hz
+[14:32:56.341] 清理层文件：d3d8.dll, d3d9.dll, dxgi.dll, dxvk.conf
+[14:32:56.343] 清理完成

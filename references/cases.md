@@ -597,3 +597,78 @@ DXVK 2.5.3 **没有 logLevel 的 conf 键** → 启动器只对本次游戏进�
 ② 规范 = pitfalls 89（乱码询问框：删标记只盖一条路，字节补丁才是所有路，补丁必须带双备份/回滚开关/往返断言）；
 ③ 实现 = `tools\patch-safemode.ps1` + `/restore-exe`；④ 下次省掉 = 不再需要「删标记后首启验证弹框没弹」
 这一步人工确认，静态调用点断言 + 一次闸门启动即可定案。
+
+## 18. 宝可梦 朱／紫（KarPur 0.3.8 PC 便携移植）—— 双按钮启动器 + 完整键位表（2026-11-20）
+
+**背景**：用户点名 `D:\YunGame\Z\PokemonScarletandViolet`，要求 REA 分析自带 `启动游戏.exe` 后
+复写我们的启动器，核心是按键使用说明，不写存档相关文字，恰好两个按钮「启动朱 / 启动紫」。
+
+**包性质（REA + ilspycmd 反编译确立，不猜）**：不是模拟器，是原生重编译移植
+（SDL3 + Vulkan，游戏 4.0.0 + 零之秘宝 DLC）。真游戏在 `runtime\scarlet\karpur.exe` 与
+`runtime\violet\karpur.exe`。自带启动器契约：`WorkingDirectory=<root>\runtime\<版本>`、
+`UseShellExecute=false`、`CreateNoWindow=true`、GUI 模式无参数；`LanguageDefaults` 读
+`karpur.ini`，缺 `lang`/`menu_lang` 键才补进程级 env `TOTK_LANG`/`TOTK_MENU_LANG=zh-Hans`；
+启动前建 `profile\save` 目录（`TOTK_PROFILE_DIR` 可覆盖）；`CheckFiles` = 9 文件存在性
+（karpur.exe、SDL3.dll、libopus-0.dll、libiconv-2.dll、totk_xlate.exe、romfs-index.bin、
+exefs\main、exefs\main.npdm、romfs\romfs.bin）。**不复刻**它的 VerifySelf（RSA 自签名）与
+VerifyRuntime（全量 SHA256）——那是他们的签名且太慢；只复刻绿色部分。
+
+**规则 37 边界**：karpur 是现代 SDL3 程序，不拿环境读数当除数 → **不改刷新率、不写 karpur.ini**
+（ini 由游戏内 F1 读写，玩家设置永不覆盖）；`--readings` 仍提供断言快照供排障。
+
+**启动器**：皮革三栏 900×620、CenterScreen 偏移 0；中栏「启动说明」一句 +
+启动朱 / 启动紫 / 打开运行日志 / 退出四按钮（无兼容档位 → 无下拉框）；默认朱，
+`--go` 零交互同默认，`--edition=violet` 与 ini `DefaultEdition` 可改；右栏 6 行极简键帽
+（深色=手柄、金色=键盘）+「详细按键」独立普通窗口（两列六卡片 + 底部红框提醒，
+复用战神III `CheatSheetForm` 结构，实机内容 716 / 视口 953、滚动 0、并排重叠 0）。
+键位权威来源 = 包内 `游戏启动说明.txt`（WASD 移动、E=A、LeftShift=B、Space=X、
+MouseLeft=Y、Q/R=L/R、MouseRight 或 Z=ZL、F 或 X=ZR、Ctrl/C=摇杆按下、1234=十字键、
+Tab/M=+/−、F1/Esc 移植设置、F10 性能、F11 全屏）。界面零存档文字、零技术串。
+
+**验证（证据在 Games\PokemonSV\evidence\）**：
+- `tools\host-sim.ps1`：临时目录假游戏（睡 8s 退 7）六断言全 PASS——直接子进程 / 关窗陪跑 /
+  退出码 7→7 / 强杀启动器后平台仍读游戏码 7 / 紫版路径与日志自证 / 紫版退码 7；
+- `tools\switch-test.ps1`：--checkfiles / --readings / --selftest(cmd exit 7) / --wer
+  （本机真实 Explorer 崩溃报告 + 中英文手写样例）七断言全 PASS，结论另存 UTF-8 再断言；
+- `tools\ui-shot.ps1`：居中偏移 0 / 并排重叠 0 / 详细窗口滚动 0 / 关详细回原位 / Esc 退码 0，
+  三张 PrintWindow 截图（ui-main / ui-cheatsheet / ui-main-back）；
+- `tools\real-run.ps1 -AllowGameLaunch` 单次门禁真启动：朱版窗口 2s 出现，截图首行
+  `[host] cfg: read …\runtime\scarlet\karpur.ini: 13 keys` 证明工作目录契约成立
+  （截图裁掉边缘桌面碎片只留标题栏+cfg 行）；日志自证八项从日志补断言全 PASS
+  （含「karpur.ini 已有 lang/menu_lang，不补环境变量」——不覆盖玩家设置）；
+  退出码回传链路由 host-sim 覆盖，真启动那次不强求二次起游戏。
+
+**自净（规则 38 四件）**：① 检查 = 规范自检新增第 23 项（PowerShell 数组元素逗号优先级坑，
+坑 120）+ 上述四个断言脚本；② 规范 = pitfalls 119–122（MSYS 吃源文件路径 / 逗号优先级 /
+uint 退码溢出 / open wb 截断）；③ 实现 = `--checkfiles --readings --wer --selftest` 四个
+不启动游戏的自检开关 + 门禁真启动脚本；④ 下次省掉 = 移植类包不再人工逐条试「工作目录 /
+语言 env / 存档目录」——反编译契约 + `--checkfiles` + 日志自证行一次定案；键位长表直接
+复用战神III 详细窗口结构，不再重新设计布局。（2026-11-20 补正：先估右栏一屏放不放得下，
+放得下就不开独立窗口——硬约束 20 与案例 19；战神III 是内容太多才拆。）
+
+## 19. 命令与征服：红色警戒1复刻版-网吧联机版（OpenRA 便携整合）—— 机器名联机显示名 + 右栏一屏（2026-11-20）
+
+**本体**：OpenRA playtest-20261026 红警1简体中文便携整合版，.NET 10 自包含引擎、SDL2 + ANGLE。
+无兼容层需求（引擎自带运行时）；本机无硬件 OpenGL，ANGLE 走 D3D11 的真启动**未验证**（门禁单次实测待做）。
+
+**启动契约（REA 反编译自带 启动游戏.exe）**：真游戏 `Engine\RedAlert.exe`，工作目录 `Engine`，
+参数 `Game.Mod=ra Engine.LaunchPath="<全路径>"`（MSVCRT 引号转义）。证据 `evidence\启动游戏.decompiled.cs`。
+不复刻自带版的窗口标题改写 / TitleProtection（规则 44 零干预）。
+
+**网吧功能（用户点名）**：每次启动前把本机电脑名写进 `Engine\Support\settings.yaml` 的
+`Player: Name:` 行——只改这一行、保留原换行与缩进、幂等（相同不动）；缺文件 / 缺行 / 缺节
+三种边界自动补。GUI 与 `--go` 同一条路径。
+
+**右栏一屏（用户定案）**：「这个右侧说明一屏就行，不要单独开窗口了。」9 行键帽说明 +
+操作性提示实测 440px ≤ 视口 450px，删掉独立详细窗口 326 行；中栏改顶对齐消除垂直居中空洞。
+日志自证行「右栏按键表自检：行数=9 … 需要滚动=False」。
+
+**验证（不真启动）**：host-sim 16/16（托管契约四条 + 参数 / CWD + 机器名六边界）、
+switch-test 7/7（checkfiles / readings / selftest / wer 中英文）、ui-shot 5/5
+（居中 / 单窗口 / 一屏 / Esc 退码 0）。Esc 键断言踩坑 123：SendMessage 绕过 ProcessCmdKey、
+keybd_event 依赖前台，最终 PostMessageW 进线程队列。
+
+**自净（规则 38 四件）**：① 检查 = ui-shot 右栏一屏断言 + 规范自检第 24 项（SendMessage 键注入报红）；
+② 规范 = 硬约束 20「先估一屏」、leather-recipes §4 顶对齐 / §9 键路线三取舍、pitfalls 123；
+③ 实现 = `LogRightTableFit` 自证行 + ui-shot PostMessage 键路线；④ 下次省掉 = 键断言直接抄
+PostMessage、中栏稀疏直接顶对齐、右栏 ≤450px 不做详细窗口（详见 `Games\CC1RedAlert\适配过程分析.md`）。

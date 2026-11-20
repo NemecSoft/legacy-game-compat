@@ -1,0 +1,33 @@
+[14:31:11.470] 实验 desktop-dgv-fixed / 层=dgvoodoo / 桌面=keep / 参数=-windows
+[14:31:11.483] 原始桌面 1920x1080 @ 60Hz
+[14:31:11.538] 放入层文件：D3D8.dll, D3D9.dll, D3DImm.dll, DDraw.dll, dgVoodoo.conf
+[14:31:11.588] 强制输出按实测桌面 = 1920x1080；水印=开（仅本次取证）
+[14:31:11.672] 已启动游戏 pid=17132
+[14:31:27.687] 16 秒后进程存活=True
+[14:31:27.693] 主窗口句柄=0x890870 标题='血战上海滩'
+[14:31:27.712] 进程 CPU=14.78s 线程=34 内存=76.5MB
+[14:31:27.750] 游戏运行时桌面 1920x1080 @ 60Hz
+[14:31:27.753] ---- Logs\A3D.log (尾部) ----
+[14:31:27.761]   
+[14:31:27.762]   [14:31:11] A3DEngine::Init, Init Angelica Imm Wrapper Fail!
+[14:31:28.464]   [14:31:12] Chosen Device Format: BackBuffer [X8R8G8B8], DepthStencil [D24X8]
+[14:31:28.466]   [14:31:12] A3DDevice::Init(), Chosen T&L Device...
+[14:31:28.468]   [14:31:12] A3DDevice::Init(), Create device 800x600x16
+[14:31:28.470]   [14:31:12] A3DGFXMan::Init() Can not open gfxlist.txt
+[14:31:28.471]   [14:31:12] A3DSurfaceMan::LoadSurfaceFromFile CreateImageSurface Fail!
+[14:31:28.474]   [14:31:12] A2DSprite::Init LoadSurfaceFromFile Fail!
+[14:31:28.477] ---- Logs\Errors.log (尾部) ----
+[14:31:28.480]   [11 15 14:31:12] A3DEngine has been Inited
+[14:31:28.481]   [11 15 14:31:12] AGame Init Ok
+[14:31:28.483]   [11 15 14:31:12] Succeed Init AEnyaWC
+[14:31:28.484]   [11 15 14:31:12] AGame Init ok
+[14:31:28.486]   [11 15 14:31:12] E:\dev\ABASE\AWndSprite.cpp(110) : 
+[14:31:28.487]   [11 15 14:31:12] Cannot load sprite <interface\out_main_menu\ս��ͬ��.bmp>.
+[14:31:28.489]   [11 15 14:31:12] E:\dev\Enya\AEnyaButton.cpp(35) : 
+[14:31:28.491]   [11 15 14:31:12] Cannot load image <interface\out_main_menu\ս��ͬ��.bmp>
+[14:31:30.082] 截图: saved=D:\AI\legacy-game-compat\Games\Shanghai\evidence\probe-desktop-dgv-fixed.png size=800x600 rect=0,0
+[14:31:30.574] setres: Display mode change requested and Windows replied...	
+[14:31:30.575] setres: The settings change was successful
+[14:31:31.530] 还原后桌面 1920x1080 @ 60Hz
+[14:31:31.533] 清理层文件：D3D8.dll, D3D9.dll, D3DImm.dll, DDraw.dll, dgVoodoo.conf
+[14:31:31.534] 清理完成

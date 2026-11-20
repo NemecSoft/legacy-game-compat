@@ -473,7 +473,11 @@ void FocusRing(Graphics g, Rectangle r)   // 皮革和金按钮上都得看得�
 焦点环：`GoldBright` 2px（内缩圆角比目标大 3px），外面再套一圈 `alpha 120` 黑 3px；
 invalidate 按控件并集外扩 8px，否则环会被裁掉。
 
-### 中栏布局：一叠垂直居中，不留大空洞
+### 中栏布局：一叠顶对齐，不留大空洞
+
+中栏内容稀疏时**顶对齐**：`int y = colCenter.Y + S(12);` 让「启动说明」标题与左右栏标题同一水平线。
+**不要垂直居中整叠**——内容少时居中会把整叠推到栏中间，顶部留下一大块空洞
+（与 AGENTS 规则 20「不上下拉出大段空白」冲突；红警1复刻版 2026-11-20 实测踩过，改顶对齐后消除）。
 
 ```csharp
 int inner = colCenter.X + S(16), innerW = colCenter.Width - S(32);
@@ -641,6 +645,11 @@ tray.Icon = Icon;                       // 托盘直接复用
 # 2) 自绘下拉是启动器唯一的子窗口：EnumChildWindows 取 Kids[0]
 # 3) 展开菜单：走键盘这条路最可靠 —— PostMessageW 给主窗口 WM_KEYDOWN/WM_KEYUP：
 #       VK_TAB(9) 把焦点送进自绘下拉，VK_RETURN(13) 展开（ProcessCmdKey 里 Activate(3) -> ShowModeMenu）
+#    这条路线适用于**一切键断言**（Esc 关窗、Tab 走焦点、Enter 激活），不只展开菜单：
+#    WinForms 的 ProcessCmdKey 只在消息循环 PreTranslateMessage 里走，PostMessage 进线程队列才会经过它。
+#    两条死路（2026-11-20 红警1复刻版 ui-shot 实测）：
+#      SendMessage WM_KEYDOWN 直入 WndProc、绕过 PreTranslateMessage → ProcessCmdKey 收不到，断言静默失效；
+#      keybd_event 走系统输入队列、依赖前台窗口 → 后台脚本 SetForegroundWindow 被前台锁拒绝，键打去别的窗口。
 #    鼠标路线不可靠：SendMessage 打不开（WinForms 要看真实鼠标状态），PostMessage 点面板时好时坏，
 #    合成鼠标点击还会因失焦把菜单关掉、坐标一偏就点到「启动游戏」上（都踩过）
 # 4) 展开前后各 EnumWindows 一次，新增的可见窗口就是弹层

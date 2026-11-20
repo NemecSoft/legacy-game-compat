@@ -1,0 +1,29 @@
+[14:30:08.134] 实验 desktop-dgv-fs / 层=dgvoodoo / 桌面=keep / 参数=
+[14:30:08.182] 原始桌面 1920x1080 @ 60Hz
+[14:30:08.744] 放入层文件：D3D8.dll, D3D9.dll, D3DImm.dll, DDraw.dll, dgVoodoo.conf
+[14:30:08.933] 强制输出按实测桌面 = 1920x1080；水印=开（仅本次取证）
+[14:30:10.081] 已启动游戏 pid=31728
+[14:30:26.280] 16 秒后进程存活=False
+[14:30:26.314] 游戏运行时桌面 1920x1080 @ 60Hz
+[14:30:26.316] ---- Logs\A3D.log (尾部) ----
+[14:30:26.324]   Angelica 3D Error Log
+[14:30:26.325]   Created(or opened) on 15/11/2026 14:30:10
+[14:30:26.327]   
+[14:30:26.328]   [14:30:10] A3DEngine::Init, Init Angelica Imm Wrapper Fail!
+[14:30:26.330]   [14:30:10] Chosen Device Format: BackBuffer [R5G6B5], DepthStencil [D16]
+[14:30:26.331]   [14:30:10] A3DDevice::Init(), Can not change display mode!
+[14:30:26.333]   [14:30:10] A3DEngine::Init() Init A3DDevice Fail!
+[14:30:26.335] ---- Logs\Errors.log (尾部) ----
+[14:30:26.337]   [11 15 14:30:10] Change Attribute Error <ini/interface.ini>
+[14:30:26.338]   [11 15 14:30:10] E:\dev\ABASE\AWndIniFile.cpp(112) : 
+[14:30:26.340]   [11 15 14:30:10] Cannot open the IniFile <ini/interface.ini>
+[14:30:26.341]   [11 15 14:30:10] Load interface file error
+[14:30:26.343]   [11 15 14:30:10] Use Pck File: shanghai.pck 
+[14:30:26.344]   [11 15 14:30:10] m_pA3DEngine->Init() error
+[14:30:26.345]   [11 15 14:30:10] Init Engine error
+[14:30:33.264] 截图失败：没有找到窗口进程：shanghai
+[14:30:33.716] setres: Display mode change requested and Windows replied...	
+[14:30:33.717] setres: The settings change was successful
+[14:30:34.665] 还原后桌面 1920x1080 @ 60Hz
+[14:30:34.667] 清理层文件：D3D8.dll, D3D9.dll, D3DImm.dll, DDraw.dll, dgVoodoo.conf
+[14:30:34.668] 清理完成

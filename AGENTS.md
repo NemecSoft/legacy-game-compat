@@ -103,6 +103,10 @@
     一律用 Windows 换行；图片 / exe / dll / ico / zip / bik / dat 等二进制不动。
     仓库根 `.gitattributes` 已设 `eol=crlf`，新文件也必须 CRLF，禁止提交 LF-only 文本。
     例外：Windows 导出的 UTF-16LE `.reg` 保留原编码和 `0D 00 0A 00` 换行，不做字节转换。
+    **执行口径（2026-11-19 用户两次暴怒后钉死）：Write/Edit 工具落盘默认 LF，
+    每写完一个文本文件当场转 CRLF（仓库内跑 `scripts\normalize-crlf.ps1`），
+    并回读字节验证（`0d 0a`；`.ps1` 首三字节必须 `ef bb bf`，`.bat` 必须无 BOM）——
+    不许攒到收尾才转，不许只改不验。**
 17. **每个游戏的交付包统一包含 `一键应用.bat` + `一键撤回.bat` + `payload\` + `manifest.txt`**
     （参考 `Games\TheSaboteur\release\`）。应用时先校验游戏主程序，把目标同名文件备份到
     `_legacy_compat_backup\<游戏>\`，写 `交付记录.txt`，再复制 payload；撤回按记录恢复被替换文件、

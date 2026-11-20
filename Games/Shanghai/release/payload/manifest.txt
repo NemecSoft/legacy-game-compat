@@ -1,0 +1,3 @@
+game_starter.exe
+game_starter.sha256
+launcher.ini

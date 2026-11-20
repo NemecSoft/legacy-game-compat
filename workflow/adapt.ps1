@@ -131,7 +131,8 @@ function Resolve-Layer($info) {
 
 function Install-Layer($info, [string]$layer) {
     $sub = if ($info.Is64) { "x64" } else { "x86" }
-    $src = Join-Path (Join-Path $Tools $layer) $sub
+    $dir = if ($layer -eq "dgv") { "dgvoodoo" } else { $layer }
+    $src = Join-Path (Join-Path $Tools $dir) $sub
     if (-not (Test-Path $src)) { throw "tools 里没有 $layer/$sub" }
 
     $files = @()

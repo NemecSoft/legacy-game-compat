@@ -84,7 +84,8 @@ public static class Keycaps
         { "Pause", "Pause" }, { "Mouse1", "左键" }, { "Mouse2", "右键" },
         { "Mouse3", "中键" }, { "WheelUp", "滚轮↑" }, { "WheelDown", "滚轮↓" },
         { "Minus", "-" }, { "Plus", "+" }, { "Comma", "," }, { "Period", "." },
-        { "Slash", "/" }, { "Semicolon", ";" }, { "BracketL", "[" }, { "BracketR", "]" }
+        { "Slash", "/" }, { "Semicolon", ";" }, { "BracketL", "[" }, { "BracketR", "]" },
+        { "NumPad5", "小键盘5" }
     };
 
     static string Alias(string key)

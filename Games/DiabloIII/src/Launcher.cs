@@ -16,9 +16,10 @@ using System.Windows.Forms;
 // CUSA00242-UPDATE（1.47 更新），设 SANCTUARY_GAME_DIR / SANCTUARY_PATCH_DIR /
 // SANCTUARY_CONFIG 环境变量，再用整合包自带的 python\python.exe 跑 run.py 完整启动链
 //（CPU 指令集检查、更新合并视图、模组与着色器准备），陪跑到游戏退出并原样回传退出码。
-// 键位按战神III重制版方案注入（SANCTUARY_KEY_MAP）：J=□技能、K=△技能、L=○技能/返回、
-// 空格=✕主要攻击、Q/E=L1/R1、U/O=L2/R2、Tab=OPTIONS、P/Esc=触摸板左右、1234=十字键；
-// L3/R3 保留移植器默认（Z/X，走跑切换等），不注入。界面速查与注入表一致。
+// 键位注入（SANCTUARY_KEY_MAP，人体工程学版）：左手移动+喝药，右手全部战斗技能——
+// J=✕主攻、K=R2副攻、L=□技能、U/O=△○技能（O 兼菜单返回）、H=L2第四技能、I=R1页签、
+// Q=L1药水（左手 WASD 边上不挪手）、Tab=OPTIONS、P/Esc=触摸板左右、F/V/C/B=十字键；
+// 闪避锁在右摇杆（移植器按钮表无摇杆项），键盘键固定为方向键；L3/R3 保留默认 Z/X。
 
 class Launcher : Form
 {
@@ -52,8 +53,8 @@ class Launcher : Form
     string gameArgs = "run.py";
     string intro =
         "《暗黑破坏神III 夺魂之镰》终极邪恶版，暴雪的刷宝经典：\n" +
-        "选职业、下地宫、捡装备。键位照战神III重制版那套排：\n" +
-        "J K L 空格 = □△○✕，WASD 走路、方向键翻滚，右手不离键。\n" +
+        "选职业、下地宫、捡装备。键位按左右手分工排：\n" +
+        "左手 WASD 走位、Q 喝药；右手 J K L U O H 全部技能，方向键翻滚。\n" +
         "\n" +
         "这份是 PS4 版的电脑移植整合包，免安装。\n" +
         "首次启动会准备运行文件和画面缓存，要多等一会儿。\n" +
@@ -290,7 +291,7 @@ class Launcher : Form
             consoleBox.Font = fConsole;
             consoleBox.BackColor = Color.FromArgb(0x16, 0x0C, 0x08);
             consoleBox.ForeColor = Ink;
-            consoleBox.Text = "控制台就绪：点「启动游戏」后，这里实时转发 run.py 与移植器的输出。\r\n";
+            consoleBox.Text = "控制台就绪：点「启动游戏」后，这里实时显示后台服务器的运行信息。\r\n";
             Controls.Add(consoleBox);
             consoleTimer = new System.Windows.Forms.Timer();
             consoleTimer.Interval = 120;
@@ -459,7 +460,7 @@ class Launcher : Form
     void DrawConsoleChrome(Graphics g)
     {
         if (rcConsole.Height <= 0 || consoleBox == null) return;
-        TextRenderer.DrawText(g, "启动控制台 · run.py 与移植器的实时输出", fMono,
+        TextRenderer.DrawText(g, "启动控制台 · 后台服务器实时输出", fMono,
             new Point(rcConsole.X + S(2), rcConsole.Y - S(20)), InkDim, Color.Transparent);
         using (GraphicsPath p = Round(rcConsole, S(8)))
         using (Pen edge = new Pen(Color.FromArgb(130, LeatherLight), 1f))
@@ -596,15 +597,16 @@ class Launcher : Form
     static bool InViewport(int y, int h, int top, int bottom) { return y >= top && y + h <= bottom; }
 
     // 主窗口右栏只放极简常用键 + 一个「详细按键」按钮；完整六卡片速查在独立窗口里。
-    // 键位来源：战神III重制版方案（SANCTUARY_KEY_MAP 注入），动作语义是暗黑3主机版布局。
+    // 键位来源：人体工程学定案（用户 2026-11-13）——左手移动+喝药，右手全部战斗技能。
+    // 纯键盘方案：移植器不映射鼠标（2026-11-13 用户实测确认），所有操作必须键盘可达。
     static readonly CheatRow[] QuickRows =
     {
-        new CheatRow("ps:stick_l", "pc:W pc:A pc:S pc:D", "移动"),
-        new CheatRow("ps:square ps:triangle ps:circle ps:cross", "pc:J pc:K pc:L pc:Space", "技能 / 技能 / 返回 / 主要攻击"),
-        new CheatRow("ps:R2", "pc:O", "次要攻击（可长按连放）"),
-        new CheatRow("ps:stick_r", "pc:Up pc:Down pc:Left pc:Right", "翻滚闪避"),
-        new CheatRow("ps:L1 ps:R1 ps:L2", "pc:Q pc:E pc:U", "菜单页签 / 技能位"),
-        new CheatRow("ps:dpad ps:options", "pc:1 pc:2 pc:3 pc:4 pc:Tab", "拾取轮换 / 暂停菜单")
+        new CheatRow("ps:stick_l", "pc:W pc:A pc:S pc:D", "移动（左手）"),
+        new CheatRow("ps:cross ps:R2 ps:square", "pc:J pc:K pc:L", "主攻 / 副攻 / 技能（右手）"),
+        new CheatRow("ps:triangle ps:circle ps:L2", "pc:U pc:O pc:H", "技能 / 技能兼返回 / 技能"),
+        new CheatRow("ps:L1", "pc:Q", "喝药（左手）"),
+        new CheatRow("ps:stick_r", "pc:Up pc:Down pc:Left pc:Right", "翻滚闪避（右手方向键）"),
+        new CheatRow("ps:R1 ps:dpad ps:options", "pc:I pc:F pc:V pc:C pc:B pc:Tab", "页签 / 十字键 / 菜单")
     };
 
     void DrawRight(Graphics g)
@@ -668,12 +670,16 @@ class Launcher : Form
     // 说明里提到的每个手柄键都要能在这行键帽上找到对应键盘键，别让玩家看着手柄键名猜键盘。
     static readonly CheatRow[] CheatNotes =
     {
-        new CheatRow("ps:square ps:triangle ps:circle ps:cross", "pc:J pc:K pc:L pc:Space",
-            "1  手柄四个主键照战神3习惯排在 J K L 空格：□ 技能 / △ 技能 / ○ 技能兼菜单返回 / ✕ 主要攻击（长按连打）。"),
-        new CheatRow("ps:R2 ps:stick_r", "pc:O pc:Up pc:Down pc:Left pc:Right",
-            "2  次要攻击在 O（R2）上，一般是输出主力；翻滚闪避在方向键（右摇杆），往哪按往哪滚。"),
-        new CheatRow("ps:L3 ps:dpad", "pc:Z pc:X pc:1 pc:2 pc:3 pc:4",
-            "3  Z X 是按下左右摇杆（走跑切换等），保留游戏默认；1 2 3 4 对应十字键，游戏里轮换新掉落的装备。")
+        new CheatRow("ps:stick_l ps:L1", "pc:W pc:A pc:S pc:D pc:Q",
+            "1  左手只管移动：WASD 走位、Q 喝药（WASD 边上不挪手），打怪时左手不用挪。"),
+        new CheatRow("ps:cross ps:R2 ps:square", "pc:J pc:K pc:L",
+            "2  右手包揽输出：J 主攻、K 副攻、L 技能，三个键都在 home row，手指不用挪窝。"),
+        new CheatRow("ps:triangle ps:circle ps:L2", "pc:U pc:O pc:H",
+            "3  其余技能在 U、O（中指无名指上探）和 H（食指下探）；O 在菜单里兼返回。"),
+        new CheatRow("ps:stick_r", "pc:Up pc:Down pc:Left pc:Right",
+            "4  翻滚闪避锁在右摇杆上，键盘对应方向键——右手往右一挪就按到。"),
+        new CheatRow("—", "—",
+            "5  鼠标在这版里没有用（移植器不映射鼠标），所有操作全靠键盘，照上面键位玩就行。")
     };
 
     static CheatCard[] BuildCheatCards()
@@ -681,38 +687,43 @@ class Launcher : Form
         Color red = Warn, cyan = Color.FromArgb(0x7C, 0xC3, 0xEE);
         // Glyph / Pc 都是通用键帽库的 id 串（见 templates\Keycaps.cs）：
         // 空格分隔 = 一排独立键帽，"+" = 组合键的小加号；"—" = 这行没有这个键。
-        // 键位是战神III重制版方案（启动器经 SANCTUARY_KEY_MAP 注入），功能语义是
-        // 暗黑3主机版官方布局（主要攻击=✕、次要攻击=R2、□△○=三个技能位，
-        // L1/R1=菜单页签翻页、十字键=拾取装备轮换）。
+        // 键位（人体工程学定案 2026-11-13，喝药键同日用户纠正改回 Q——整合包自带
+        // 说明就是 Q=L1 药水）：左手 WASD + Q 药水；右手 J K L 主排
+        // + U O 上排 + H 下探包揽全部战斗技能，I 页签、P/Esc/Tab 菜单也在右手；
+        // 十字键（低频，菜单里用）放左手 WASD 下方 F/V/C/B。
+        // 功能语义是暗黑3主机版官方布局（✕=主攻、R2=副攻、□△○=技能位）。
         return new CheatCard[]
         {
             new CheatCard("基础移动", red,
                 new CheatRow("ps:stick_l", "pc:W pc:A pc:S pc:D", "左摇杆移动：走路、走位全靠它，按住别放"),
-                new CheatRow("ps:stick_r", "pc:Up pc:Down pc:Left pc:Right", "右摇杆翻滚闪避：往推的方向滚出一段，主机版独有动作"),
+                new CheatRow("ps:stick_r", "pc:Up pc:Down pc:Left pc:Right", "右摇杆翻滚闪避 = 方向键：往推的方向滚出一段；闪避锁在摇杆通道，键盘改不了别的键"),
                 new CheatRow("ps:options", "pc:Tab", "暂停菜单：难度、技能、装备、退出都在这"),
                 new CheatRow("ps:L3 ps:R3", "pc:Z pc:X", "按下左 / 右摇杆：走跑切换等，保留游戏默认没改")),
 
             new CheatCard("攻击与技能", red,
-                new CheatRow("ps:cross", "pc:Space", "✕ 主要攻击：连按或长按；菜单里同时是确认键"),
-                new CheatRow("ps:R2", "pc:O", "R2 次要攻击：一般是输出主力，可长按连放"),
-                new CheatRow("ps:square ps:triangle", "pc:J pc:K", "□（J）与 △（K）：两个技能位"),
-                new CheatRow("ps:circle", "pc:L", "○（L）：第三个技能位；菜单里当返回 / 取消")),
+                new CheatRow("ps:cross", "pc:J", "✕ 主要攻击：连按或长按；菜单里同时是确认键"),
+                new CheatRow("ps:R2", "pc:K", "R2 次要攻击：一般是输出主力，可长按连放"),
+                new CheatRow("ps:square", "pc:L", "□（L）：技能位，home row 中指原位"),
+                new CheatRow("ps:triangle ps:circle", "pc:U pc:O", "△（U）与 ○（O）：技能位；○ 在菜单里兼返回 / 取消"),
+                new CheatRow("ps:L2", "pc:H", "L2（H）：第四技能 / 功能键，食指下探")),
 
-            new CheatCard("肩键与十字键", Gold,
-                new CheatRow("ps:L1 ps:R1", "pc:Q pc:E", "L1 / R1：背包、技能、随从、任务页签左右翻"),
-                new CheatRow("ps:L2", "pc:U", "L2（U）：扳机键，技能位，功能照游戏内屏幕提示"),
-                new CheatRow("ps:dpad", "pc:1 pc:2 pc:3 pc:4", "十字键上右下左 = 1 2 3 4：游戏里挑新掉落的装备、菜单导航")),
+            new CheatCard("左手区：移动与药水", Gold,
+                new CheatRow("ps:stick_l", "pc:W pc:A pc:S pc:D", "左摇杆移动：走路、走位全靠它，按住别放"),
+                new CheatRow("ps:L1", "pc:Q", "L1（Q）：治疗药水——左手 WASD 边上，不用挪手"),
+                new CheatRow("ps:L3 ps:R3", "pc:Z pc:X", "按下左右摇杆：走跑切换等，左手小指区，保留游戏默认"),
+                new CheatRow("ps:dpad", "pc:F pc:V pc:C pc:B", "十字键（上右下左 = F B V C）：菜单导航、挑新掉落的装备——菜单里左手闲着，WASD 下方顺手")),
 
-            new CheatCard("界面与系统", cyan,
+            new CheatCard("右手区：菜单与界面", cyan,
+                new CheatRow("ps:R1", "pc:I", "R1（I）：背包、技能、随从、任务页签翻动"),
                 new CheatRow("ps:touchpad", "pc:P pc:Esc", "触摸板左半 = P、右半 = Esc：背包、角色与系统界面"),
                 new CheatRow("ps:options", "pc:Tab", "OPTIONS = Tab：暂停 + 存档、难度与技能管理"),
                 new CheatRow("ps:share", "—", "SHARE 键未绑定键盘；截图用系统的截图键")),
 
             new CheatCard("一句话速记", Gold,
-                new CheatRow("ps:stick_l ps:stick_r", "pc:W pc:A pc:S pc:D pc:Up pc:Down pc:Left pc:Right", "WASD 走路，方向键翻滚"),
-                new CheatRow("ps:square ps:triangle ps:circle ps:cross", "pc:J pc:K pc:L pc:Space", "J K L 空格 = □△○✕：技能、技能、返回、主攻"),
-                new CheatRow("ps:R2 ps:L2", "pc:O pc:U", "O 副攻，U 技能"),
-                new CheatRow("ps:L1 ps:R1 ps:options", "pc:Q pc:E pc:Tab", "Q E 翻页签，Tab 暂停")),
+                new CheatRow("ps:stick_l ps:L1", "pc:W pc:A pc:S pc:D pc:Q", "左手：WASD 走位，Q 喝药"),
+                new CheatRow("ps:cross ps:R2 ps:square", "pc:J pc:K pc:L", "右手：J 主攻、K 副攻、L 技能"),
+                new CheatRow("ps:triangle ps:circle ps:L2", "pc:U pc:O pc:H", "U O H 补技能"),
+                new CheatRow("ps:stick_r", "pc:Up pc:Down pc:Left pc:Right", "方向键翻滚闪避")),
 
             new CheatCard("移植器画面菜单", cyan,
                 new CheatRow("ps:R3 + ps:L2", "pc:Insert", "游戏内按 Insert（或 R3+L2）打开移植器画面菜单：分辨率、帧率"),
@@ -1293,7 +1304,7 @@ class Launcher : Form
                 {
                     Log("自动检测：使用游戏自己的画面设置");
                 }
-                Log("键位注入（战神3方案）：" + Sanctuary.KeyMapOf());
+                Log("键位注入（人体工程学方案）：" + Sanctuary.KeyMapOf());
                 SetStatus("游戏运行中…首次启动要多等一会儿", Ok);
                 int code = RunGame(exePath);
                 Log("游戏退出，退出码 0x" + ((uint)code).ToString("X8") + "，启动器随之退出");
@@ -1516,9 +1527,9 @@ class Launcher : Form
 
     static void Log(string msg)
     {
-        // 启动器自己的日志也转推一份到主窗口控制台（▪ 前缀区分来源），
-        // 玩家不用开记事本就能看完整启动链
-        PushConsole("▪ " + msg);
+        // 启动器自己的日志（启动参数、画面探测、DPI、布局方案这类技术细节）只写
+        // 运行日志.txt，不刷到主窗口控制台——GUI 控制台只转发 run.py 与移植器的
+        // 实时输出，玩家点「打开运行日志」才能看到技术细节（2026-11-13 用户定案）。
         try
         {
             lock (logGate)
@@ -1973,30 +1984,41 @@ class Launcher : Form
             }
         }
 
-        // ---------- 键位表（按战神III重制版方案，2026-11-13 用户定案） ----------
+        // ---------- 键位表（人体工程学版，2026-11-13 用户第五轮定案） ----------
+        // 设计原则（用户定案）：这是手柄的重新映射，纯键盘、左右手分工——
+        //   左手只管移动（WASD）和喝药（Q，WASD 边上不挪手），全部战斗技能在右手；
+        //   技能放左手数字键 = 打怪时左手顾不上，明确禁止。PC 版社区的 1234 键位
+        //   是鼠标操作的键位，不适用于本移植版。
+        // 喝药键：整合包自带说明本来就是「Q = L1 药水」，重排时被改成空格，
+        //   2026-11-13 用户纠正改回 Q，与整合包说明和玩家习惯一致。
+        // 右手技能圈：J K L 主排（食指/中指/无名指不用挪位）+ U O 上排（中指/无名指上探）
+        //   + H 下探（食指）；菜单与界面键也在右手（I 页签、P/Esc、Tab）。
+        // 闪避绑不了别的键：主机版闪避锁死在右摇杆，移植器按钮表（18 个物理按钮）
+        // 没有摇杆方向项，闪避的键盘键固定是方向键（右手区最右）。
         // 按钮名必须是移植器认识的（二进制按钮表实测：cross circle square triangle
         // l1 r1 l2 r2 l3 r3 options touchpad touchpad_left touchpad_right up down left right），
         // 不认识的名字会被移植器忽略并记 "pad map: ignored"。
-        // 动作语义照暗黑3主机版官方布局：✕=主要攻击、R2=次要攻击、□△○=三个技能位、
-        // L1/R1=菜单页签左右翻、十字键=拾取装备轮换、右摇杆=翻滚闪避。
-        // l3/r3 故意不列：保留移植器默认 Z/X（走跑切换等暗黑3实用功能）。
+        // l3/r3 故意不列：保留移植器默认 Z/X（走跑切换，左手小指区，移动相关）。
         static readonly string[,] Actions =
         {
-            { "square", "J" },
-            { "triangle", "K" },
-            { "circle", "L" },
-            { "cross", "Space" },
-            { "l1", "Q" },
-            { "r1", "E" },
-            { "l2", "U" },
-            { "r2", "O" },
+            // 注意：键名不能带空格！"Mouse Left" 这种全称会把暗黑3 probe 的键位解析器
+            // 直接搞崩（guest 崩溃，实测 2026-11-13；战神3版本没这问题）。键名只用
+            // 单词键名：单字母、Space、Escape、Tab 这类。
+            { "square", "L" },              // □ 技能位 → L（home row，中指原位）
+            { "triangle", "U" },            // △ 技能位 → U（上排）
+            { "circle", "O" },              // ○ 技能位 / 菜单返回
+            { "cross", "J" },               // ✕ 主要攻击
+            { "l1", "Q" },                  // 药水：Q（整合包说明的键，左手 WASD 边上不挪手）
+            { "r1", "I" },                  // 页签
+            { "l2", "H" },                  // 技能4 / 功能键（食指下探）
+            { "r2", "K" },                  // R2 次要攻击
             { "options", "Tab" },
             { "touchpad_left", "P" },
             { "touchpad_right", "Escape" },
-            { "up", "1" },
-            { "down", "3" },
-            { "left", "4" },
-            { "right", "2" }
+            { "up", "F" },                  // 十字键（菜单导航/轮换装备，低频）放左手边缘 F V C B：
+            { "down", "V" },                // 菜单里左手闲着，WASD 下方一排顺手
+            { "left", "C" },
+            { "right", "B" }
         };
 
         // 传给移植器的键位映射串：square=J,triangle=K,...（与战神3启动器同格式）

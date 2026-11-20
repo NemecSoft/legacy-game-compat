@@ -1,0 +1,5 @@
+﻿运行日志：出问题时把这个文件发给管理员
+2026-11-13 05:21:26  启动参数：（无）；父进程：everything；零交互：否
+2026-11-13 05:21:26  启动 战神III 重制版｜桌面 1920×1080（EnumDisplaySettings）｜DPI 1｜按键 square=J,triangle=K,circle=L,cross=Space,l1=Q,r1=E,l2=U,r2=O,l3=None,r3=None,rage=F,options=Tab,touchpad_left=None,touchpad_right=Escape,up=1,down=3,left=4,right=2,grab=I,dodge=Left Shift,weapon_next=None,weapon_prev=None
+2026-11-13 05:21:31  打开完整按键速查窗口（普通窗口，非模态，位置错开主窗口）
+2026-11-13 05:21:31  详细按键窗口：962×985，内容高 946，视口 953，需滚动 0px

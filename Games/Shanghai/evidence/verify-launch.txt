@@ -1,0 +1,4 @@
+==== 实测 2026-11-15 14:46:35 ====
+[启动前] 桌面 1920x1080 (VideoController 读数 x@)
+[游戏运行中] 桌面 800x600 (VideoController 读数 x@)
+[启动器退出后] 桌面 1920x1080 (VideoController 读数 x@)
