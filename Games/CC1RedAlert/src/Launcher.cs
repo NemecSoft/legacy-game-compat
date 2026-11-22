@@ -74,22 +74,15 @@ class Launcher : Form
     // ---------- launcher.ini 可覆盖 ----------
     string gameTitle = "命令与征服：红色警戒1复刻版-网吧联机版";
     string gameSubtitle = "OpenRA playtest-20261026 · 简体中文便携整合版";
+    // 用户定案 2026-11-21：分层小标题（单机玩/联机玩）+ 内容一件事一句，不硬换行劈句
     string intro =
-        "本游戏包含所有红色警戒1内容：\n" +
-        "本体 + 危机反击 Counterstrike\n" +
-        "+ 劫后余生 The Aftermath\n" +
-        "+ OpenRA 扩展任务。\n" +
-        "\n" +
-        "单机玩：单人游戏 -\n" +
-        "遭遇战或战役任务。\n" +
-        "\n" +
-        "联机玩：\n" +
-        "主机：多人游戏 - 创建 -\n" +
-        "更换底图 - 创建。\n" +
-        "客机：多人游戏 - 找到主机\n" +
-        "双击加入。\n" +
-        "设置和存档都在游戏文件夹内，\n" +
-        "移动或备份时保留整个文件夹。\n" +
+        "本游戏包含所有红色警戒1内容：本体 + 危机反击 Counterstrike + 劫后余生 The Aftermath + OpenRA 扩展任务。\n" +
+        "# 单机玩：\n" +
+        "单人游戏 - 遭遇战或战役任务。\n" +
+        "# 联机玩：\n" +
+        "主机：多人游戏 - 创建 - 更换底图 - 创建。\n" +
+        "客机：多人游戏 - 找到主机双击加入。\n" +
+        "设置和存档都在游戏文件夹内，移动或备份时保留整个文件夹。\n" +
         "\n" +
         "# 玩不了或报错\n" +
         "点「打开运行日志」把内容发给我们";
@@ -134,11 +127,12 @@ class Launcher : Form
     static readonly CheatRow[] QuickRows =
     {
         new CheatRow("—", "pc:Mouse1 pc:Mouse2", "选择 / 框选 / 放置建筑；移动 / 攻击"),
-        new CheatRow("—", "pc:Mouse3 pc:WheelUp pc:WheelDown", "中键平移视野；滚轮放大 - 缩小界面"),
+        new CheatRow("—", "pc:Mouse3 pc:WheelUp pc:WheelDown", "中键平移；滚轮放大 - 缩小界面"),
         new CheatRow("—", "pc:A pc:S pc:D pc:F", "攻击移动 / 停止 / 警戒 / 部署"),
         new CheatRow("—", "pc:Q pc:W", "选全部作战单位 / 同类单位"),
         new CheatRow("—", "pc:Up pc:Down pc:Left pc:Right pc:H pc:Space", "移视野 / 回基地 / 最近事件"),
         new CheatRow("—", "pc:Ctrl pc:1", "Ctrl+数字编队，数字选编队"),
+        new CheatRow("—", "pc:E pc:R pc:T pc:Y", "建造分类：建筑 / 防御 / 步兵 / 车辆"),
         new CheatRow("—", "pc:F1 pc:F12", "F1–F12 生产栏快捷键"),
         new CheatRow("—", "pc:Esc", "菜单：目标 / 保存 / 读取 / 设置"),
         new CheatRow("—", "pc:Ctrl pc:P pc:Enter pc:M", "截图 / 快速保存(小键盘) / 静音")
@@ -334,7 +328,7 @@ class Launcher : Form
         MakeFonts();
         Keycaps.Configure(dpi, fCap, fCapZh);
         Rectangle wa = Screen.PrimaryScreen.WorkingArea;
-        ClientSize = new Size(Math.Min(S(900), wa.Width - S(30)), Math.Min(S(620), wa.Height - S(30)));
+        ClientSize = new Size(Math.Min(S(1188), wa.Width - S(30)), Math.Min(S(620), wa.Height - S(30)));
     }
 
     protected override void OnHandleCreated(EventArgs e)
@@ -361,8 +355,9 @@ class Launcher : Form
         fRowSel = new Font(ui, 10f * dpi, FontStyle.Bold);
         fRow = new Font(ui, 10f * dpi, FontStyle.Regular);
         fBody = new Font(ui, 9.5f * dpi, FontStyle.Regular);
-        fCap = new Font(ui, 9f * dpi, FontStyle.Bold);
-        fCapZh = new Font(ui, 8.5f * dpi, FontStyle.Bold);
+        // 用户定案 2026-11-21：右栏键帽字加大两号（小五 9pt → 小四 12pt），左栏字号不动
+        fCap = new Font(ui, 12f * dpi, FontStyle.Bold);
+        fCapZh = new Font(ui, 10.5f * dpi, FontStyle.Bold);
         fMono = new Font(mono, 9f * dpi, FontStyle.Regular);
         fBrand = new Font(ui, 12f * dpi, FontStyle.Bold);
     }
@@ -388,7 +383,9 @@ class Launcher : Form
     void LayoutRects()
     {
         int pad = S(20), gut = S(16);
-        int c1 = S(252), c2 = S(296);
+        // 用户定案 2026-11-20：左右同宽加宽（c3 自动等于 c1），键帽与说明同行；
+        // 2026-11-21 帽字加大两号后实测九行最宽需内宽 380（行9），400→410
+        int c1 = S(410), c2 = S(296);
         int c3 = ClientSize.Width - pad * 2 - c1 - c2 - gut * 2;
         int top = S(88), bottom = ClientSize.Height - S(68);
         colLeft = new Rectangle(pad, top, c1, bottom - top);
@@ -537,35 +534,59 @@ class Launcher : Form
         // 表的看法写在右栏自己头上（一行就够；不写翻页提示）
         if (InViewport(y, headH, top, bottom))
             TextRenderer.DrawText(g, "操作说明 · 默认「现代」方案", fHead, new Point(x, y), Gold, Color.Transparent);
-        y += headH + S(4);
+        y += headH + S(6);
         int lh = TextRenderer.MeasureText(g, "国", fBody).Height;
-        int capH = S(20);
+        int capH = S(26);   // 12pt 键帽字配 26px 帽高（用户定案 2026-11-21 加大两号）
+        int row = 0, wraps = 0;
         foreach (CheatRow r in QuickRows)
         {
-            int gw = Keycaps.GroupWidth(g, r.Glyph, capH);
-            if (InViewport(y, capH, top, bottom))
+            row++;
+            // 横排：键帽 + 说明同一行（用户定案 2026-11-20）。
+            // 纯 PC 游戏的手柄占位符不画，把宽度让给说明。
+            bool hasGlyph = r.Glyph != "—";
+            int gw = hasGlyph ? Keycaps.GroupWidth(g, r.Glyph, capH) : 0;
+            int keysW = (hasGlyph ? gw + S(6) : 0) + Keycaps.GroupWidth(g, r.Pc, capH);
+            int textX = x + keysW + S(8);
+            string[] lns = WrapLines(g, r.Text, w - keysW - S(8), fBody);
+            wraps += lns.Length - 1;
+            int rowH = Math.Max(capH, lns.Length * lh);
+            if (InViewport(y, rowH, top, bottom))
             {
-                Keycaps.DrawGroup(g, r.Glyph, x, y, capH, false);
-                Keycaps.DrawGroup(g, r.Pc, x + gw + S(6), y, capH, true);
+                if (hasGlyph) Keycaps.DrawGroup(g, r.Glyph, x, y, capH, false);
+                Keycaps.DrawGroup(g, r.Pc, x + (hasGlyph ? gw + S(6) : 0), y, capH, true);
+                int ty = y + Math.Max(0, (capH - lns.Length * lh) / 2);
+                foreach (string ln in lns)
+                {
+                    TextRenderer.DrawText(g, ln, fBody, new Point(textX, ty), Ink, Color.Transparent);
+                    ty += lh;
+                }
             }
-            y += capH + S(1);
-            foreach (string ln in WrapLines(g, r.Text, w, fBody))
-            {
-                if (InViewport(y, lh, top, bottom))
-                    TextRenderer.DrawText(g, ln, fBody, new Point(x, y), Ink, Color.Transparent);
-                y += lh;
-            }
-            y += S(2);
+            LogRightRow(row, keysW, lns.Length);
+            y += rowH + S(10);
         }
-        // 用户定案（2026-11-20）：右栏补一条模式切换提示（菜单路径，不是按键，不套键帽）
-        foreach (string ln in WrapLines(g, "游戏内「设置 - 操作性」可选择经典和现代操作模式。", w, fBody))
+        // 模式切换提示（菜单路径，不是按键，不套键帽）
+        foreach (string ln in WrapLines(g, "游戏内「设置 - 操作性」可切换经典 / 现代操作。", w, fBody))
         {
             if (InViewport(y, lh, top, bottom))
                 TextRenderer.DrawText(g, ln, fBody, new Point(x, y), InkDim, Color.Transparent);
             y += lh;
         }
-        y += S(1);
+        LogRightWraps(wraps);
+        y += S(2);
         return y;
+    }
+
+    bool rightRowsLogged;
+    void LogRightRow(int row, int keysW, int lines)
+    {
+        if (rightRowsLogged) return;
+        Log("右栏行宽：行" + row + " 键帽=" + keysW + " 说明行数=" + lines);
+    }
+    void LogRightWraps(int wraps)
+    {
+        if (rightRowsLogged) return;
+        rightRowsLogged = true;
+        Log("右栏同行自检：折行=" + wraps);
     }
 
     void DrawRightScroll(Graphics g, int viewport, int contentH)
@@ -708,12 +729,10 @@ class Launcher : Form
             string line = head ? raw.Substring(2) : raw;
             while (line.Length > 0)
             {
-                int take = line.Length;
-                while (take > 1 && TextRenderer.MeasureText(g, line.Substring(0, take), f).Width > width)
-                    take--;
-                TextRenderer.DrawText(g, line.Substring(0, take), f, new Point(x, y), c, Color.Transparent);
+                int take = WrapTake(g, line, width, f);
+                TextRenderer.DrawText(g, line.Substring(0, take).TrimEnd(), f, new Point(x, y), c, Color.Transparent);
                 y += lh;
-                line = line.Substring(take);
+                line = line.Substring(take).TrimStart();
             }
         }
         return y;
@@ -731,11 +750,9 @@ class Launcher : Form
                 string line = raw.StartsWith("# ") ? raw.Substring(2) : raw;
                 while (line.Length > 0)
                 {
-                    int take = line.Length;
-                    while (take > 1 && TextRenderer.MeasureText(g, line.Substring(0, take), font).Width > width)
-                        take--;
+                    int take = WrapTake(g, line, width, font);
                     total += lh;
-                    line = line.Substring(take);
+                    line = line.Substring(take).TrimStart();
                 }
             }
             return total;
@@ -1514,14 +1531,26 @@ class Launcher : Form
             if (line.Length == 0) { res.Add(""); continue; }
             while (line.Length > 0)
             {
-                int take = line.Length;
-                while (take > 1 && TextRenderer.MeasureText(g, line.Substring(0, take), font).Width > width)
-                    take--;
-                res.Add(line.Substring(0, take));
-                line = line.Substring(take);
+                int take = WrapTake(g, line, width, font);
+                res.Add(line.Substring(0, take).TrimEnd());
+                line = line.Substring(take).TrimStart();
             }
         }
         return res.ToArray();
+    }
+
+    // 兜底折行取字符数：优先断在空格、英文单词不劈半（Counterstrik/e 被用户点名过）；中文没空格按字符断
+    static int WrapTake(Graphics g, string line, int width, Font f)
+    {
+        int take = line.Length;
+        while (take > 1 && TextRenderer.MeasureText(g, line.Substring(0, take), f).Width > width)
+            take--;
+        if (take < line.Length)
+        {
+            int sp = line.LastIndexOf(' ', take - 1);
+            if (sp > 0 && line.Substring(0, sp).TrimEnd().Length > 0) take = sp;
+        }
+        return take;
     }
 
     // ==========================================================================

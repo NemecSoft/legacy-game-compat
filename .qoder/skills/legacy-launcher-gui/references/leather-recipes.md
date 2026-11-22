@@ -199,21 +199,33 @@ void Body(Graphics g, string text, Rectangle r, Color color)
         bool head = raw.StartsWith("# ");
         Font f = head ? fHead : fBody;
         string line = head ? raw.Substring(2) : raw;
-        while (line.Length > 0)                       // 中文没空格，按字符折行（只当兜底）
+        while (line.Length > 0)                       // 兜底折行：优先断空格保英文单词整，中文没空格按字符断
         {
             int take = line.Length;
             while (take > 1 && TextRenderer.MeasureText(g, line.Substring(0, take), f).Width > r.Width)
                 take--;
-            TextRenderer.DrawText(g, line.Substring(0, take), f, new Point(r.Left, y),
+            if (take < line.Length)
+            {
+                int sp = line.LastIndexOf(' ', take - 1);
+                if (sp > 0 && line.Substring(0, sp).TrimEnd().Length > 0) take = sp;
+            }
+            TextRenderer.DrawText(g, line.Substring(0, take).TrimEnd(), f, new Point(r.Left, y),
                 head ? Gold : color, Color.Transparent);
             y += lh;
-            line = line.Substring(take);
+            line = line.Substring(take).TrimStart();
         }
     }
 }
 ```
 
-- 按字符折行会断词（`Esc 退` + 换行 + `出`），所以**每条独立信息自带换行**，折行只当兜底。
+- 按字符折行会断词（`Esc 退` + 换行 + `出`），所以**每条独立信息自带换行**，折行只当兜底；
+  兜底真折时**优先断在空格**、英文单词不劈半（红警1 `Counterstrik/e` 被用户点名过），中文没空格才按字符断；
+  **空格优先限断点 12 字内**——中文段落里的孤立空格（「2009 年」）会让整行退回只剩一个数字；
+  中文按字符断还要**避头尾**（下一行行首不许是 `。，、；：！？）》」』】…—`）和**孤儿保护**
+  （数字/英文串不回退成整行孤悬，必要时断点后移、宁可超宽 1 字）。三连修样板：金刚狼 WrapTake。
+- **折行 take 逻辑全窗口单副本**（样板 `WrapTake`）：绘制 / 量高 / 折行数组三处调同一个函数；
+  三处各写循环必「改一漏二」（红警1 改空格优先时漏了左栏，坑 125）；`规范自检.ps1` 第 25 项扫多副本
+  （存量 15 游戏按规则 25 豁免，重做引入 WrapTake 自动收回检查）。
 - 放不下就删文案；不许缩到 9pt 以下、不许用省略号截断。
 - 右栏内容多时按整行排版，只画完整落在视口内的行（`InViewport`），配滚轮 + 自绘滚动条（见 §4 末）。
 - `TextRenderer.MeasureText` 与 `Graphics.MeasureString` 结果不同，同一处别混用两套。
@@ -550,9 +562,27 @@ void KeyRow(Graphics g, string caption, string[] caps, int x, int y, int labelW)
   `Shift`/`Alt`/`Home` 42、`Page Up`/`Insert` 60；两键并排留 4px，组间留 8px。
 - **一行里多个「标签 + 键帽」先量整组宽度，放不下整体换行**，绝不能裁掉键（等于给玩家错键位表，
   `Page Up` 这种宽键最容易顶爆右栏，踩过）。
-- 只有真键盘键才画键帽；鼠标 / 手柄输入写普通文字（`视角 鼠标`、`射击 鼠标左键`），
-  实现见 `Games\CS16\src\Launcher.cs` 的 `PlainItem`。
+- **鼠标 / 手柄键同样画拟物键帽**（硬约束 17；旧「只有真键盘键才画帽、鼠标手柄写普通文字」
+  规定已作废，`Games\CS16\src\Launcher.cs` 的 `PlainItem` 是存量旧做法，不要学）。
 - 键帽旁的说明用正常字号 `fRow` + `Ink`，**不要用 `InkDim` 压暗**。
+
+### 右栏横排同行（红警1复刻版用户定案 2026-11-20/21）
+
+用户原话：「按键和说明，在一行，不要这样2行，看着费劲」「左右的宽度还是要保持一致」
+「右边按键的字太小了，加大2个号。左边可以不变。」
+
+- 排版：键帽组在左、说明在右**同一行**；纯 PC 游戏手柄列 `Glyph="—"` 占位不画、省宽度。
+  `keysW = Keycaps.GroupWidth(g, r.Pc, capH)`；`textX = x + keysW + S(8)`；说明 `WrapLines` 兜底；
+  `rowH = Max(capH, 行数 * lh)`；说明垂直居中 `ty = y + Max(0, (capH - 行数*lh)/2)`；行距 S(10)。
+- 帽字字号由宿主 `Keycaps.Configure(dpi, fCap, fCapZh)` 注入（红警1：12pt / 窄帽 10.5pt、帽高 S(26)）；
+  **Keycaps.cs 与 templates 字节一致，不许私有改字号**。
+- **栏宽实测定，不估**：TextRenderer 量每行说明宽 + `GroupWidth` 量键帽组宽，
+  需内宽 = 键帽组 + S(8) + 说明宽，取各行最大（红警1 实测 380 → 栏宽 410、内宽 382）。
+  估算连错两轮（帽字 9pt→12pt 后键帽组变宽），实测才一次定准。
+- 左右同宽：`c1 = S(410)`，c3 由 `ClientSize.Width - pad*2 - c1 - c2 - gut*2` 自动等于 c1；
+  窗口 `ClientSize = S(1188)×S(620)`（用户定案覆盖 900×620 基准；左右栏必须同宽）。
+- 自证：日志 `右栏行宽：行N 键帽=… 说明行数=…` + `右栏同行自检：折行=0`；
+  ui-shot 断言折行=0（说明折行就红）。样板 `Games\CC1RedAlert\src\Launcher.cs` 的 DrawRightContent。
 
 ## 6. 按钮
 

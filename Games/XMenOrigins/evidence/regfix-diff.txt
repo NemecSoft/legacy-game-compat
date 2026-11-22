@@ -1,0 +1,26 @@
+reg.fix.exe 动态取证摘要（2026-11-21）
+========================================
+方法：reg export 三个区域（HKLM\SOFTWARE\WOW6432Node、HKLM\SOFTWARE、HKCU\Software）
+运行前/后快照 → 逐键 diff。快照原文件已在取证后清理，本文件保留结论。
+
+reg.fix.exe 的真实行为（唯一有效键）：
+  HKLM\SOFTWARE\WOW6432Node\Activision\Wolverine
+    EXEString (REG_SZ) = "D:\YunGame\M\X-MenOrigins-Wolverine\Binaries\Wolverine.exe"
+  （值是带双引号的 exe 全路径；运行前已存在同样的值——reg.fix 就是把路径写死进注册表）
+
+其余差异 4 条全部是 Windows 自身噪声（Notifications\Data、Schedule\TaskCache），与游戏无关：
+  HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Notifications\Data（系统通知缓存）
+  HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks\{67C2...}（计划任务动态信息）
+HKCU\Software 无任何差异。
+
+静态分析补充：
+  reg.fix.exe = UPX 壳（UPX0/UPX1 节）→ upx -d 解出 696KB 的 AutoIt v3 编译体
+  （导入 Software\AutoIt v3\AutoIt、RegSetValueExW 等），脚本体二次加密，
+  autoit-ripper 的 EA05/EA06/JB01 解包均失败 → 改用动态 diff，结论如上。
+
+init.exe（用户要求默认执行，启动器已实现）：
+  WinRAR SFX（PDB sfxrar.pdb），SFX 配置：
+    Path=C:\Users\Administrator\Documents\Wolverine\WGame
+    Silent=1  Overwrite=2（跳过已存在，不覆盖玩家存档）
+  运行后解出的内容 = 11 个 Config ini（WEngine/WGame/WInput/...）+ SaveData\Player.wgameprofile。
+  写死用户名路径的问题由启动器动态修正（补到当前用户「我的文档\Wolverine」，只补缺不覆盖）。

@@ -1,4 +1,4 @@
-PASS  A1 直接子进程  游戏 pid=15720 父 pid=15248 启动器 pid=15248
+PASS  A1 直接子进程  游戏 pid=22920 父 pid=22956 启动器 pid=22956
 PASS  A2 关窗陪跑  关窗=True 启动器活着=True 游戏活着=True
 PASS  A3 退出码回传  退出码=7（期望 7）
 PASS  A4 启动参数契约  假游戏命令行=CMD="D:\AI\legacy-game-compat\Games\CC1RedAlert\tools\hostsim-run\Engine\RedAlert.exe" Game.Mod=ra "Engine.LaunchPath=D:\AI\legacy-game-compat\Games\CC1RedAlert\tools\hostsim-run\Engine\RedAlert.exe"
@@ -14,4 +14,4 @@ PASS  E1 节头后补 Name 行  Player 行=2 下一行=	Name: DESKTOP-40VD6KN
 PASS  E2 补行日志自证  新日志含补行行=True
 PASS  F1 末尾补 Player 节  尾部匹配=True 原内容保留=True
 PASS  F2 补节日志自证  新日志含补节行=True
-host-sim 结果：失败 0 项  2026-11-20 15:57:19
+host-sim 结果：失败 0 项  2026-11-21 07:20:07

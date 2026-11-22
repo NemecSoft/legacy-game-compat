@@ -1,0 +1,14 @@
+PASS  A1 直接子进程  游戏 pid=18484 父 pid=16168 启动器 pid=16168
+PASS  A2 关窗陪跑  关窗=True 启动器活着=True 游戏活着=True
+PASS  A3 退出码回传  退出码=7（期望 7）
+PASS  A4 直接启动无参数  假游戏命令行=[]
+PASS  A5 工作目录 = 游戏目录  CWD=D:\AI\legacy-game-compat\Games\Dune2000Remake\tools\hostsim-run 期望=D:\AI\legacy-game-compat\Games\Dune2000Remake\tools\hostsim-run
+PASS  C1 绝对路径改回相对 data  dataDir=data（期望 data）
+PASS  C2 只改 dataDir 一行  逐字一致=True 长度 148→84
+PASS  C3 便携化日志自证  新日志含便携化行=True
+PASS  B1 强杀后仍读到游戏码  读到=True 游戏码=7（期望 7，游戏自然退出未被连带杀掉）
+PASS  D1 别的数据目录保留不动  dataDir=C:\DuneData-Elsewhere（期望 C:\DuneData-Elsewhere）
+PASS  D2 保留日志自证  新日志含保留行=True
+PASS  E1 相对路径字节不动  长度 63→63 逐字节相同=True
+PASS  E2 相对路径日志自证  新日志含相对路径行=True
+host-sim 结果：失败 0 项  2026-11-22 17:56:09

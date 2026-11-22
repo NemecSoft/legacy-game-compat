@@ -659,16 +659,110 @@ uint 退码溢出 / open wb 截断）；③ 实现 = `--checkfiles --readings --
 `Player: Name:` 行——只改这一行、保留原换行与缩进、幂等（相同不动）；缺文件 / 缺行 / 缺节
 三种边界自动补。GUI 与 `--go` 同一条路径。
 
-**右栏一屏（用户定案）**：「这个右侧说明一屏就行，不要单独开窗口了。」9 行键帽说明 +
-操作性提示实测 440px ≤ 视口 450px，删掉独立详细窗口 326 行；中栏改顶对齐消除垂直居中空洞。
-日志自证行「右栏按键表自检：行数=9 … 需要滚动=False」。
+**右栏一屏 + 横排同行（用户定案）**：「这个右侧说明一屏就行，不要单独开窗口了。」删掉独立详细窗口
+326 行；随后「按键和说明，在一行」「左右的宽度还是要保持一致」「右边按键的字太小了，加大2个号。
+左边可以不变」→ 窗口 1188×620、左右栏同宽 410、键帽与说明横排同行、帽字 12pt（帽高 26px，左栏字号不动）。
+栏宽由 GDI 实测十行「键帽组+8+说明」取最大 380 定（400 栏宽内宽 372 不够，末行折行）；
+内容 406px ≤ 视口 450px、折行=0。中栏顶对齐消除垂直居中空洞。
+2026-11-21 用户点名加 E/R/T/Y 建造分类行：本版本 `Engine\mods\ra\hotkeys.yaml` 明写
+Building:E / Defense:R / Infantry:T / Vehicle:Y，与社区 OpenRA 键表双重确认（原版 RA 的 Q/W/E/R 不适用）。
+同日左栏硬换行被点名：改一件事一句，再定案分层小标题（单机玩：/联机玩：独立行，主机/客机各单行）；
+兜底折行优先断空格、英文单词不劈半，折行 take 逻辑抽 WrapTake 单副本（规范自检第 25 项、坑 125）。
+日志自证行「右栏按键表自检：行数=10 … 需要滚动=False」「右栏同行自检：折行=0」。
 
 **验证（不真启动）**：host-sim 16/16（托管契约四条 + 参数 / CWD + 机器名六边界）、
-switch-test 7/7（checkfiles / readings / selftest / wer 中英文）、ui-shot 5/5
-（居中 / 单窗口 / 一屏 / Esc 退码 0）。Esc 键断言踩坑 123：SendMessage 绕过 ProcessCmdKey、
+switch-test 7/7（checkfiles / readings / selftest / wer 中英文）、ui-shot 6/6
+（无残留 / 居中 / 单窗口 / 一屏 / 同行折行 0 / Esc 退码 0）。Esc 键断言踩坑 123：SendMessage 绕过 ProcessCmdKey、
 keybd_event 依赖前台，最终 PostMessageW 进线程队列。
 
-**自净（规则 38 四件）**：① 检查 = ui-shot 右栏一屏断言 + 规范自检第 24 项（SendMessage 键注入报红）；
-② 规范 = 硬约束 20「先估一屏」、leather-recipes §4 顶对齐 / §9 键路线三取舍、pitfalls 123；
-③ 实现 = `LogRightTableFit` 自证行 + ui-shot PostMessage 键路线；④ 下次省掉 = 键断言直接抄
-PostMessage、中栏稀疏直接顶对齐、右栏 ≤450px 不做详细窗口（详见 `Games\CC1RedAlert\适配过程分析.md`）。
+**自净（规则 38 四件）**：① 检查 = ui-shot 右栏一屏 + 同行折行=0 断言 + 规范自检第 24 项（SendMessage 键注入报红）；
+② 规范 = 硬约束 20「先估一屏 + 横排同行 / 左右同宽 / 帽字按用户定案 + 栏宽实测」、
+leather-recipes §4 顶对齐 / §5 横排同行配方（并修掉「鼠标手柄写普通文字」旧漂移）/ §9 键路线三取舍、pitfalls 123；
+③ 实现 = `LogRightTableFit` / `右栏行宽` / `右栏同行自检` 自证行 + ui-shot PostMessage 键路线；
+④ 下次省掉 = 键断言直接抄 PostMessage、中栏稀疏直接顶对齐、右栏 ≤450px 不做详细窗口、
+栏宽直接 GDI 实测一次定准（省掉估算→编译→截图→折行→再改两轮）（详见 `Games\CC1RedAlert\适配过程分析.md`）。
+
+## 20. 命令与征服：泰伯利亚黎明复刻版（OpenRA playtest-20261026 整合版，2026-11-21）
+
+**目标**：给 `D:\YunGame\F\CC1-TiberianDawn` 写启动器（参考自带 启动游戏.exe）；操作说明用社区 OpenRA 键位。
+
+**取证**：自带启动器是 .NET 托管程序集（REA inspect_managed_artifact，IL-only x64，sha256 `ab20f32f…`）；
+UTF-16 串取证拿 `Game.Mod=` / `Engine.LaunchPath=` 拼接常量和 `TiberianDawn.exe` / `settings.yaml`。
+契约与红警1同款：`Engine\TiberianDawn.exe`、CWD=Engine、`Game.Mod=cnc Engine.LaunchPath="…"`。
+
+**方案**：以红警1启动器外科式移植（同引擎同 UI）：标题/介绍（GDI+Nod 战役 + 隐秘行动，来源 missions.yaml）、
+契约 cnc、RequiredFiles 13 项逐项核对存在、机器名写 settings.yaml 保留；键位十行逐条核对
+`mods\cnc\hotkeys.yaml` + `mods\common\hotkeys\*.yaml`（E/R/T/Y 页签、A/S/D/F、Q/W、H/空格/Home、Ctrl+数字、
+F1–F12、Esc、Ctrl+P/小键盘 Enter/M）；社区键表混原版 C&C 键（Q/W/E/R、Ctrl+Shift），只作口径佐证。
+
+**坑**：写 ini 时 python heredoc 把 Intro 字面 `\n` 写成真换行 → LoadIni 跳过续行，左栏静默只剩第一段
+（坑 6 复现，坑 126）；ui-shot 首轮 3 秒找不到窗口 → 等待放宽 5 秒。
+
+**验证**：ui-shot 6/6（居中 1194×649 偏移 0 / 单窗口 / 右栏 10 行 406≤450 折行 0 / Esc 退码 0）、
+host-sim 16/16（A4 契约 `Game.Mod=cnc`）、switch-test 7/7；规范自检 0 项。真启动待用户点头。
+
+**自净（规则 38 四件）**：① 检查 = 规范自检第 26 项（launcher.ini 每行必须「键=值」/注释/节头，真换行报红）；
+② 规范 = pitfalls 126；③ 实现 = 键位全部出自随包 hotkeys.yaml（适配分析逐行注明来源）；
+④ 下次省掉 = 多行值一律字面 `\n` 写一行、第 26 项部署前拦下，省掉「部署→截图缺段→回查解析」一轮（详见
+`Games\CC1TiberianDawn\适配过程分析.md`）。
+
+## 21. X战警前传：金刚狼（2009 UE3 硬盘版，2026-11-21）
+
+**目标**：给 `D:\YunGame\M\X-MenOrigins-Wolverine` 写启动器；分析自带 reg.fix.exe 并改成动态按所在目录写；
+init.exe 是默认初始化，启动时默认执行。
+
+**取证**：reg.fix.exe = UPX 壳 + AutoIt 加密脚本，autoit-ripper 解不开 → 动态法：`reg export` 三区域
+前后 diff，唯一有效键 `HKLM\SOFTWARE\WOW6432Node\Activision\Wolverine\EXEString`（REG_SZ，带引号的
+exe 全路径）。init.exe = WinRAR SFX（Path 写死 `C:\Users\Administrator\Documents\Wolverine\WGame`、
+Silent=1、Overwrite=2），包内容 = 存档目录初始 11 个 Config ini + SaveProfile。
+
+**方案**：以红警1启动器移植。启动前 `EnsureRegistry`（Registry32 视图动态写 EXEString，幂等，失败只记日志）
+→ `RunInitSilently`（每次启动默认执行 init.exe，执行后把写死路径内容**只补缺**到当前用户「我的文档」）
+→ 拉起 `Binaries\Wolverine.exe`（CWD=根目录、无参数，同自带 运行游戏.bat）。键位取自自带
+`WGame\Config\WInput.ini` 的 mButtonAliasPairs 映射（左键攻击/右键重击/空格跳/C 抓取/Z 格挡/Shift 技能/
+Q 冲刺/E 锁定/1 感知/2 收爪），右栏 8 行一屏（内容高 334≤450、折行 0）。
+
+**坑**：中文折行（三连修）：① 句号被甩成行首孤行 → WrapTake 避头尾；② 空格优先无距离限制，
+「2009 年」里的孤立空格把整行退回只剩「2009」→ 空格断点限 12 字内；③ 数字/英文串孤悬一行 →
+孤儿保护（断点推到空格后第一个字之后，宁可超宽 1 字）。
+同日用户定案：左栏只讲游戏介绍（年代/类型/汉化），操作全归右栏，不写存档说明。
+
+**验证**：ui-shot 6/6、host-sim 13/13（注册表写/幂等/纠正 + init 每次执行 + 托管契约四条）、
+switch-test 7/7、规范自检 0 项；测试注册表值 finally 还原。
+
+**自净（规则 38 四件）**：① 检查 = host-sim R1-R5/I1-I2 断言；② 规范 = 本 case + 配方 §3 避头尾；
+③ 实现 = `EnsureRegistry`/`RunInitSilently`/`MigrateHardcodedDocs` + `evidence\regfix-diff.txt`；
+④ 下次省掉 = 自带「注册表修复器」不再脱壳读脚本，直接 reg export 前后 diff（详见
+`Games\XMenOrigins\适配过程分析.md`）。
+
+## 22. 沙丘2000 重制版（OpenD2K 简体中文整合版，2026-11-22）
+
+**目标**：给 `D:\YunGame\F\dune2000Remake` 写启动器；左栏介绍与右栏操作说明参考
+https://github.com/OpenD2K/opend2k 的 README。用户明确：现代项目，不做绿色兼容。
+
+**取证**：主程序 `D2kRemake_TrustBox.exe`（x64 GUI，PE machine 0x8664 / subsystem 2）；
+自带 启动游戏.bat 直接 `start` 主程序（CWD=游戏目录、无参数），前后跑 `_1080p.ps1` 改
+`config\settings.ini` 并最大化窗口。settings.ini 是 UTF-8 无 BOM + LF，dataDir=data；
+游戏退出会把 dataDir 写回绝对路径（`_1080p.ps1` 注释与实测）。
+
+**方案**：以红警1启动器外科式移植（同三栏/键帽/托管契约）。直接 `CreateProcess` 主程序、
+无参数、CWD=游戏目录；**不复刻 `_1080p.ps1` 的窗口最大化 / 前台操作**（规则 44），
+也不改 fullscreen/resolution（玩家游戏内设置）。退出后 `RestorePortableDataDir`：
+只把「绝对路径 == 本目录 data」改回相对 `data`，其它行逐字不动（LF/无 BOM 保持），
+玩家把数据放别处时保留不动。文件检查 6 文件 + 3 目录。右栏 13 行键位表逐条照
+README Controls（默认「原版」方案），中栏无下拉框（只有一个启动方式，沿用红警1 2026-11-20 定案）；
+作弊键按用户 2026-11-22 定案补三行（F1 无限资源、F2 无限电量、F3 瞬间建造、F4 全图、F5 直接过关，
+每个功能名与键帽顺序对应，前缀「作弊 · 」+ 细线分界）。
+
+**坑**：左栏长句折出「对手。」孤行 → 按「一件事一句」重写 6 句；
+右栏行 1 说明超宽折行 → 去掉「(原版)」压短，折行 0；settings.ini 是 LF 无 BOM，
+还原 dataDir 时必须原样保留换行与 BOM 状态（host-sim C2/E1 断言逐字节）。
+
+**验证**：ui-shot 6/6（居中 1194×649 偏移 dx=0 dy=0.5 / 单窗口 / 右栏 13 行 436≤450 折行 0 / Esc 退码 0）、
+host-sim 13/13、switch-test 7/7；规范自检 0 项。真启动待用户点头。
+
+**自净（规则 38 四件）**：① 检查 = host-sim 的 dataDir C1/C2/D1/E1 + ui-shot 行数/折行断言；
+② 规范 = pitfalls 127（游戏回写绝对路径的还原口径）；③ 实现 = `RestorePortableDataDir` +
+`tools\host-sim.ps1` 假游戏验证；④ 下次省掉 = 现代重制版直接抄红警1 架构，数据目录便携化只还原
+「指向本目录」的那一个值，省掉「整份 ini 重写」误伤玩家设置的排查（详见
+`Games\Dune2000Remake\适配过程分析.md`）。

@@ -4,8 +4,9 @@
   2 主窗口屏幕居中：窗口中心与工作区中心偏移必须 ≤1
   3 只有一个窗口（用户定案 2026-11-20：右栏一屏放全说明，不开独立详细窗口）
   4 主窗口截图 evidence\ui-main.png
-  5 右栏一屏自证：日志「右栏按键表自检：行数=9 … 需要滚动=False」
-  6 Esc 关主窗口，启动器正常退出（退出码 0）
+  5 右栏一屏自证：日志「右栏按键表自检：行数=10 … 需要滚动=False」
+  6 右栏同行自证：日志「右栏同行自检：折行=0」（键帽与说明同一行，用户定案 2026-11-20）
+  7 Esc 关主窗口，启动器正常退出（退出码 0）
 
 用法：pwsh -NoProfile -File Games\CC1RedAlert\tools\ui-shot.ps1
 结论另存 evidence\ui-shot-result.txt（UTF-8），脚本退出码 = 失败项数。
@@ -98,8 +99,13 @@ try {
   $logText = if (Test-Path $logPath) { [IO.File]::ReadAllText($logPath, [Text.Encoding]::UTF8) } else { '' }
   $m = [regex]::Matches($logText, '右栏按键表自检：行数=(\d+) 内容高=(\d+) 视口高=(\d+) 需要滚动=(True|False)')
   $last = if ($m.Count -gt 0) { $m[$m.Count - 1] } else { $null }
-  $fitOk = $last -and $last.Groups[1].Value -eq '9' -and $last.Groups[4].Value -eq 'False'
-  Assert '右栏一屏放全（行数 9、需要滚动 False）' $fitOk $(if ($last) { "行数 $($last.Groups[1].Value) 内容高 $($last.Groups[2].Value) 视口高 $($last.Groups[3].Value) 需要滚动 $($last.Groups[4].Value)" } else { '日志里没有右栏自检行' })
+  $fitOk = $last -and $last.Groups[1].Value -eq '10' -and $last.Groups[4].Value -eq 'False'
+  Assert '右栏一屏放全（行数 10、需要滚动 False）' $fitOk $(if ($last) { "行数 $($last.Groups[1].Value) 内容高 $($last.Groups[2].Value) 视口高 $($last.Groups[3].Value) 需要滚动 $($last.Groups[4].Value)" } else { '日志里没有右栏自检行' })
+
+  # 键帽与说明同行（用户定案 2026-11-20）：任何一行说明折行都算失败
+  $mw = [regex]::Matches($logText, '右栏同行自检：折行=(\d+)')
+  $lastW = if ($mw.Count -gt 0) { $mw[$mw.Count - 1] } else { $null }
+  Assert '右栏键帽与说明同行（折行 0）' ($lastW -and $lastW.Groups[1].Value -eq '0') $(if ($lastW) { "折行=$($lastW.Groups[1].Value)" } else { '日志里没有右栏同行自检行' })
 
   # Esc 关主窗口（未启动游戏，应直接退出，退出码 0）。
   # 键消息 Post 进主窗口线程队列：WinForms 的 ProcessCmdKey 只在消息循环

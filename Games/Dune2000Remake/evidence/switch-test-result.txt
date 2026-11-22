@@ -1,0 +1,8 @@
+PASS  checkfiles 退出码与自证  rc=0 stdout=FILES OK 日志齐全=True
+PASS  readings 退出码与断言进日志  rc=0 全部合理=True
+PASS  selftest 退出码回传  rc=7（期望 7）
+PASS  wer 真实报告解析  报告=C:\ProgramData\Microsoft\Windows\WER\ReportQueue\AppCrash_Explorer.EXE_41eaa551f8dba27ef1f1f56cf7b03db09c7b9aab_12640bb9_e458600e-206e-4e70-9083-b14c9d5739c9\Report.wer 结论=崩溃捕获：异常码 0xc0000005，出错地址 +0x00000000000249fc，故障模块 PalmInputTSFCore.dll
+PASS  wer zh 样例  rc=0 结论=崩溃捕获：异常码 0xc0000005，出错地址 +0x00012345，故障模块 fake.dll
+PASS  wer en 样例  rc=0 结论=崩溃捕获：异常码 0xc0000005，出错地址 +0x00012345，故障模块 fake.dll
+PASS  日志参数自证  无路径转换警告=True 原始参数行齐全=True
+switch-test 结果：失败 0 项  2026-11-22 17:56:15

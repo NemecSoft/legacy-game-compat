@@ -525,6 +525,37 @@ foreach ($dir in $psDirs) {
   }
 }
 
+# ---------- 25) 折行 take 逻辑每文件单副本（2026-11-21 红警1复刻版踩过，坑 125） ----------
+# 绘制 DrawWrapped / 量高 MeasureWrappedHeight / 折行数组 WrapLines 三处各写一份折行循环，
+# 改空格优先折行时只改一处，左栏编译后截图不变。抽 WrapTake 三处共用才修齐。
+# 存量豁免（规则 25 已交付不返工）：下列游戏仍是旧多副本；哪个重做引入 WrapTake 就自动收回本检查。
+$wrapLegacy = @('CoD2','CoD5','CS16','DFBHD','DiabloIII','FiveStar','FutureSoldier','GodofWarIII','OnimushaWotS','PokemonSV','Prototype1','Prototype2','RoadRash','Shanghai','TheSaboteur')
+foreach ($f in (Get-ChildItem (Join-Path $root 'Games\*\src\*.cs') -File)) {
+  $lines = [IO.File]::ReadAllLines($f.FullName, [Text.Encoding]::UTF8)
+  $hits = @($lines | Where-Object { $_ -match 'take > 1 && TextRenderer\.MeasureText' })
+  if ($hits.Count -le 1) { continue }
+  $hasWrapTake = @($lines | Where-Object { $_ -match 'static int WrapTake\(' }).Count -gt 0
+  if (-not $hasWrapTake -and $wrapLegacy -contains $f.Directory.Parent.Name) { continue }
+  Add-Issue '折行逻辑多副本' $f.FullName ("折行 take 循环出现 " + $hits.Count + " 处；绘制/量高/折行数组须共用同一个 WrapTake，改一漏二必布局漂移（坑 125）")
+}
+
+# ---------- 26) launcher.ini 每行都是「键=值」或注释/节头（2026-11-21 泰伯利亚黎明踩过，坑 6 复现） ----------
+# 写 ini 时把 Intro 里的字面 \n 写成了真换行：后续行没有「=」、又被 LoadIni 当注释/无效行跳过，
+# 左栏静默只剩第一段。多行值必须用字面 \n 转义写在同一行。
+foreach ($f in (Get-ChildItem (Join-Path $root 'Games\*\src\launcher.ini') -File)) {
+  $bad = @()
+  $n = 0
+  foreach ($line in [IO.File]::ReadAllLines($f.FullName, [Text.Encoding]::UTF8)) {
+    $n++
+    $t = $line.Trim()
+    if ($t.Length -eq 0 -or $t.StartsWith(';') -or $t.StartsWith('#') -or $t.StartsWith('[')) { continue }
+    if ($t.IndexOf('=') -le 0) { $bad += $n }
+  }
+  if ($bad.Count -gt 0) {
+    Add-Issue 'ini 键值行残缺' $f.FullName ("第 " + ($bad -join '、') + " 行不是「键=值」（多行值用字面 \n 转义写一行，坑 6）")
+  }
+}
+
 # ---------- 输出 ----------
 if ($issues.Count -eq 0) { Write-Host '规范自检通过：0 项'; exit 0 }
 $rel0 = $root.TrimEnd('\') + '\'

@@ -5,4 +5,4 @@ PASS  wer 真实报告解析  报告=C:\ProgramData\Microsoft\Windows\WER\Report
 PASS  wer zh 样例  rc=0 结论=崩溃捕获：异常码 0xc0000005，出错地址 +0x00012345，故障模块 fake.dll
 PASS  wer en 样例  rc=0 结论=崩溃捕获：异常码 0xc0000005，出错地址 +0x00012345，故障模块 fake.dll
 PASS  日志参数自证  无路径转换警告=True 原始参数行齐全=True
-switch-test 结果：失败 0 项  2026-11-20 15:57:24
+switch-test 结果：失败 0 项  2026-11-21 07:20:17
